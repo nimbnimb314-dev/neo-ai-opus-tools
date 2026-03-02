@@ -3,21 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ご当地グルメナビ</title>
+<title>ご当地グルメナビ｜全国47都道府県のご当地グルメ検索</title>
+<meta name="description" content="全国47都道府県のご当地グルメ330品以上を収録。地方・都道府県・ジャンルで絞り込み、Googleマップで周辺の飲食店を探せます。旅行先のグルメ探しに。">
+<meta property="og:title" content="ご当地グルメナビ｜全国47都道府県のご当地グルメ検索">
+<meta property="og:description" content="全国47都道府県のご当地グルメ330品以上を収録。地方・都道府県・ジャンルで絞り込み、Googleマップで周辺の飲食店を探せます。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --primary:#ea580c;
-  --primary-hover:#c2410c;
-  --primary-light:#fff7ed;
-  --primary-pale:#fed7aa;
-  --accent:#dc2626;
-  --accent-light:#fef2f2;
-  --bg:#fffbf5;
+  --primary:#2a5298;
+  --primary-hover:#1e3f7a;
+  --primary-light:#e8eef8;
+  --primary-pale:#c8d6e5;
+  --accent:#3b82c4;
+  --accent-light:#e8f2fc;
+  --bg:#eaf0f7;
   --card:#ffffff;
   --text:#1e293b;
-  --text-light:#64748b;
-  --border:#e2e8f0;
+  --text-light:#546b8a;
+  --border:#c8d6e5;
   --shadow:0 1px 3px rgba(0,0,0,0.08);
   --radius:10px;
 }
@@ -31,7 +36,7 @@ body{
 
 /* ----- Header ----- */
 header{
-  background:linear-gradient(135deg,#ea580c,#f97316,#fb923c);
+  background:linear-gradient(135deg,#1e3a6e,#2a5298);
   color:#fff;
   text-align:center;
   padding:2rem 1rem 1.5rem;
@@ -51,22 +56,43 @@ header p{font-size:0.9rem;opacity:0.92}
   padding:1rem 1.2rem;
   margin-bottom:1.2rem;
 }
-.control-row{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:0.8rem;
+.region-filter{
+  display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;
 }
-.control-row label{font-weight:600;font-size:0.85rem;white-space:nowrap}
-.control-row select{
-  font-family:inherit;font-size:0.9rem;padding:0.5rem 0.7rem;
-  border:1px solid var(--border);border-radius:6px;
-  background:#fff;color:var(--text);cursor:pointer;min-width:160px;
+.region-filter-label{font-weight:600;font-size:0.85rem;margin-right:0.3rem}
+.region-btn{
+  font-family:inherit;font-size:0.85rem;padding:0.45rem 0.9rem;
+  border:1px solid var(--border);border-radius:20px;
+  background:#fff;color:var(--text);cursor:pointer;transition:all 0.15s;
+  font-weight:500;
 }
-.control-row select:focus{
-  outline:none;border-color:var(--primary);
-  box-shadow:0 0 0 3px rgba(234,88,12,0.15);
+.region-btn:hover{border-color:var(--primary);color:var(--primary)}
+.region-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* ----- Pref filter ----- */
+.pref-filter{
+  margin-top:0.8rem;
+  display:none;flex-wrap:wrap;gap:0.4rem;align-items:center;
 }
+.pref-filter.visible{display:flex}
+.pref-filter-label{font-weight:600;font-size:0.85rem;margin-right:0.3rem}
+.pref-btn{
+  font-family:inherit;font-size:0.82rem;padding:0.4rem 0.8rem;
+  border:1px solid var(--border);border-radius:20px;
+  background:#fff;color:var(--text);cursor:pointer;transition:all 0.15s;
+  font-weight:500;
+}
+.pref-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pref-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pref-btn.disabled{opacity:0.4;cursor:default;pointer-events:none}
+.pref-btn-all{
+  font-family:inherit;font-size:0.82rem;padding:0.4rem 0.8rem;
+  border:1px solid var(--primary);border-radius:20px;
+  background:var(--primary);color:#fff;cursor:pointer;transition:all 0.15s;
+  font-weight:600;
+}
+.pref-btn-all:hover{background:var(--primary-hover)}
+.pref-btn-all.inactive{background:#fff;color:var(--primary);border-color:var(--primary)}
 
 /* ----- Genre filter ----- */
 .genre-filter{
@@ -95,7 +121,10 @@ header p{font-size:0.9rem;opacity:0.92}
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius);box-shadow:var(--shadow);
   overflow:hidden;transition:transform 0.18s,box-shadow 0.18s;
+  opacity:0;transform:translateY(16px);
+  animation:cardIn 0.4s ease forwards;
 }
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 .spot-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.10)}
 .card-img-wrap{
   position:relative;width:100%;padding-top:56.25%;overflow:hidden;
@@ -119,7 +148,6 @@ header p{font-size:0.9rem;opacity:0.92}
 .card-area{font-size:0.78rem;color:var(--text-light);margin-bottom:0.35rem}
 .card-desc{
   font-size:0.82rem;color:var(--text-light);line-height:1.5;margin-bottom:0.7rem;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .card-map-link{
   display:inline-flex;align-items:center;gap:0.3rem;
@@ -134,6 +162,17 @@ header p{font-size:0.9rem;opacity:0.92}
 .empty-state .icon{font-size:2.5rem;margin-bottom:0.5rem}
 .empty-state p{font-size:0.95rem}
 
+/* ----- Featured sections ----- */
+.featured-section{margin-bottom:2rem}
+.featured-hd{
+  display:flex;align-items:center;gap:0.5rem;
+  margin-bottom:0.8rem;padding-bottom:0.5rem;
+  border-bottom:2px solid var(--primary);
+}
+.featured-hd-icon{font-size:1.3rem}
+.featured-hd-title{font-size:1.05rem;font-weight:700;color:var(--primary)}
+.featured-hd-sub{font-size:0.8rem;color:var(--text-light);margin-left:auto}
+
 footer{text-align:center;padding:1.5rem 1rem;font-size:0.75rem;color:var(--text-light)}
 </style>
 </head>
@@ -146,21 +185,18 @@ footer{text-align:center;padding:1.5rem 1rem;font-size:0.75rem;color:var(--text-
 
 <div class="container">
   <div class="controls">
-    <div class="control-row">
-      <label for="sel-region">地方:</label>
-      <select id="sel-region"><option value="">-- 選択してください --</option></select>
-      <label for="sel-pref">都道府県:</label>
-      <select id="sel-pref"><option value="">-- すべて --</option></select>
-    </div>
+    <div class="region-filter" id="region-filter"></div>
+    <div class="pref-filter" id="pref-filter"></div>
     <div class="genre-filter" id="genre-filter"></div>
   </div>
+  <div id="featured-area"></div>
   <div class="result-count" id="result-count"></div>
   <div class="card-grid" id="card-grid"></div>
 </div>
 
 <footer>
   <div>&copy; 2026 ご当地グルメナビ</div>
-  <a href="../" style="display:inline-block;margin-top:0.6rem;color:#ea580c;font-size:0.85rem;font-weight:600;text-decoration:none;">&#9664; トップページへ戻る</a>
+  <a href="../" style="display:inline-block;margin-top:0.6rem;color:#2a5298;font-size:0.85rem;font-weight:600;text-decoration:none;">&#9664; トップページへ戻る</a>
 </footer>
 
 <script>
@@ -176,6 +212,30 @@ const REGIONS = [
 ];
 
 const GENRES = ["麺類","肉料理","海鮮","揚げ物","ご飯もの","粉もの・鉄板","郷土料理・軽食","スイーツ・喫茶"];
+
+// ===== 季節おすすめ =====
+const SEASONAL_PICKS = {
+  1:["きりたんぽ鍋","味噌煮込みうどん","ほうとう","スープカレー","水炊き","札幌味噌ラーメン"],
+  2:["石狩鍋","もつ鍋","味噌煮込みうどん","スープカレー","鍋焼きラーメン","黒豚しゃぶしゃぶ"],
+  3:["桜えび料理","博多ラーメン","讃岐うどん","明石焼き","長崎ちゃんぽん","たこ焼き"],
+  4:["生しらす丼","桜えび料理","出雲そば","信州そば","讃岐うどん","ジンギスカン"],
+  5:["ジンギスカン","牛タン焼き","盛岡冷麺","浜松餃子","カツオのたたき","海鮮丼"],
+  6:["盛岡冷麺","ひつまぶし","盛岡じゃじゃ麺","稲庭うどん","鯛めし（宇和島）","牛タン焼き"],
+  7:["ゴーヤーチャンプルー","沖縄そば","冷や汁","ずんだ餅","盛岡冷麺","白くま"],
+  8:["沖縄そば","ゴーヤーチャンプルー","冷や汁","白くま","ブルーシールアイス","宮崎マンゴー"],
+  9:["芋煮","信州そば","カツオのたたき","讃岐うどん","横手やきそば","瓦そば"],
+  10:["芋煮","広島お好み焼き","ひつまぶし","もみじ饅頭","スープカレー","さつま揚げ"],
+  11:["きりたんぽ鍋","味噌煮込みうどん","ほうとう","もつ鍋","水炊き","熊本ラーメン"],
+  12:["きりたんぽ鍋","石狩鍋","味噌煮込みうどん","スープカレー","ほうとう","水炊き"]
+};
+const SEASON_LABELS = {
+  1:"冬のあったかグルメ",2:"冬のあったかグルメ",
+  3:"春の旬グルメ",4:"春の旬グルメ",
+  5:"初夏のさわやかグルメ",6:"初夏のさわやかグルメ",
+  7:"夏のひんやりグルメ",8:"夏のひんやりグルメ",
+  9:"秋の味覚",10:"秋の味覚",11:"秋の味覚",
+  12:"冬のあったかグルメ"
+};
 
 // ===== グルメデータ (人気ランキング順) =====
 const SPOTS = [
@@ -292,260 +352,1641 @@ const SPOTS = [
   { pref:"新潟県", region:"chubu", name:"へぎそば", genre:"麺類",
     area:"魚沼・小千谷市",
     desc:"海藻の布海苔をつなぎに使い「へぎ」という器に絹糸のように美しく盛り付ける新潟を代表する蕎麦。ツルツルの喉越しが絶品",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hegisoba_2014.jpg/640px-Hegisoba_2014.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Hegisoba_001.jpg/640px-Hegisoba_001.jpg",
     mapUrl:"https://maps.google.com/?q=へぎそば+魚沼" },
   { pref:"新潟県", region:"chubu", name:"タレかつ丼", genre:"ご飯もの",
     area:"新潟市内",
     desc:"卵でとじず、甘辛い醤油ダレにくぐらせた薄めのとんかつをご飯にのせる新潟流かつ丼。さっぱりなのに後を引く旨さ",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Tarekatsudon_001.jpg/640px-Tarekatsudon_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/TareKatsudon_Matsuriya.jpg/640px-TareKatsudon_Matsuriya.jpg",
     mapUrl:"https://maps.google.com/?q=タレかつ丼+新潟市" },
   { pref:"新潟県", region:"chubu", name:"新潟イタリアン", genre:"粉もの・鉄板",
     area:"新潟市内",
     desc:"中華麺の焼きそばにミートソースをかけた新潟独自のB級グルメ。昭和30年代から愛される新潟市民のソウルフード",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Italian_%28Niigata%29.jpg/640px-Italian_%28Niigata%29.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Italian_%28Mikazuki%29%2C_Japanese_local_fast_food.jpg/640px-Italian_%28Mikazuki%29%2C_Japanese_local_fast_food.jpg",
     mapUrl:"https://maps.google.com/?q=イタリアン+新潟" },
   { pref:"新潟県", region:"chubu", name:"燕三条背脂ラーメン", genre:"麺類",
     area:"燕市・三条市",
     desc:"醤油スープに大量の背脂を浮かべ極太麺を合わせた豪快なラーメン。工場地帯の職人文化から生まれた力強い一杯",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Tsubame-Sanjo_Ramen.jpg/640px-Tsubame-Sanjo_Ramen.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Tsubame_Sanjo_Masaru.jpg/640px-Tsubame_Sanjo_Masaru.jpg",
     mapUrl:"https://maps.google.com/?q=背脂ラーメン+燕三条" },
   { pref:"新潟県", region:"chubu", name:"村上の塩引き鮭", genre:"海鮮",
     area:"村上市",
     desc:"千年の鮭文化を誇る村上の名物。塩で締めた鮭を冬の寒風で長期間熟成させた伝統の保存食で、凝縮された旨みは格別",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Murakami_Salmon_Museum.jpg/640px-Murakami_Salmon_Museum.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Drying_and_salted_salmon%2C_Japanese_name_Shiobiki_zyake.jpg/640px-Drying_and_salted_salmon%2C_Japanese_name_Shiobiki_zyake.jpg",
     mapUrl:"https://maps.google.com/?q=塩引き鮭+村上" },
   { pref:"新潟県", region:"chubu", name:"のっぺ", genre:"郷土料理・軽食",
     area:"新潟県全域",
     desc:"里芋・こんにゃく・にんじん・鶏肉を醤油ベースで煮た新潟の伝統郷土料理。正月やお盆に欠かせない家庭の味",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Noppe_%28Niigata_local_dish%29.jpg/640px-Noppe_%28Niigata_local_dish%29.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Noppe.jpg/640px-Noppe.jpg",
     mapUrl:"https://maps.google.com/?q=のっぺ+新潟" },
 
   // ===== 富山県 =====
   { pref:"富山県", region:"chubu", name:"白エビ料理", genre:"海鮮",
     area:"富山市・射水市",
     desc:"「富山湾の宝石」と呼ばれ世界で富山湾だけで漁獲される希少種。とろりとした食感と上品な甘みの刺身やかき揚げが絶品",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Shiro_ebi_%28white_shrimp%29_don.jpg/640px-Shiro_ebi_%28white_shrimp%29_don.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Siroebi_siraebi_gunkan_sushi.jpg/640px-Siroebi_siraebi_gunkan_sushi.jpg",
     mapUrl:"https://maps.google.com/?q=白エビ+富山" },
   { pref:"富山県", region:"chubu", name:"ホタルイカ料理", genre:"海鮮",
     area:"滑川市・富山湾沿岸",
     desc:"春に富山湾に大量に押し寄せるホタルイカ。沖漬け・酢みそ和え・しゃぶしゃぶなど、濃厚な旨みを多彩に堪能できる",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Hotaruika_Sashimi.jpg/640px-Hotaruika_Sashimi.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Firefly_squid_with_daikon_oroshi.jpg/640px-Firefly_squid_with_daikon_oroshi.jpg",
     mapUrl:"https://maps.google.com/?q=ホタルイカ+富山" },
   { pref:"富山県", region:"chubu", name:"ます寿し", genre:"ご飯もの",
     area:"富山市内",
     desc:"塩漬けのサクラマスを酢飯に乗せ笹で包んだ伝統の押し寿司。江戸時代から続く製法と鮮やかなピンク色が美しい富山の定番土産",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Masuzushi.jpg/640px-Masuzushi.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/%E9%B1%92%E5%AF%BF%E5%8F%B8_%28486121003%29.jpg/640px-%E9%B1%92%E5%AF%BF%E5%8F%B8_%28486121003%29.jpg",
     mapUrl:"https://maps.google.com/?q=ます寿し+富山" },
   { pref:"富山県", region:"chubu", name:"富山ブラックラーメン", genre:"麺類",
     area:"富山市内",
     desc:"真っ黒な濃口醤油スープに粗挽き黒胡椒をたっぷり散らした富山独自のラーメン。ごはんのおかずにもなる塩っぱ旨い味が名物",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Toyama_Black_Ramen.jpg/640px-Toyama_Black_Ramen.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Toyama_Black_Daiki.jpg/640px-Toyama_Black_Daiki.jpg",
     mapUrl:"https://maps.google.com/?q=富山ブラックラーメン+富山" },
   { pref:"富山県", region:"chubu", name:"氷見うどん", genre:"麺類",
     area:"氷見市",
     desc:"手延べ製法で仕上げた極細でなめらかな伝統うどん。コシがありつるつるとした食感で、素うどんで麺本来の甘みが際立つ",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Himi_Udon.jpg/640px-Himi_Udon.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Himi-udon.jpg/640px-Himi-udon.jpg",
     mapUrl:"https://maps.google.com/?q=氷見うどん+氷見" },
   { pref:"富山県", region:"chubu", name:"氷見の寒ブリ", genre:"海鮮",
     area:"氷見市",
     desc:"冬の富山湾を代表する高級魚。脂をたっぷり蓄えた氷見の寒ブリの刺身はとろけるような甘みで、12〜2月が旬",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Buri_Sashimi.jpg/640px-Buri_Sashimi.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/%E3%83%96%E3%83%AA%E5%88%BA%E8%BA%AB%E5%AE%9A%E9%A3%9F%EF%BC%88%E6%B0%B7%E8%A6%8B%E9%AD%9A%E5%B8%82%E5%A0%B4%E9%A3%9F%E5%A0%82%EF%BC%8920240330-P1040829.jpg/640px-%E3%83%96%E3%83%AA%E5%88%BA%E8%BA%AB%E5%AE%9A%E9%A3%9F%EF%BC%88%E6%B0%B7%E8%A6%8B%E9%AD%9A%E5%B8%82%E5%A0%B4%E9%A3%9F%E5%A0%82%EF%BC%8920240330-P1040829.jpg",
     mapUrl:"https://maps.google.com/?q=寒ブリ+氷見" },
 
   // ===== 石川県 =====
   { pref:"石川県", region:"chubu", name:"のどぐろ料理", genre:"海鮮",
     area:"金沢市内",
     desc:"「白身のトロ」と呼ばれる高級魚。豊富な脂をたたえた身は塩焼き・刺身・煮付けいずれも絶品で、金沢に来たら必食",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Nodoguro_%28Blackthroat_seaperch%29.jpg/640px-Nodoguro_%28Blackthroat_seaperch%29.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nodoguro_meal_%2832738791560%29.jpg/640px-Nodoguro_meal_%2832738791560%29.jpg",
     mapUrl:"https://maps.google.com/?q=のどぐろ+金沢" },
   { pref:"石川県", region:"chubu", name:"治部煮", genre:"郷土料理・軽食",
     area:"金沢市内",
     desc:"鴨肉に小麦粉をまぶしてとろみをつけ、すだれ麩・加賀野菜と甘辛い出汁で煮た加賀藩伝来の伝統料理。わさびを添えて味わう上品な一品",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Jibuni.jpg/640px-Jibuni.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Jibuni_01.jpg/640px-Jibuni_01.jpg",
     mapUrl:"https://maps.google.com/?q=治部煮+金沢" },
   { pref:"石川県", region:"chubu", name:"金沢おでん", genre:"郷土料理・軽食",
     area:"金沢市内",
     desc:"バイ貝・赤巻・車麩など金沢ならではのネタが揃う一年中食べられる金沢の国民食。冬には香箱ガニ面も登場",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Kanazawa_Oden.jpg/640px-Kanazawa_Oden.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/%E9%87%91%E6%B2%A2%E3%81%8A%E3%81%A7%E3%82%93%E5%8B%9D%E4%B8%8020241030_01.jpg/640px-%E9%87%91%E6%B2%A2%E3%81%8A%E3%81%A7%E3%82%93%E5%8B%9D%E4%B8%8020241030_01.jpg",
     mapUrl:"https://maps.google.com/?q=金沢おでん+金沢" },
   { pref:"石川県", region:"chubu", name:"香箱ガニ", genre:"海鮮",
     area:"金沢市・加賀地方",
     desc:"ズワイガニのメスで11〜12月の短い解禁期間だけの幻のカニ。身・外子・内子・カニみそが一杯に詰まった冬の最大の楽しみ",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Kobako-gani.jpg/640px-Kobako-gani.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kobako_Crab_%2823789370165%29.jpg/640px-Kobako_Crab_%2823789370165%29.jpg",
     mapUrl:"https://maps.google.com/?q=香箱ガニ+金沢" },
   { pref:"石川県", region:"chubu", name:"金沢カレー", genre:"ご飯もの",
     area:"金沢市内",
     desc:"濃厚なルーをステンレス皿に盛りソースかつと千切りキャベツを添える金沢スタイル。金沢市民のソウルフード",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Kanazawa_Curry.jpg/640px-Kanazawa_Curry.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Kanazawa_Curry_%2831151752452%29.jpg/640px-Kanazawa_Curry_%2831151752452%29.jpg",
     mapUrl:"https://maps.google.com/?q=金沢カレー+金沢" },
   { pref:"石川県", region:"chubu", name:"ハントンライス", genre:"ご飯もの",
     area:"金沢市内",
     desc:"ケチャップライスにふわとろ卵、白身魚のフライとタルタルソースで仕上げた金沢発祥の洋食。昭和30年代から愛されるレトロな一皿",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Hanton_rice.jpg/640px-Hanton_rice.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Hanton_rice.jpg/640px-Hanton_rice.jpg",
     mapUrl:"https://maps.google.com/?q=ハントンライス+金沢" },
   { pref:"石川県", region:"chubu", name:"能登牛", genre:"肉料理",
     area:"能登地方",
     desc:"能登半島で育てられた希少なブランド和牛で県外にはほとんど流通しない。きめ細かなサシと深い風味は一度食べると忘れられない",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Wagyu_beef.jpg/640px-Wagyu_beef.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Griddled_wagyu_beef.jpg/640px-Griddled_wagyu_beef.jpg",
     mapUrl:"https://maps.google.com/?q=能登牛+石川" },
 
   // ===== 福井県 =====
   { pref:"福井県", region:"chubu", name:"越前おろしそば", genre:"麺類",
     area:"越前市・福井市",
     desc:"石臼挽きの風味豊かなそばにたっぷりの大根おろしをのせて食べる福井の魂のグルメ。辛みが蕎麦の甘みを引き立てる",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Echizen_Oroshi_Soba.jpg/640px-Echizen_Oroshi_Soba.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/%E8%B6%8A%E5%89%8D%E3%81%8A%E3%82%8D%E3%81%97%E3%81%9D%E3%81%B0%EF%BC%88%E3%81%82%E3%81%BF%E3%81%A0%E3%81%9D%E3%81%B0%E7%A6%8F%E3%81%AE%E4%BA%95%EF%BC%8920230802-P1029516.jpg/640px-%E8%B6%8A%E5%89%8D%E3%81%8A%E3%82%8D%E3%81%97%E3%81%9D%E3%81%B0%EF%BC%88%E3%81%82%E3%81%BF%E3%81%A0%E3%81%9D%E3%81%B0%E7%A6%8F%E3%81%AE%E4%BA%95%EF%BC%8920230802-P1029516.jpg",
     mapUrl:"https://maps.google.com/?q=越前おろしそば+福井" },
   { pref:"福井県", region:"chubu", name:"越前ガニ", genre:"海鮮",
     area:"越前海岸・三国港",
     desc:"黄色いタグが品質の証のズワイガニ。身はぎっしり詰まり濃厚な甘みとコクは日本屈指。11〜3月の冬の主役",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Echizen_crab.jpg/640px-Echizen_crab.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Boiled_Echizen_crab_%28snow_crab%29_male_and_female.jpg/640px-Boiled_Echizen_crab_%28snow_crab%29_male_and_female.jpg",
     mapUrl:"https://maps.google.com/?q=越前ガニ+越前" },
   { pref:"福井県", region:"chubu", name:"ソースカツ丼", genre:"ご飯もの",
     area:"福井市・勝山市",
     desc:"薄めのカツを秘伝のウスターソースベースのタレにくぐらせご飯にのせる福井流かつ丼。卵とじなしのシンプルさが100年以上愛される",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Sauce_Katsudon_Fukui.jpg/640px-Sauce_Katsudon_Fukui.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Sauce_Katsudon_in_Fukui.jpg/640px-Sauce_Katsudon_in_Fukui.jpg",
     mapUrl:"https://maps.google.com/?q=ソースカツ丼+福井" },
   { pref:"福井県", region:"chubu", name:"焼き鯖寿し", genre:"ご飯もの",
     area:"小浜市・若狭地方",
     desc:"香ばしく焼いた鯖を酢飯にのせた押し寿司。若狭湾の鯖文化が生んだ郷土の味で、大葉と生姜が鯖の旨みを引き立てる",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Yakisaba_sushi.jpg/640px-Yakisaba_sushi.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/%E7%84%BC%E3%81%8D%E9%AF%96%E5%AF%BF%E5%8F%B8.jpg/640px-%E7%84%BC%E3%81%8D%E9%AF%96%E5%AF%BF%E5%8F%B8.jpg",
     mapUrl:"https://maps.google.com/?q=焼き鯖寿し+小浜" },
   { pref:"福井県", region:"chubu", name:"永平寺ごま豆腐", genre:"郷土料理・軽食",
     area:"永平寺町",
     desc:"大本山・永平寺で修行僧の精進料理として受け継がれてきた伝統食。もっちりとした食感とごまの深い香りは普通の豆腐とは別物",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Goma_Tofu.jpg/640px-Goma_Tofu.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Goma_tofu_by_eiko_eiko.jpg/640px-Goma_tofu_by_eiko_eiko.jpg",
     mapUrl:"https://maps.google.com/?q=ごま豆腐+永平寺" },
   { pref:"福井県", region:"chubu", name:"ボルガライス", genre:"ご飯もの",
     area:"越前市（武生）",
     desc:"オムライスの上にとんかつをのせデミグラスソースをかけたボリューム満点の越前市発祥グルメ。B級グルメとして全国から注目",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Bolga_rice.jpg/640px-Bolga_rice.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/%E3%83%9C%E3%83%AB%E3%82%AC%E3%83%A9%E3%82%A4%E3%82%B920211224-P1280947.jpg/640px-%E3%83%9C%E3%83%AB%E3%82%AC%E3%83%A9%E3%82%A4%E3%82%B920211224-P1280947.jpg",
     mapUrl:"https://maps.google.com/?q=ボルガライス+越前市" },
   { pref:"福井県", region:"chubu", name:"羽二重餅", genre:"スイーツ・喫茶",
     area:"福井市内",
     desc:"絹織物「羽二重」のなめらかさを表現した福井銘菓。口に入れた瞬間とろける柔らかさと上品な甘みが福井土産の定番",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Habutae_mochi.jpg/640px-Habutae_mochi.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Habutaemochi.JPG/640px-Habutaemochi.JPG",
     mapUrl:"https://maps.google.com/?q=羽二重餅+福井" },
 
   // ===== 山梨県 =====
   { pref:"山梨県", region:"chubu", name:"ほうとう", genre:"郷土料理・軽食",
     area:"山梨県内全域",
     desc:"武田信玄の陣中食とも伝わる山梨の代表的郷土鍋。幅広の生麺とかぼちゃ・季節野菜を味噌仕立てで煮込んだ体温まる一杯",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Houtou_%28Japanese_food%29_001.jpg/640px-Houtou_%28Japanese_food%29_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Houtou.jpg/640px-Houtou.jpg",
     mapUrl:"https://maps.google.com/?q=ほうとう+山梨" },
   { pref:"山梨県", region:"chubu", name:"吉田のうどん", genre:"麺類",
     area:"富士吉田市内",
     desc:"讃岐うどんを凌ぐ強烈なコシと歯ごたえが特徴。馬肉とキャベツのトッピングが定番の富士山麓のソウルフード",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Yoshida_udon_001.jpg/640px-Yoshida_udon_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Yoshida_udon_001.jpg/640px-Yoshida_udon_001.jpg",
     mapUrl:"https://maps.google.com/?q=吉田のうどん+富士吉田" },
   { pref:"山梨県", region:"chubu", name:"甲府鳥もつ煮", genre:"肉料理",
     area:"甲府市内",
     desc:"砂肝・ハツ・レバーなど鶏もつを甘辛い醤油ダレで照り煮にした甲府のソウルフード。B-1グランプリ優勝で全国区に",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Kofu_Tori_Motsuni.jpg/640px-Kofu_Tori_Motsuni.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/K%C5%8Dfu_Torimotsuni.jpg/640px-K%C5%8Dfu_Torimotsuni.jpg",
     mapUrl:"https://maps.google.com/?q=甲府鳥もつ煮+甲府" },
   { pref:"山梨県", region:"chubu", name:"馬刺し", genre:"肉料理",
     area:"山梨県内",
     desc:"山梨では古くから馬肉文化が根付いており新鮮な馬刺しをおろし生姜と醤油で味わうのが定番。甘みのある赤身が絶品",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Basashi_in_Kumamoto.jpg/640px-Basashi_in_Kumamoto.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Basashi_%2815121111029%29.jpg/640px-Basashi_%2815121111029%29.jpg",
     mapUrl:"https://maps.google.com/?q=馬刺し+山梨" },
   { pref:"山梨県", region:"chubu", name:"信玄餅", genre:"スイーツ・喫茶",
     area:"山梨県内",
     desc:"山梨みやげの代名詞。きな粉をまとったやわらかな求肥に黒蜜をかけていただく。風呂敷包みの愛らしい見た目も人気",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Shingen_mochi_001.jpg/640px-Shingen_mochi_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Shingen-mochi.jpg/640px-Shingen-mochi.jpg",
     mapUrl:"https://maps.google.com/?q=信玄餅+山梨" },
   { pref:"山梨県", region:"chubu", name:"水信玄餅", genre:"スイーツ・喫茶",
     area:"北杜市白州町",
     desc:"甲斐駒ヶ岳の伏流水を最小限の寒天で固めた「食べる水」。賞味期限わずか30分、口の中でスッと溶ける唯一無二の和菓子",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Mizu_shingen_mochi.jpg/640px-Mizu_shingen_mochi.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Mizushingenmochi.JPG/640px-Mizushingenmochi.JPG",
     mapUrl:"https://maps.google.com/?q=水信玄餅+北杜市" },
 
   // ===== 長野県 =====
   { pref:"長野県", region:"chubu", name:"信州そば", genre:"麺類",
     area:"長野県内全域",
     desc:"冷涼な気候と清らかな水が育む香り高いそば。戸隠そばは日本三大そばの一つで「ぼっち盛り」の美しい盛り付けも見どころ",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Togakushi_soba_002.jpg/640px-Togakushi_soba_002.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/160430_Togakushi_soba_Nagano_Japan01s.jpg/640px-160430_Togakushi_soba_Nagano_Japan01s.jpg",
     mapUrl:"https://maps.google.com/?q=信州そば+長野" },
   { pref:"長野県", region:"chubu", name:"山賊焼き", genre:"揚げ物",
     area:"松本市・塩尻市",
     desc:"鶏もも肉をニンニク醤油ダレに漬け片栗粉でカラリと揚げた中信地方のソウルフード。サクサクでジューシーな豪快さが魅力",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Sanzoku-yaki_001.jpg/640px-Sanzoku-yaki_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Sanzoku-yaki_001.jpg/640px-Sanzoku-yaki_001.jpg",
     mapUrl:"https://maps.google.com/?q=山賊焼き+松本" },
   { pref:"長野県", region:"chubu", name:"おやき", genre:"郷土料理・軽食",
     area:"長野県内全域",
     desc:"小麦粉やそば粉の皮に野沢菜・なす・あんこなどを包んで焼いた信州の伝統軽食。素朴な風味が旅人の胃袋を満たす",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Oyaki_by_yoppy.jpg/640px-Oyaki_by_yoppy.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Oyaki_001.jpg/640px-Oyaki_001.jpg",
     mapUrl:"https://maps.google.com/?q=おやき+長野" },
   { pref:"長野県", region:"chubu", name:"駒ヶ根ソースかつ丼", genre:"ご飯もの",
     area:"駒ヶ根市内",
     desc:"ご飯の上に千切りキャベツを敷き甘辛秘伝ソースをまとわせた厚切りカツをのせるソースかつ丼発祥の地のスタイル",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Komagane_Sauce_Katsudon.jpg/640px-Komagane_Sauce_Katsudon.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Sauce_Katsudon.jpg/640px-Sauce_Katsudon.jpg",
     mapUrl:"https://maps.google.com/?q=ソースかつ丼+駒ヶ根" },
   { pref:"長野県", region:"chubu", name:"馬刺し", genre:"肉料理",
     area:"長野県内",
     desc:"長野は日本三大馬刺の一つ。おろし生姜やニンニクを添えて醤油で味わう信州流で、赤身の旨みが凝縮された一皿",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Basashi_in_Kumamoto.jpg/640px-Basashi_in_Kumamoto.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Basashi_%2815121111029%29.jpg/640px-Basashi_%2815121111029%29.jpg",
     mapUrl:"https://maps.google.com/?q=馬刺し+長野" },
   { pref:"長野県", region:"chubu", name:"五平餅", genre:"郷土料理・軽食",
     area:"木曽・伊那地方",
     desc:"半つきの米をわらじ形の串に成形しクルミ味噌や甘辛醤油ダレを塗って炭火で焼く木曽・伊那の伝統料理。香ばしさが食欲をそそる",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Goheimochi_001.jpg/640px-Goheimochi_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Goheimochi_%288729869647%29.jpg/640px-Goheimochi_%288729869647%29.jpg",
     mapUrl:"https://maps.google.com/?q=五平餅+木曽" },
   { pref:"長野県", region:"chubu", name:"ローメン", genre:"麺類",
     area:"伊那市内",
     desc:"蒸し太麺と羊肉・キャベツを醤油・ソースで炒め煮にした伊那市独自の不思議な麺料理。酢や醤油で自分好みに仕上げるのが流儀",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Romen_ina.jpg/640px-Romen_ina.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Romen001.jpg/640px-Romen001.jpg",
     mapUrl:"https://maps.google.com/?q=ローメン+伊那" },
   { pref:"長野県", region:"chubu", name:"栗きんとん", genre:"スイーツ・喫茶",
     area:"小布施町",
     desc:"厳選した栗を丁寧に裏ごしし茶巾で絞り上げた素材の甘さが際立つ上品な和菓子。小布施の栗文化を象徴する秋の名物",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Kurikinton.jpg/640px-Kurikinton.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Kurikinton_001.jpg/640px-Kurikinton_001.jpg",
     mapUrl:"https://maps.google.com/?q=栗きんとん+小布施" },
 
   // ===== 岐阜県 =====
   { pref:"岐阜県", region:"chubu", name:"飛騨牛", genre:"肉料理",
     area:"高山市・飛騨地方",
     desc:"飛騨地方で育てられたブランド黒毛和牛。きめ細かな霜降りととろけるような食感は世界的評価。にぎり寿司でも人気",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Hidagyu.jpg/640px-Hidagyu.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Grilling_Hida_Beef_%28Takayama_Street_Food%29_%2835910429046%29.jpg/640px-Grilling_Hida_Beef_%28Takayama_Street_Food%29_%2835910429046%29.jpg",
     mapUrl:"https://maps.google.com/?q=飛騨牛+高山" },
   { pref:"岐阜県", region:"chubu", name:"高山ラーメン", genre:"麺類",
     area:"高山市内",
     desc:"鶏ガラと醤油が調和したあっさりスープと縮れ細麺が特徴の飛騨高山のご当地ラーメン。シンプルながら奥深い味",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Takayama_ramen_001.jpg/640px-Takayama_ramen_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Takayama_ramen_001.jpg/640px-Takayama_ramen_001.jpg",
     mapUrl:"https://maps.google.com/?q=高山ラーメン+高山" },
   { pref:"岐阜県", region:"chubu", name:"鶏ちゃん焼き", genre:"肉料理",
     area:"飛騨地方・郡上市",
     desc:"醤油や味噌ダレに漬け込んだ鶏肉をキャベツと鉄板でジュウジュウ焼く飛騨・奥美濃の郷土料理。ご飯が止まらない濃厚な味",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Keichan_001.jpg/640px-Keichan_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Keichan.jpg/640px-Keichan.jpg",
     mapUrl:"https://maps.google.com/?q=鶏ちゃん+飛騨" },
   { pref:"岐阜県", region:"chubu", name:"朴葉味噌", genre:"郷土料理・軽食",
     area:"高山市内",
     desc:"朴葉の上に麹味噌と葱・きのこをのせ炭火でじっくり焼く飛騨の朝食の定番。朴葉の香りがうつった味噌とご飯の相性が格別",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Hobamiso_001.jpg/640px-Hobamiso_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Houbamiso.jpg/640px-Houbamiso.jpg",
     mapUrl:"https://maps.google.com/?q=朴葉味噌+高山" },
   { pref:"岐阜県", region:"chubu", name:"漬物ステーキ", genre:"郷土料理・軽食",
     area:"高山市・飛騨地方",
     desc:"白菜漬けを鉄板で焼き溶き卵と絡めて仕上げる飛騨のB級ソウルフード。漬物の酸味が熱で和らぎ独特のコクが生まれる",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Tsukemono_steak.jpg/640px-Tsukemono_steak.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Cuisine_of_Gifu_prefecture_%E6%BC%AC%E7%89%A9%E3%82%B9%E3%83%86%E3%83%BC%E3%82%AD.jpg/640px-Cuisine_of_Gifu_prefecture_%E6%BC%AC%E7%89%A9%E3%82%B9%E3%83%86%E3%83%BC%E3%82%AD.jpg",
     mapUrl:"https://maps.google.com/?q=漬物ステーキ+高山" },
   { pref:"岐阜県", region:"chubu", name:"五平餅", genre:"郷土料理・軽食",
     area:"飛騨・東濃地方",
     desc:"すりつぶした米をわらじ形にしてクルミ味噌や甘辛醤油ダレを塗り炭火で香ばしく焼いた岐阜の郷土おやつ",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Goheimochi_001.jpg/640px-Goheimochi_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Goheimochi_%288729869647%29.jpg/640px-Goheimochi_%288729869647%29.jpg",
     mapUrl:"https://maps.google.com/?q=五平餅+飛騨" },
   { pref:"岐阜県", region:"chubu", name:"鮎の塩焼き", genre:"海鮮",
     area:"長良川・郡上市",
     desc:"「清流の女王」と称される長良川の鮎を炭火でじっくり焼いた夏の風物詩。香ばしい香りと淡泊ながら旨みの詰まった白身が絶品",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Ayu_no_Shioyaki_001.jpg/640px-Ayu_no_Shioyaki_001.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Ayu_no_Shioyaki.jpg/640px-Ayu_no_Shioyaki.jpg",
     mapUrl:"https://maps.google.com/?q=鮎の塩焼き+長良川" },
   { pref:"岐阜県", region:"chubu", name:"栗きんとん", genre:"スイーツ・喫茶",
     area:"中津川市・恵那市",
     desc:"日本有数の栗産地・中津川で良質な栗を砂糖だけで練り上げた上品な和菓子。各店の味を食べ比べる秋の楽しみも格別",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Kurikinton.jpg/640px-Kurikinton.jpg",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Kawakamiya_Kurikinton_2021-10_ac.jpg/640px-Kawakamiya_Kurikinton_2021-10_ac.jpg",
     mapUrl:"https://maps.google.com/?q=栗きんとん+中津川" },
   { pref:"岐阜県", region:"chubu", name:"水まんじゅう", genre:"スイーツ・喫茶",
     area:"大垣市内",
     desc:"透き通る葛の生地でこし餡を包んだ大垣発祥の夏の銘菓。水の都の清水に浸けて供されるプルプルの涼菓子",
-    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mizu_Manju.jpg/640px-Mizu_Manju.jpg",
-    mapUrl:"https://maps.google.com/?q=水まんじゅう+大垣" }
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Mizumanju_1.JPG/640px-Mizumanju_1.JPG",
+    mapUrl:"https://maps.google.com/?q=水まんじゅう+大垣" },
+
+  // ===== 東京都 =====
+  { pref:"東京都", region:"kanto", name:"もんじゃ焼き", genre:"粉もの・鉄板",
+    area:"中央区月島",
+    desc:"水溶きの薄い生地にキャベツや海鮮などの具材を鉄板で焼く東京下町の名物。小さなヘラでこそげながら食べるスタイルが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Monja_After_DSCN2754_20111028.JPG/640px-Monja_After_DSCN2754_20111028.JPG",
+    mapUrl:"https://maps.google.com/?q=もんじゃ焼き+月島" },
+  { pref:"東京都", region:"kanto", name:"深川めし", genre:"ご飯もの",
+    area:"江東区深川",
+    desc:"アサリなどの貝類とネギを味噌で煮込みご飯にぶっかけた江戸時代の漁師めし。農林水産省選定の郷土料理百選にも選ばれた東京の丼",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Fukagawameshi.jpg/640px-Fukagawameshi.jpg",
+    mapUrl:"https://maps.google.com/?q=深川めし+深川" },
+  { pref:"東京都", region:"kanto", name:"ちゃんこ鍋", genre:"郷土料理・軽食",
+    area:"墨田区両国",
+    desc:"両国の相撲部屋で生まれた肉・魚・野菜たっぷりの力士の栄養食。両国駅周辺にはちゃんこ鍋専門店が多数集まる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Chankonabe.jpg/640px-Chankonabe.jpg",
+    mapUrl:"https://maps.google.com/?q=ちゃんこ鍋+両国" },
+  { pref:"東京都", region:"kanto", name:"柳川鍋", genre:"郷土料理・軽食",
+    area:"台東区浅草",
+    desc:"ドジョウと笹がきゴボウを甘辛い割り下で煮込み卵でとじた江戸の伝統鍋料理。浅草や日本橋の老舗が江戸庶民の味を今に伝える",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Yanagawa_nabe_Tokyo.jpg/640px-Yanagawa_nabe_Tokyo.jpg",
+    mapUrl:"https://maps.google.com/?q=柳川鍋+浅草" },
+  { pref:"東京都", region:"kanto", name:"江戸前天ぷら", genre:"揚げ物",
+    area:"東京都心部",
+    desc:"東京湾産の穴子や車海老をごま油でカラッと揚げる江戸前スタイル。きつね色の仕上がりが特徴で天丼や天ざるとして楽しめる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Tempura_001.jpg/640px-Tempura_001.jpg",
+    mapUrl:"https://maps.google.com/?q=江戸前天ぷら+東京" },
+  { pref:"東京都", region:"kanto", name:"築地の玉子焼き", genre:"郷土料理・軽食",
+    area:"中央区築地",
+    desc:"築地場外市場の食べ歩き定番。出汁の効いたふわふわの厚焼き玉子を串に刺して提供。甘め・しょっぱめなど店ごとの個性がある",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Tamagoyaki_by_jetalone_in_Tsukiji_fish_market%2C_Tokyo.jpg/640px-Tamagoyaki_by_jetalone_in_Tsukiji_fish_market%2C_Tokyo.jpg",
+    mapUrl:"https://maps.google.com/?q=玉子焼き+築地" },
+  { pref:"東京都", region:"kanto", name:"八王子ラーメン", genre:"麺類",
+    area:"八王子市",
+    desc:"刻みタマネギをトッピングする独特の醤油ラーメン。豚骨と鶏ガラのダシにラードを浮かべタマネギの甘味を引き出す1959年頃誕生の一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Hachioujira-men.jpg/640px-Hachioujira-men.jpg",
+    mapUrl:"https://maps.google.com/?q=八王子ラーメン+八王子" },
+  { pref:"東京都", region:"kanto", name:"武蔵野油そば", genre:"麺類",
+    area:"武蔵野市・多摩地区",
+    desc:"スープなしの太麺にタレと油を絡めて食べる多摩地区発祥の汁なし麺。酢とラー油で味変しながら食べるのが定番",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Abura_soba_with_raw_egg_by_kimishowota_in_Kichijoji%2C_Tokyo.jpg/640px-Abura_soba_with_raw_egg_by_kimishowota_in_Kichijoji%2C_Tokyo.jpg",
+    mapUrl:"https://maps.google.com/?q=油そば+武蔵野" },
+
+  // ===== 神奈川県 =====
+  { pref:"神奈川県", region:"kanto", name:"横浜家系ラーメン", genre:"麺類",
+    area:"横浜市",
+    desc:"豚骨醤油のこってりスープに太いストレート麺を合わせた横浜発祥のラーメン。麺の硬さや味の濃さを好みで注文できる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Iekeiramen111.jpg/640px-Iekeiramen111.jpg",
+    mapUrl:"https://maps.google.com/?q=家系ラーメン+横浜" },
+  { pref:"神奈川県", region:"kanto", name:"よこすか海軍カレー", genre:"ご飯もの",
+    area:"横須賀市",
+    desc:"明治時代の日本海軍の食事がルーツ。小麦粉でとろみをつけた昔懐かしい味わいで牛乳とサラダを添えるのが横須賀スタイル",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Yokosuka_Navy_Curry_DSCN2599_20111026.JPG/640px-Yokosuka_Navy_Curry_DSCN2599_20111026.JPG",
+    mapUrl:"https://maps.google.com/?q=海軍カレー+横須賀" },
+  { pref:"神奈川県", region:"kanto", name:"サンマーメン", genre:"麺類",
+    area:"横浜市",
+    desc:"もやし・白菜・豚肉の野菜炒めにとろみをつけて醤油ラーメンに乗せた横浜発祥の麺料理。神奈川県民のソウルフード",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Sanmamen---2023-12-07.jpg/640px-Sanmamen---2023-12-07.jpg",
+    mapUrl:"https://maps.google.com/?q=サンマーメン+横浜" },
+  { pref:"神奈川県", region:"kanto", name:"横浜シウマイ", genre:"郷土料理・軽食",
+    area:"横浜市",
+    desc:"豚肉と干帆立貝柱を使った一口サイズの焼売。冷めても美味しく横浜駅の駅弁・お土産の定番として全国的に有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Kiyoken_factory_tasting.jpg/640px-Kiyoken_factory_tasting.jpg",
+    mapUrl:"https://maps.google.com/?q=シウマイ+横浜" },
+  { pref:"神奈川県", region:"kanto", name:"湘南しらす丼", genre:"海鮮",
+    area:"湘南・江の島エリア",
+    desc:"湘南の海で水揚げされた新鮮なしらすをご飯にたっぷり乗せた丼。生しらすと釜揚げの二色丼が人気で漁期限定の味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Whitebait_Rice_Bowl_at_Enoshima.jpg/640px-Whitebait_Rice_Bowl_at_Enoshima.jpg",
+    mapUrl:"https://maps.google.com/?q=しらす丼+江の島" },
+  { pref:"神奈川県", region:"kanto", name:"江の島丼", genre:"海鮮",
+    area:"藤沢市江の島",
+    desc:"刻んだサザエの身を甘めの出汁で煮て卵とじにしご飯に乗せた江の島限定のご当地丼。コリコリとした食感と磯の香りが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/%E5%90%8D%E7%89%A9_%E6%B1%9F%E3%81%AE%E5%B3%B6%E4%B8%BC_%2839543038382%29.jpg/640px-%E5%90%8D%E7%89%A9_%E6%B1%9F%E3%81%AE%E5%B3%B6%E4%B8%BC_%2839543038382%29.jpg",
+    mapUrl:"https://maps.google.com/?q=江の島丼+江の島" },
+  { pref:"神奈川県", region:"kanto", name:"小田原かまぼこ", genre:"郷土料理・軽食",
+    area:"小田原市",
+    desc:"約200年以上の歴史を持つ小田原名産の蒲鉾。新鮮な魚を使い弾力のある独特の歯応えが特徴。東海道の宿場町から全国に広まった",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Odawarakamaboko.jpg/640px-Odawarakamaboko.jpg",
+    mapUrl:"https://maps.google.com/?q=かまぼこ+小田原" },
+  { pref:"神奈川県", region:"kanto", name:"厚木シロコロホルモン", genre:"肉料理",
+    area:"厚木市",
+    desc:"豚の大腸を管状のまま焼く厚木独自のホルモン焼き。外はカリッと中はジューシー。2008年B-1グランプリ優勝で全国区に",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Atsugi_shirokoro_01.JPG/640px-Atsugi_shirokoro_01.JPG",
+    mapUrl:"https://maps.google.com/?q=シロコロホルモン+厚木" },
+
+  // ===== 茨城県 =====
+  { pref:"茨城県", region:"kanto", name:"あんこう鍋", genre:"海鮮",
+    area:"水戸市・大洗町・北茨城市",
+    desc:"茨城の冬を代表する鍋料理。「常磐もの」のあんこうを味噌ベースの出汁で煮込みあん肝の濃厚な旨みが特徴。11月〜3月が旬",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Ankounabe_2.jpg/640px-Ankounabe_2.jpg",
+    mapUrl:"https://maps.google.com/?q=あんこう鍋+大洗町" },
+  { pref:"茨城県", region:"kanto", name:"水戸納豆", genre:"郷土料理・軽食",
+    area:"水戸市",
+    desc:"水戸を代表する名物。小粒で糸引きが良く風味豊かな納豆。わら納豆から納豆天ぷらなど創作料理にも発展",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Natto_mixed.jpg/640px-Natto_mixed.jpg",
+    mapUrl:"https://maps.google.com/?q=水戸納豆+水戸市" },
+  { pref:"茨城県", region:"kanto", name:"常陸牛", genre:"肉料理",
+    area:"県内全域",
+    desc:"茨城県産黒毛和牛の中でもA4・B4以上に格付けされた高級ブランド牛。きめ細かいサシと上質な赤身の旨みが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hitachi_Beef_on_the_dish.jpg/640px-Hitachi_Beef_on_the_dish.jpg",
+    mapUrl:"https://maps.google.com/?q=常陸牛+茨城県" },
+  { pref:"茨城県", region:"kanto", name:"スタミナラーメン", genre:"麺類",
+    area:"ひたちなか市・水戸市",
+    desc:"カボチャ・キャベツ・ニラ・レバーなどをとろみのある甘辛い醤油餡で絡め太麺の上にのせる茨城を代表するご当地ラーメン",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/%E6%B0%B4%E6%88%B8%E5%B8%82%E3%83%BB%E6%9D%BE%E5%96%9C%E5%90%89%E3%81%AE%E3%82%B9%E3%82%BF%E3%83%9F%E3%83%8A%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg/640px-%E6%B0%B4%E6%88%B8%E5%B8%82%E3%83%BB%E6%9D%BE%E5%96%9C%E5%90%89%E3%81%AE%E3%82%B9%E3%82%BF%E3%83%9F%E3%83%8A%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg",
+    mapUrl:"https://maps.google.com/?q=スタミナラーメン+ひたちなか市" },
+  { pref:"茨城県", region:"kanto", name:"干し芋", genre:"スイーツ・喫茶",
+    area:"ひたちなか市",
+    desc:"全国生産量の約9割を占める茨城の特産品。さつまいもを蒸して天日干しにした自然な甘さが魅力で平干し・丸干しなど種類も豊富",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Hoshi-imo2.jpg/640px-Hoshi-imo2.jpg",
+    mapUrl:"https://maps.google.com/?q=干し芋+ひたちなか市" },
+  { pref:"茨城県", region:"kanto", name:"メロン", genre:"スイーツ・喫茶",
+    area:"鉾田市",
+    desc:"生産量日本一を誇る茨城のメロン。特に鉾田市は一大産地で5〜6月が旬。アンデスメロンやイバラキングなどが有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Asahi_Melons%2C_Hokota%2C_Ibaraki.jpg/640px-Asahi_Melons%2C_Hokota%2C_Ibaraki.jpg",
+    mapUrl:"https://maps.google.com/?q=メロン+鉾田市" },
+  { pref:"茨城県", region:"kanto", name:"けんちんうどん", genre:"麺類",
+    area:"常陸大宮市・県北地域",
+    desc:"根菜たっぷりの汁にうどんを合わせた茨城の郷土料理。大根・人参・ごぼう・里芋などを醤油ベースのだしで煮込んだ温かい一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Kenchin_Udon_zoomed.jpg/640px-Kenchin_Udon_zoomed.jpg",
+    mapUrl:"https://maps.google.com/?q=けんちんうどん+常陸大宮市" },
+  { pref:"茨城県", region:"kanto", name:"うな丼", genre:"ご飯もの",
+    area:"霞ヶ浦・龍ケ崎市周辺",
+    desc:"霞ヶ浦周辺はうなぎの名産地。ふっくら焼き上げた鰻と甘辛いタレが絶品で多くの老舗が並ぶ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Unadon_at_an_unagi_restaurant_in_Tsukiji_by_ayustety.jpg/640px-Unadon_at_an_unagi_restaurant_in_Tsukiji_by_ayustety.jpg",
+    mapUrl:"https://maps.google.com/?q=うな丼+龍ケ崎市" },
+
+  // ===== 栃木県 =====
+  { pref:"栃木県", region:"kanto", name:"宇都宮餃子", genre:"粉もの・鉄板",
+    area:"宇都宮市",
+    desc:"具材の7割が野菜でジューシーさとシャキシャキ食感が特徴。焼き・水・揚げなど多彩なスタイルで楽しめる栃木を代表するグルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Gyoza_dumplings_%2853726549642%29.jpg/640px-Gyoza_dumplings_%2853726549642%29.jpg",
+    mapUrl:"https://maps.google.com/?q=宇都宮餃子+宇都宮市" },
+  { pref:"栃木県", region:"kanto", name:"佐野ラーメン", genre:"麺類",
+    area:"佐野市",
+    desc:"青竹手打ちによるコシのある縮れ麺とあっさり澄んだ醤油スープが特徴。市内に200軒以上の店が軒を連ねる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Sano_ramen_002.jpg/640px-Sano_ramen_002.jpg",
+    mapUrl:"https://maps.google.com/?q=佐野ラーメン+佐野市" },
+  { pref:"栃木県", region:"kanto", name:"日光湯波", genre:"郷土料理・軽食",
+    area:"日光市",
+    desc:"日光の社寺文化とともに発展した精進料理の代表格。豆乳を加熱して膜を引き上げたもので刺身・揚げ・煮物など多彩に楽しめる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Shiitake_mushroom_and_bean_curd_skin_%28yuba%29_%288213045947%29.jpg/640px-Shiitake_mushroom_and_bean_curd_skin_%28yuba%29_%288213045947%29.jpg",
+    mapUrl:"https://maps.google.com/?q=日光湯波+日光市" },
+  { pref:"栃木県", region:"kanto", name:"しもつかれ", genre:"郷土料理・軽食",
+    area:"栃木県全域",
+    desc:"初午の日に作られる栃木の代表的郷土料理。鮭の頭・大豆・大根・人参・酒粕を煮込んだ伝統の味で各家庭で味が異なる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Shimotsukare1.jpg/640px-Shimotsukare1.jpg",
+    mapUrl:"https://maps.google.com/?q=しもつかれ+栃木県" },
+  { pref:"栃木県", region:"kanto", name:"足利シュウマイ", genre:"粉もの・鉄板",
+    area:"足利市",
+    desc:"肉を使わず玉ねぎと片栗粉で作る足利独自のシュウマイ。蒸し上げた後にウスターソースをかけて食べるのが定番",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Ashikaga_Shumai.jpg/640px-Ashikaga_Shumai.jpg",
+    mapUrl:"https://maps.google.com/?q=足利シュウマイ+足利市" },
+  { pref:"栃木県", region:"kanto", name:"いもフライ", genre:"揚げ物",
+    area:"佐野市",
+    desc:"蒸したじゃがいもを串に刺し衣をつけて揚げた佐野市のB級グルメ。特製ソースをかけて食べる食べ歩きにも人気の一品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Imo-fry.jpg/640px-Imo-fry.jpg",
+    mapUrl:"https://maps.google.com/?q=いもフライ+佐野市" },
+  { pref:"栃木県", region:"kanto", name:"とちおとめ", genre:"スイーツ・喫茶",
+    area:"栃木県全域",
+    desc:"いちご生産量日本一の栃木が誇るブランドいちご。真っ赤な大粒で甘さとジューシーな果汁が魅力。県内各地でいちご狩りも楽しめる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/%E3%81%A8%E3%81%A1%E3%81%8A%E3%81%A8%E3%82%81_%282413573026%29.jpg/640px-%E3%81%A8%E3%81%A1%E3%81%8A%E3%81%A8%E3%82%81_%282413573026%29.jpg",
+    mapUrl:"https://maps.google.com/?q=とちおとめ+栃木県" },
+
+  // ===== 群馬県 =====
+  { pref:"群馬県", region:"kanto", name:"焼きまんじゅう", genre:"郷土料理・軽食",
+    area:"前橋市・高崎市・県内広域",
+    desc:"素まんじゅうを串に刺し濃厚な甘辛味噌ダレを塗って炭火で香ばしく焼き上げる群馬を代表する郷土のおやつ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Yakimanju%3B_2017.jpg/640px-Yakimanju%3B_2017.jpg",
+    mapUrl:"https://maps.google.com/?q=焼きまんじゅう+前橋市" },
+  { pref:"群馬県", region:"kanto", name:"水沢うどん", genre:"麺類",
+    area:"渋川市（伊香保温泉）",
+    desc:"日本三大うどんのひとつ。伊香保温泉の水沢観音門前で約400年の歴史を持ちコシがありのど越しの良い太麺が特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Mizusawa_Udon_Tamaruya.JPG/640px-Mizusawa_Udon_Tamaruya.JPG",
+    mapUrl:"https://maps.google.com/?q=水沢うどん+渋川市" },
+  { pref:"群馬県", region:"kanto", name:"ひもかわうどん", genre:"麺類",
+    area:"桐生市",
+    desc:"幅広の平打ち麺が特徴的な桐生のご当地うどん。店によっては幅10cm以上にもなりつるりとした舌触りともちもちの食感が魅力",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Himokawa-udon.jpg/640px-Himokawa-udon.jpg",
+    mapUrl:"https://maps.google.com/?q=ひもかわうどん+桐生市" },
+  { pref:"群馬県", region:"kanto", name:"峠の釜めし", genre:"ご飯もの",
+    area:"安中市（横川）",
+    desc:"JR横川駅の名物駅弁として全国的に有名。益子焼の土釜に鶏肉・椎茸・栗・杏など具だくさんの彩り豊かな炊き込みご飯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/T%C5%8Dge_no_Kamameshi_02.jpg/640px-T%C5%8Dge_no_Kamameshi_02.jpg",
+    mapUrl:"https://maps.google.com/?q=峠の釜めし+安中市横川" },
+  { pref:"群馬県", region:"kanto", name:"上州太田焼きそば", genre:"粉もの・鉄板",
+    area:"太田市",
+    desc:"太くて黒い麺にたっぷりのソースを絡めた濃い味付けが特徴。太田市に約80店もの焼きそば店が存在する群馬のB級グルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Ota_Yakisoba_001.jpg/640px-Ota_Yakisoba_001.jpg",
+    mapUrl:"https://maps.google.com/?q=上州太田焼きそば+太田市" },
+  { pref:"群馬県", region:"kanto", name:"こんにゃく料理", genre:"郷土料理・軽食",
+    area:"下仁田町・県内全域",
+    desc:"こんにゃく芋の収穫量日本一の群馬ならではの味。味噌おでん風の田楽が定番で刺身こんにゃくも人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Miso_konnyaku_by_nyaa_birdies_perch_in_Nakanojo%2C_Gunma.jpg/640px-Miso_konnyaku_by_nyaa_birdies_perch_in_Nakanojo%2C_Gunma.jpg",
+    mapUrl:"https://maps.google.com/?q=こんにゃく料理+下仁田町" },
+  { pref:"群馬県", region:"kanto", name:"もつ煮", genre:"郷土料理・軽食",
+    area:"渋川市・県内広域",
+    desc:"豚の小腸とこんにゃくを味噌で煮込んだ群馬のソウルフード。ご飯のおかずにも酒の肴にもぴったり",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Motsu-nikomi_001.jpg/640px-Motsu-nikomi_001.jpg",
+    mapUrl:"https://maps.google.com/?q=もつ煮+渋川市" },
+
+  // ===== 埼玉県 =====
+  { pref:"埼玉県", region:"kanto", name:"武蔵野うどん", genre:"麺類",
+    area:"埼玉県西部（所沢・川越周辺）",
+    desc:"武蔵野台地産の小麦を使った太くコシの強いうどんを豚肉入りのかつおだしつけ汁で食べるつけ麺スタイルの郷土うどん",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Musashino_udon_001.jpg/640px-Musashino_udon_001.jpg",
+    mapUrl:"https://maps.google.com/?q=武蔵野うどん+埼玉" },
+  { pref:"埼玉県", region:"kanto", name:"わらじカツ丼", genre:"ご飯もの",
+    area:"秩父郡小鹿野町",
+    desc:"草鞋のように大きな薄い豚カツを2枚、甘辛い秘伝のタレで味付けしてご飯にのせた秩父名物の丼",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Warajikatsu.jpg/640px-Warajikatsu.jpg",
+    mapUrl:"https://maps.google.com/?q=わらじカツ丼+秩父" },
+  { pref:"埼玉県", region:"kanto", name:"みそポテト", genre:"郷土料理・軽食",
+    area:"秩父地方",
+    desc:"茹でたジャガイモに衣をつけて揚げ甘辛い味噌ダレをたっぷりかけた秩父の郷土おやつ。農作業の合間に食べられてきた素朴なB級グルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Misopoteto_1.jpg/640px-Misopoteto_1.jpg",
+    mapUrl:"https://maps.google.com/?q=みそポテト+秩父" },
+  { pref:"埼玉県", region:"kanto", name:"ゼリーフライ", genre:"揚げ物",
+    area:"行田市",
+    desc:"おからとジャガイモを混ぜて小判型に成形し衣なしで素揚げしてソースをかけた行田名物。「銭フライ」が訛ったのが名前の由来",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Zellyfry_001.jpg/640px-Zellyfry_001.jpg",
+    mapUrl:"https://maps.google.com/?q=ゼリーフライ+行田市" },
+  { pref:"埼玉県", region:"kanto", name:"行田フライ", genre:"粉もの・鉄板",
+    area:"行田市",
+    desc:"小麦粉を水で溶いた生地にネギや肉・卵をのせて薄く焼いたお好み焼き風B級グルメ。足袋工場の女工のおやつが起源",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/%E8%A1%8C%E7%94%B0%E3%83%95%E3%83%A9%E3%82%A4.jpg/640px-%E8%A1%8C%E7%94%B0%E3%83%95%E3%83%A9%E3%82%A4.jpg",
+    mapUrl:"https://maps.google.com/?q=行田フライ+行田市" },
+  { pref:"埼玉県", region:"kanto", name:"豆腐ラーメン", genre:"麺類",
+    area:"さいたま市岩槻区",
+    desc:"醤油ラーメンの上に豆腐とひき肉の甘辛い餡をかけた岩槻発祥のご当地ラーメン。埼玉B級グルメ王決定戦で2度の優勝",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/%E8%B1%86%E8%85%90%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg/640px-%E8%B1%86%E8%85%90%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg",
+    mapUrl:"https://maps.google.com/?q=豆腐ラーメン+さいたま市岩槻区" },
+  { pref:"埼玉県", region:"kanto", name:"浦和のうなぎ", genre:"郷土料理・軽食",
+    area:"さいたま市浦和区",
+    desc:"江戸時代から中山道の宿場町として栄えた浦和は沼地でうなぎが豊富に獲れたことから鰻の名所として有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Unagi_matsuri_01_Saitama.jpg/640px-Unagi_matsuri_01_Saitama.jpg",
+    mapUrl:"https://maps.google.com/?q=うなぎ+浦和" },
+  { pref:"埼玉県", region:"kanto", name:"東松山やきとん", genre:"肉料理",
+    area:"東松山市",
+    desc:"豚のカシラ肉を炭火で焼きピリ辛の味噌ダレで食べる東松山スタイル。「やきとり」と呼ぶが実は豚肉なのが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/%E7%84%BC%E3%81%8D%E3%81%A8%E3%82%93_%2891799279%29.jpg/640px-%E7%84%BC%E3%81%8D%E3%81%A8%E3%82%93_%2891799279%29.jpg",
+    mapUrl:"https://maps.google.com/?q=やきとん+東松山市" },
+  { pref:"埼玉県", region:"kanto", name:"川越の芋スイーツ", genre:"スイーツ・喫茶",
+    area:"川越市",
+    desc:"江戸時代からさつまいもの名産地として知られる川越。芋ようかん・芋けんぴ・いも恋など多彩な芋菓子が小江戸の街で楽しめる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Imokoi_002.jpg/640px-Imokoi_002.jpg",
+    mapUrl:"https://maps.google.com/?q=芋スイーツ+川越市" },
+  { pref:"埼玉県", region:"kanto", name:"大宮ナポリタン", genre:"麺類",
+    area:"さいたま市大宮区",
+    desc:"地場野菜を1種類以上使うことが条件の大宮発ご当地ナポリタン。鉄道の街・大宮の喫茶店文化から生まれた町おこしグルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Spaghetti_Naporitan_002.jpg/640px-Spaghetti_Naporitan_002.jpg",
+    mapUrl:"https://maps.google.com/?q=大宮ナポリタン+大宮" },
+
+  // ===== 千葉県 =====
+  { pref:"千葉県", region:"kanto", name:"勝浦タンタンメン", genre:"麺類",
+    area:"勝浦市",
+    desc:"芝麻醤を使わず醤油ベースのスープにラー油をたっぷり入れた独自の担々麺。漁師が体を温めるために食べたのが起源。2015年B-1グランプリ優勝",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Katsutan.jpg/640px-Katsutan.jpg",
+    mapUrl:"https://maps.google.com/?q=勝浦タンタンメン+勝浦市" },
+  { pref:"千葉県", region:"kanto", name:"なめろう", genre:"海鮮",
+    area:"南房総地域",
+    desc:"アジなどの新鮮な魚を味噌・ネギ・生姜と一緒に叩いて作る房総の漁師飯。皿まで舐めるほど旨いことが名前の由来",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Namerou_001.jpg/640px-Namerou_001.jpg",
+    mapUrl:"https://maps.google.com/?q=なめろう+南房総" },
+  { pref:"千葉県", region:"kanto", name:"竹岡式ラーメン", genre:"麺類",
+    area:"富津市竹岡周辺（内房）",
+    desc:"チャーシューの煮汁を醤油ダレとして麺の茹で汁で割った真っ黒なスープが特徴の千葉三大ラーメンの一つ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Takeokaramen.jpg/640px-Takeokaramen.jpg",
+    mapUrl:"https://maps.google.com/?q=竹岡式ラーメン+富津市" },
+  { pref:"千葉県", region:"kanto", name:"ホワイト餃子", genre:"粉もの・鉄板",
+    area:"野田市",
+    desc:"厚めのモチモチ皮で野菜たっぷりのあんを包み油でパリパリに焼き上げる野田発祥の名物餃子。ぷっくり丸い独特のフォルム",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/White_Gyouza_001.jpg/640px-White_Gyouza_001.jpg",
+    mapUrl:"https://maps.google.com/?q=ホワイト餃子+野田市" },
+  { pref:"千葉県", region:"kanto", name:"ぬれ煎餅", genre:"スイーツ・喫茶",
+    area:"銚子市",
+    desc:"焼きたての煎餅を銚子特産の醤油に浸してしっとり仕上げた銚子電鉄の名物。経営難の鉄道会社を救った伝説のお菓子",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Nure-senbei_001.jpg/640px-Nure-senbei_001.jpg",
+    mapUrl:"https://maps.google.com/?q=ぬれ煎餅+銚子市" },
+  { pref:"千葉県", region:"kanto", name:"成田のうなぎ", genre:"郷土料理・軽食",
+    area:"成田市",
+    desc:"成田山新勝寺の参道に江戸時代から続くうなぎ屋が軒を連ねる。店先で焼くうなぎの香ばしい煙が門前町の風物詩",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Unaju_by_Kawatoyo_Honten.jpg/640px-Unaju_by_Kawatoyo_Honten.jpg",
+    mapUrl:"https://maps.google.com/?q=うなぎ+成田山" },
+  { pref:"千葉県", region:"kanto", name:"太巻き祭り寿司", genre:"ご飯もの",
+    area:"房総地域",
+    desc:"断面に花や動物などの美しい絵柄が現れる千葉の伝統的な巻き寿司。冠婚葬祭やお祝いの席で振る舞われる郷土料理",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Big_rolled_sushi%2CHutomakizushi%2CKatori-city%2CChiba%2CJapan.JPG/640px-Big_rolled_sushi%2CHutomakizushi%2CKatori-city%2CChiba%2CJapan.JPG",
+    mapUrl:"https://maps.google.com/?q=太巻き祭り寿司+千葉県" },
+  { pref:"千葉県", region:"kanto", name:"アリランラーメン", genre:"麺類",
+    area:"長生郡長柄町",
+    desc:"大量の玉ねぎとニンニクを甘辛い醤油スープで煮込んだスタミナ系ラーメン。房総の山奥にある千葉三大ラーメンの一角",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/%E3%82%A2%E3%83%AA%E3%83%A9%E3%83%B3%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg/640px-%E3%82%A2%E3%83%AA%E3%83%A9%E3%83%B3%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg",
+    mapUrl:"https://maps.google.com/?q=アリランラーメン+長柄町" },
+  { pref:"千葉県", region:"kanto", name:"ゆで落花生", genre:"郷土料理・軽食",
+    area:"八街市・県内全域",
+    desc:"収穫したての生落花生を殻ごと塩茹でにした千葉ならではの食べ方。ホクホクとした食感と濃厚な甘みは煎り落花生とは別物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Boiled_big_peanuts_%26_normal_peanuts%2C_Katori_City%2C_Japan.jpg/640px-Boiled_big_peanuts_%26_normal_peanuts%2C_Katori_City%2C_Japan.jpg",
+    mapUrl:"https://maps.google.com/?q=ゆで落花生+八街市" },
+  { pref:"千葉県", region:"kanto", name:"伊勢えび料理", genre:"海鮮",
+    area:"いすみ市〜勝浦市（外房）",
+    desc:"外房の海で獲れる「外房イセエビ」は千葉の高級食材の代表格。刺身や鬼殻焼きなど豪快な料理で味わえる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Sashimi_%E4%BC%8A%E5%8B%A2%E3%82%A8%E3%83%93.jpg/640px-Sashimi_%E4%BC%8A%E5%8B%A2%E3%82%A8%E3%83%93.jpg",
+    mapUrl:"https://maps.google.com/?q=伊勢えび+外房" },
+
+  // ===== 北海道 =====
+  { pref:"北海道", region:"hokkaido", name:"ジンギスカン", genre:"肉料理",
+    area:"札幌市・北海道全域",
+    desc:"専用の山型鉄鍋でラム肉や野菜を焼く北海道を代表する郷土料理。タレに漬け込む「味付け」と焼いてからタレをつける「後づけ」の2スタイルがある",
+    img:"https://upload.wikimedia.org/wikipedia/commons/b/bc/Jingisukan_japanese_mutton_barbecue.jpg",
+    mapUrl:"https://maps.google.com/?q=ジンギスカン+札幌" },
+  { pref:"北海道", region:"hokkaido", name:"札幌味噌ラーメン", genre:"麺類",
+    area:"札幌市",
+    desc:"濃厚な味噌スープに中太ちぢれ麺、炒めたもやしやひき肉をのせた札幌発祥の定番。北海道三大ラーメンの筆頭格",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Sapporo_miso_ramen.jpg/640px-Sapporo_miso_ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=札幌味噌ラーメン+札幌" },
+  { pref:"北海道", region:"hokkaido", name:"海鮮丼", genre:"海鮮",
+    area:"札幌市・小樽市・函館市",
+    desc:"ウニ・イクラ・カニ・ホタテなど北海道産の新鮮な海の幸をたっぷりのせた丼。朝市や市場で食べるのが定番",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Kaisen-don_001.jpg/640px-Kaisen-don_001.jpg",
+    mapUrl:"https://maps.google.com/?q=海鮮丼+札幌" },
+  { pref:"北海道", region:"hokkaido", name:"スープカレー", genre:"郷土料理・軽食",
+    area:"札幌市",
+    desc:"サラサラのスパイシーなカレースープに大きなチキンレッグや素揚げ野菜がごろっと入った札幌発祥のご当地グルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/A_soup_curry_dish_in_Sapporo_-_Flickr_-_odako1.jpg/640px-A_soup_curry_dish_in_Sapporo_-_Flickr_-_odako1.jpg",
+    mapUrl:"https://maps.google.com/?q=スープカレー+札幌" },
+  { pref:"北海道", region:"hokkaido", name:"旭川醤油ラーメン", genre:"麺類",
+    area:"旭川市",
+    desc:"豚骨と魚介のWスープに醤油ダレを合わせ表面にラードの膜が張るのが特徴。寒い旭川で冷めにくい工夫から生まれた一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Asahikawa_Tenkin_Shoyu_Ramen.jpg/640px-Asahikawa_Tenkin_Shoyu_Ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=旭川ラーメン+旭川" },
+  { pref:"北海道", region:"hokkaido", name:"十勝豚丼", genre:"ご飯もの",
+    area:"帯広市・十勝地方",
+    desc:"厚切りの豚ロースを炭火で香ばしく焼き甘辛い醤油ダレをからめてご飯にのせた帯広発祥の名物丼。開拓時代の豚肉文化が起源",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tokachi_Butadon_Ippin_Butadon.jpg/640px-Tokachi_Butadon_Ippin_Butadon.jpg",
+    mapUrl:"https://maps.google.com/?q=豚丼+帯広" },
+  { pref:"北海道", region:"hokkaido", name:"ザンギ", genre:"揚げ物",
+    area:"釧路市・北海道全域",
+    desc:"醤油やニンニク・生姜で濃いめに下味をつけてカリッと揚げる北海道流の鶏の唐揚げ。釧路が発祥とされ道民のソウルフード",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Zangi_20120527.JPG/640px-Zangi_20120527.JPG",
+    mapUrl:"https://maps.google.com/?q=ザンギ+釧路" },
+  { pref:"北海道", region:"hokkaido", name:"函館塩ラーメン", genre:"麺類",
+    area:"函館市",
+    desc:"透き通った塩味のあっさりスープにストレート麺を合わせた北海道三大ラーメンの一つ。函館の港町文化から発展した",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Hakodate-Shio-Ramen.png/640px-Hakodate-Shio-Ramen.png",
+    mapUrl:"https://maps.google.com/?q=塩ラーメン+函館" },
+  { pref:"北海道", region:"hokkaido", name:"石狩鍋", genre:"郷土料理・軽食",
+    area:"石狩市・札幌市",
+    desc:"鮭の身やアラを味噌仕立てのスープで豆腐や野菜と煮込む北海道の代表的な郷土鍋。仕上げにバターを落とすのが北海道流",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Ishikari_nabe_by_Adonis_Chen_in_Hokkaido.jpg/640px-Ishikari_nabe_by_Adonis_Chen_in_Hokkaido.jpg",
+    mapUrl:"https://maps.google.com/?q=石狩鍋+石狩" },
+  { pref:"北海道", region:"hokkaido", name:"小樽あんかけ焼きそば", genre:"麺類",
+    area:"小樽市",
+    desc:"パリッと焼いた太めの麺にたっぷりの具材入りとろみ餡をかけた小樽のB級グルメ。昭和30年代から港町の食堂で愛されている",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Otaru_ankake_yakisoba_20140113.jpg/640px-Otaru_ankake_yakisoba_20140113.jpg",
+    mapUrl:"https://maps.google.com/?q=あんかけ焼きそば+小樽" },
+  { pref:"北海道", region:"hokkaido", name:"室蘭カレーラーメン", genre:"麺類",
+    area:"室蘭市",
+    desc:"スパイシーなカレー風味のスープにちぢれ麺を合わせた30年以上の歴史を持つ室蘭のご当地ラーメン",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Muroran_Curry_Ramen_Ajino-Daioh_Muroran_Honten.jpg/640px-Muroran_Curry_Ramen_Ajino-Daioh_Muroran_Honten.jpg",
+    mapUrl:"https://maps.google.com/?q=カレーラーメン+室蘭" },
+  { pref:"北海道", region:"hokkaido", name:"白い恋人", genre:"スイーツ・喫茶",
+    area:"札幌市",
+    desc:"ラングドシャクッキーでホワイトチョコレートを挟んだ北海道土産の定番中の定番として全国的に知られる銘菓",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Shiroi_Koibito_%282%29.jpg/640px-Shiroi_Koibito_%282%29.jpg",
+    mapUrl:"https://maps.google.com/?q=白い恋人+札幌" },
+  { pref:"北海道", region:"hokkaido", name:"夕張メロン", genre:"スイーツ・喫茶",
+    area:"夕張市",
+    desc:"赤肉で芳醇な香りと濃厚な甘みが特徴の最高級ブランドメロン。初競りでは数百万円の値がつくことでも有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/5/5d/Half_cut_of_Yubari_melon.JPG",
+    mapUrl:"https://maps.google.com/?q=夕張メロン+夕張" },
+
+  // ===== 青森県 =====
+  { pref:"青森県", region:"tohoku", name:"味噌カレー牛乳ラーメン", genre:"麺類",
+    area:"青森市",
+    desc:"味噌・カレー粉・牛乳・バターを組み合わせた青森市のソウルフード。1970年代に中高生の発想から誕生しまろやかでコク深い味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Curry_miso_milk_ramen_%2850612643643%29.jpg/640px-Curry_miso_milk_ramen_%2850612643643%29.jpg",
+    mapUrl:"https://maps.google.com/?q=味噌カレー牛乳ラーメン+青森市" },
+  { pref:"青森県", region:"tohoku", name:"十和田バラ焼き", genre:"肉料理",
+    area:"十和田市",
+    desc:"牛バラ肉と大量の玉ねぎを甘辛い醤油ベースのタレで鉄板焼きにしたB級グルメ。B-1グランプリで全国的に有名に",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/%E5%8D%81%E5%92%8C%E7%94%B0%E3%83%90%E3%83%A9%E7%84%BC%E3%81%8D_P1290019.jpg/640px-%E5%8D%81%E5%92%8C%E7%94%B0%E3%83%90%E3%83%A9%E7%84%BC%E3%81%8D_P1290019.jpg",
+    mapUrl:"https://maps.google.com/?q=十和田バラ焼き+十和田市" },
+  { pref:"青森県", region:"tohoku", name:"八戸せんべい汁", genre:"郷土料理・軽食",
+    area:"八戸市",
+    desc:"肉や魚・野菜の出汁に南部せんべいを割り入れて煮込んだ八戸の郷土鍋料理。B-1グランプリでゴールドグランプリを獲得",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Senbeijiru.jpg/640px-Senbeijiru.jpg",
+    mapUrl:"https://maps.google.com/?q=八戸せんべい汁+八戸市" },
+  { pref:"青森県", region:"tohoku", name:"青森のっけ丼", genre:"海鮮",
+    area:"青森市",
+    desc:"青森魚菜センターで好きな海鮮の具材をチケットと交換しながらご飯に乗せて作るオリジナル海鮮丼",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/%E3%83%81%E3%82%B1%E3%83%83%E3%83%881%E6%9E%9A_%E3%83%81%E3%82%B1%E3%83%83%E3%83%882%E6%9E%9A_%2840635526630%29.jpg/640px-%E3%83%81%E3%82%B1%E3%83%83%E3%83%881%E6%9E%9A_%E3%83%81%E3%82%B1%E3%83%83%E3%83%882%E6%9E%9A_%2840635526630%29.jpg",
+    mapUrl:"https://maps.google.com/?q=のっけ丼+青森市" },
+  { pref:"青森県", region:"tohoku", name:"大間マグロ", genre:"海鮮",
+    area:"大間町",
+    desc:"津軽海峡の荒波で育った最高級の本マグロ。一本釣りで知られ「黒いダイヤ」とも呼ばれる大間町の代名詞",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Aomori-Ohma_Tuna-xl.jpg/640px-Aomori-Ohma_Tuna-xl.jpg",
+    mapUrl:"https://maps.google.com/?q=大間マグロ+大間町" },
+  { pref:"青森県", region:"tohoku", name:"貝焼き味噌", genre:"郷土料理・軽食",
+    area:"青森市・津軽地方",
+    desc:"大きなホタテの貝殻を鍋代わりにしホタテや卵を味噌で煮た津軽地方の伝統的な郷土料理。素朴で滋味深い家庭の味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Kaiyakimiso_hotate.jpg/640px-Kaiyakimiso_hotate.jpg",
+    mapUrl:"https://maps.google.com/?q=貝焼き味噌+青森市" },
+  { pref:"青森県", region:"tohoku", name:"黒石つゆやきそば", genre:"麺類",
+    area:"黒石市",
+    desc:"太平麺のソース焼きそばに和風の汁をかけた黒石発祥のB級グルメ。焼きそばとラーメンの中間のような独特の食感",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Kuroishi_Yakisoba01.JPG/640px-Kuroishi_Yakisoba01.JPG",
+    mapUrl:"https://maps.google.com/?q=黒石つゆやきそば+黒石市" },
+  { pref:"青森県", region:"tohoku", name:"津軽煮干しラーメン", genre:"麺類",
+    area:"青森市・弘前市",
+    desc:"陸奥湾産の煮干しをふんだんに使った津軽地方伝統の中華そば。あっさり系から濃厚煮干し系まで店ごとに個性が光る",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/%E3%81%93%E3%81%8F%E7%85%AE%E5%B9%B2%E3%81%97%EF%BC%88%E9%95%B7%E5%B0%BE%E4%B8%AD%E8%8F%AF%E3%81%9D%E3%81%B0%EF%BC%89.jpg/640px-%E3%81%93%E3%81%8F%E7%85%AE%E5%B9%B2%E3%81%97%EF%BC%88%E9%95%B7%E5%B0%BE%E4%B8%AD%E8%8F%AF%E3%81%9D%E3%81%B0%EF%BC%89.jpg",
+    mapUrl:"https://maps.google.com/?q=津軽煮干しラーメン+青森市" },
+
+  // ===== 岩手県 =====
+  { pref:"岩手県", region:"tohoku", name:"盛岡冷麺", genre:"麺類",
+    area:"盛岡市",
+    desc:"強いコシのある半透明の麺に牛骨ベースの冷たいスープとキムチを合わせた盛岡三大麺の一つ。焼肉店の〆としても人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Morioka_Reimen.jpg/640px-Morioka_Reimen.jpg",
+    mapUrl:"https://maps.google.com/?q=盛岡冷麺+盛岡市" },
+  { pref:"岩手県", region:"tohoku", name:"わんこそば", genre:"麺類",
+    area:"盛岡市・花巻市",
+    desc:"給仕が次々と小椀にそばを注ぎ足す岩手の名物体験型グルメ。何杯食べられるか挑戦するのが醍醐味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Wanko_soba.jpg/640px-Wanko_soba.jpg",
+    mapUrl:"https://maps.google.com/?q=わんこそば+盛岡市" },
+  { pref:"岩手県", region:"tohoku", name:"盛岡じゃじゃ麺", genre:"麺類",
+    area:"盛岡市",
+    desc:"茹でた平打ち麺に特製の肉味噌をのせニンニクや酢を加えて混ぜて食べる盛岡三大麺の一つ。食後の「ちいたんたん」も楽しみ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Morioka-Jajamen.jpg/640px-Morioka-Jajamen.jpg",
+    mapUrl:"https://maps.google.com/?q=盛岡じゃじゃ麺+盛岡市" },
+  { pref:"岩手県", region:"tohoku", name:"前沢牛", genre:"肉料理",
+    area:"奥州市前沢",
+    desc:"奥州市前沢で肥育される最高級の黒毛和牛ブランド。きめ細やかな霜降りと上品な脂の甘みが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Maezawa_beef_rib.jpg/640px-Maezawa_beef_rib.jpg",
+    mapUrl:"https://maps.google.com/?q=前沢牛+奥州市" },
+  { pref:"岩手県", region:"tohoku", name:"宮古の瓶ドン", genre:"海鮮",
+    area:"宮古市",
+    desc:"牛乳瓶に旬の海鮮具材を詰めた宮古市の新名物。瓶からご飯に豪快にあけて食べるスタイルで三陸の恵みを堪能できる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/%E5%AE%AE%E5%8F%A4%E3%81%AE%E7%93%B6%E3%83%89%E3%83%B3%EF%BC%81%E9%AE%9120211023-P1250618.jpg/640px-%E5%AE%AE%E5%8F%A4%E3%81%AE%E7%93%B6%E3%83%89%E3%83%B3%EF%BC%81%E9%AE%9120211023-P1250618.jpg",
+    mapUrl:"https://maps.google.com/?q=瓶ドン+宮古市" },
+  { pref:"岩手県", region:"tohoku", name:"一関もち料理", genre:"郷土料理・軽食",
+    area:"一関市",
+    desc:"年間60日以上もちを食べる一関の餅文化。あんこ・ずんだ・くるみ・エビなど多彩なもちだれで味わう「もち膳」が名物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Ichinoseki_Local_Food_%22Mochi%22.jpg/640px-Ichinoseki_Local_Food_%22Mochi%22.jpg",
+    mapUrl:"https://maps.google.com/?q=一関もち料理+一関市" },
+  { pref:"岩手県", region:"tohoku", name:"まめぶ汁", genre:"郷土料理・軽食",
+    area:"久慈市",
+    desc:"くるみや黒砂糖を包んだ団子を野菜や豆腐と一緒に醤油出汁で煮込んだ久慈地方の郷土料理。NHKドラマ「あまちゃん」で有名に",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Mamebujiru.JPG/640px-Mamebujiru.JPG",
+    mapUrl:"https://maps.google.com/?q=まめぶ汁+久慈市" },
+
+  // ===== 宮城県 =====
+  { pref:"宮城県", region:"tohoku", name:"牛タン焼き", genre:"肉料理",
+    area:"仙台市",
+    desc:"厚切りの牛タンを炭火で焼き上げ麦飯とテールスープと共に味わう仙台の代名詞的グルメ。市内に100店以上の専門店がある",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Gyutan_teishoku.JPG/640px-Gyutan_teishoku.JPG",
+    mapUrl:"https://maps.google.com/?q=牛タン焼き+仙台市" },
+  { pref:"宮城県", region:"tohoku", name:"ずんだ餅", genre:"スイーツ・喫茶",
+    area:"仙台市",
+    desc:"すりつぶした枝豆の鮮やかな緑色の餡で餅をまぶした南東北の郷土菓子。ずんだシェイクも人気で仙台土産の定番",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Zunda-mochi.jpg/640px-Zunda-mochi.jpg",
+    mapUrl:"https://maps.google.com/?q=ずんだ餅+仙台市" },
+  { pref:"宮城県", region:"tohoku", name:"笹かまぼこ", genre:"郷土料理・軽食",
+    area:"仙台市",
+    desc:"笹の葉の形を模した仙台名物の蒲鉾。明治期に大量に獲れた魚を保存加工するため誕生し伊達家の家紋にちなんだ形が特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Sasa-Kamaboko_001.jpg/640px-Sasa-Kamaboko_001.jpg",
+    mapUrl:"https://maps.google.com/?q=笹かまぼこ+仙台市" },
+  { pref:"宮城県", region:"tohoku", name:"はらこ飯", genre:"ご飯もの",
+    area:"亘理町・仙台市",
+    desc:"鮭の煮汁で炊いたご飯の上に鮭の身とイクラをのせた宮城の秋の郷土料理。伊達政宗も絶賛したと伝わる「海の親子丼」",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Harakomesi-01.JPG/640px-Harakomesi-01.JPG",
+    mapUrl:"https://maps.google.com/?q=はらこ飯+亘理町" },
+  { pref:"宮城県", region:"tohoku", name:"気仙沼フカヒレ", genre:"海鮮",
+    area:"気仙沼市",
+    desc:"サメの水揚げ量日本一を誇る気仙沼の名物高級食材。フカヒレ丼やフカヒレラーメンなど産地ならではの贅沢な味わいを手頃に楽しめる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Shark_fin_rice_bowl_in_Kesennuma.jpg/640px-Shark_fin_rice_bowl_in_Kesennuma.jpg",
+    mapUrl:"https://maps.google.com/?q=気仙沼フカヒレ+気仙沼市" },
+  { pref:"宮城県", region:"tohoku", name:"仙台マーボー焼そば", genre:"粉もの・鉄板",
+    area:"仙台市",
+    desc:"焼きそばの上に熱々の麻婆豆腐をかけた仙台発祥のB級グルメ。1970年代に中華料理店のまかないから生まれた",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Mapo_Yakisoba_%28Regional_cuisine_in_Sendai_City%29.jpg/640px-Mapo_Yakisoba_%28Regional_cuisine_in_Sendai_City%29.jpg",
+    mapUrl:"https://maps.google.com/?q=仙台マーボー焼そば+仙台市" },
+  { pref:"宮城県", region:"tohoku", name:"油麩丼", genre:"ご飯もの",
+    area:"登米市",
+    desc:"グルテンを棒状に伸ばして油で揚げた「油麩」を卵でとじてご飯にのせた登米地方の郷土丼。カツ丼のような食べ応えでヘルシー",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Aburafu-don.JPG/640px-Aburafu-don.JPG",
+    mapUrl:"https://maps.google.com/?q=油麩丼+登米市" },
+  { pref:"宮城県", region:"tohoku", name:"白石温麺", genre:"麺類",
+    area:"白石市",
+    desc:"長さ約9cmの短い手延べ乾麺で油を使わず胃に優しいのが特徴。江戸時代に病弱な父のために考案されたと伝わる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Shiroishi-Uumen.JPG/640px-Shiroishi-Uumen.JPG",
+    mapUrl:"https://maps.google.com/?q=白石温麺+白石市" },
+
+  // ===== 秋田県 =====
+  { pref:"秋田県", region:"tohoku", name:"きりたんぽ鍋", genre:"郷土料理・軽食",
+    area:"大館・鹿角地方",
+    desc:"潰したご飯を杉の棒に巻いて焼いたきりたんぽを比内地鶏のスープで野菜やきのこと一緒に煮込む秋田を代表する郷土鍋",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Kiritanpo_nabe_z.JPG/640px-Kiritanpo_nabe_z.JPG",
+    mapUrl:"https://maps.google.com/?q=きりたんぽ鍋+大館市" },
+  { pref:"秋田県", region:"tohoku", name:"稲庭うどん", genre:"麺類",
+    area:"湯沢市稲庭町",
+    desc:"日本三大うどんの一つ。手延べ製法で作られた極細の平打ち麺はつるりとした喉越しとしっかりしたコシが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Inaniwa_udon_by_yoppy.jpg/640px-Inaniwa_udon_by_yoppy.jpg",
+    mapUrl:"https://maps.google.com/?q=稲庭うどん+湯沢市" },
+  { pref:"秋田県", region:"tohoku", name:"横手やきそば", genre:"粉もの・鉄板",
+    area:"横手市",
+    desc:"もちもちの茹で麺にウスターソースを絡めキャベツと豚ひき肉を具材に目玉焼きと福神漬けを添えるB級グルメの王道",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Yokote_yakisoba_by_Hyougushi_in_Akita.jpg/640px-Yokote_yakisoba_by_Hyougushi_in_Akita.jpg",
+    mapUrl:"https://maps.google.com/?q=横手やきそば+横手市" },
+  { pref:"秋田県", region:"tohoku", name:"比内地鶏", genre:"肉料理",
+    area:"大館市・北秋田エリア",
+    desc:"日本三大地鶏の一つで天然記念物の比内鶏を品種改良した食用鶏。親子丼や焼き鳥など多彩な料理で味わえる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/%E6%AF%94%E5%86%85%E5%9C%B0%E9%B6%8F%E8%A6%AA%E5%AD%90%E4%B8%BC%EF%BC%88%E7%A7%8B%E7%94%B0%E6%AF%94%E5%86%85%E3%82%84%E5%A4%A7%E9%A4%A8%E6%9C%AC%E5%BA%97%EF%BC%89.jpg/640px-%E6%AF%94%E5%86%85%E5%9C%B0%E9%B6%8F%E8%A6%AA%E5%AD%90%E4%B8%BC%EF%BC%88%E7%A7%8B%E7%94%B0%E6%AF%94%E5%86%85%E3%82%84%E5%A4%A7%E9%A4%A8%E6%9C%AC%E5%BA%97%EF%BC%89.jpg",
+    mapUrl:"https://maps.google.com/?q=比内地鶏+大館市" },
+  { pref:"秋田県", region:"tohoku", name:"しょっつる鍋", genre:"海鮮",
+    area:"男鹿半島・秋田市",
+    desc:"ハタハタなどの小魚を塩漬けにして発酵させた秋田の魚醤「しょっつる」をベースにした伝統的な鍋料理",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Gyosyou2830.JPG/640px-Gyosyou2830.JPG",
+    mapUrl:"https://maps.google.com/?q=しょっつる鍋+男鹿市" },
+  { pref:"秋田県", region:"tohoku", name:"ハタハタ寿司", genre:"海鮮",
+    area:"秋田県沿岸部",
+    desc:"秋田の県魚ハタハタを米麹と野菜で漬け込んだなれずしの一種。冬の保存食として古くから親しまれる郷土の味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Hatahatazushi_in_Akita_2024_Mar_28_02-42PM.jpeg/640px-Hatahatazushi_in_Akita_2024_Mar_28_02-42PM.jpeg",
+    mapUrl:"https://maps.google.com/?q=ハタハタ寿司+秋田市" },
+  { pref:"秋田県", region:"tohoku", name:"いぶりがっこ", genre:"郷土料理・軽食",
+    area:"秋田県内陸部",
+    desc:"大根を囲炉裏の煙で燻製にしてから米ぬかで漬けた秋田独自の漬物。スモーキーな香りとパリッとした食感が特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Iburigakko_sliced.jpg/640px-Iburigakko_sliced.jpg",
+    mapUrl:"https://maps.google.com/?q=いぶりがっこ+秋田県" },
+  { pref:"秋田県", region:"tohoku", name:"ババヘラアイス", genre:"スイーツ・喫茶",
+    area:"秋田県内各地の国道沿い",
+    desc:"おばさん（ババ）がヘラで花の形に盛り付ける路上販売のアイス。ピンクと黄色のバラ盛りが定番の秋田の夏の風物詩",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/%E3%83%90%E3%83%90%E3%81%95%E3%82%93%E3%82%A2%E3%82%A4%E3%82%B9%EF%BC%88%E5%85%90%E7%8E%89%E5%86%B7%E8%8F%93%EF%BC%89.jpg/640px-%E3%83%90%E3%83%90%E3%81%95%E3%82%93%E3%82%A2%E3%82%A4%E3%82%B9%EF%BC%88%E5%85%90%E7%8E%89%E5%86%B7%E8%8F%93%EF%BC%89.jpg",
+    mapUrl:"https://maps.google.com/?q=ババヘラアイス+秋田県" },
+  { pref:"秋田県", region:"tohoku", name:"バター餅", genre:"スイーツ・喫茶",
+    area:"北秋田市",
+    desc:"つきたての餅にバター・卵黄・砂糖を練り込んだ素朴な甘味。柔らかくもっちりした食感が長く続くマタギのおやつ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Butter_Mochi_%28Japan%29_20121129.jpg/640px-Butter_Mochi_%28Japan%29_20121129.jpg",
+    mapUrl:"https://maps.google.com/?q=バター餅+北秋田市" },
+  { pref:"秋田県", region:"tohoku", name:"だまこ鍋", genre:"郷土料理・軽食",
+    area:"秋田市・五城目町周辺",
+    desc:"ご飯をつぶして丸めた「だまこもち」を比内地鶏のスープで煮込む鍋。きりたんぽ鍋と並ぶ秋田の冬の定番郷土鍋",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Damako_Nabe.jpg/640px-Damako_Nabe.jpg",
+    mapUrl:"https://maps.google.com/?q=だまこ鍋+秋田市" },
+
+  // ===== 山形県 =====
+  { pref:"山形県", region:"tohoku", name:"芋煮", genre:"郷土料理・軽食",
+    area:"山形市・河川敷",
+    desc:"里芋・牛肉・こんにゃく・ねぎを醤油ベースで煮込む山形の秋の風物詩。河川敷での大規模な芋煮会は全国的に有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Yamagataimoni.JPG/640px-Yamagataimoni.JPG",
+    mapUrl:"https://maps.google.com/?q=芋煮+山形市" },
+  { pref:"山形県", region:"tohoku", name:"冷やしラーメン", genre:"麺類",
+    area:"山形市",
+    desc:"1952年に山形市で生まれた冷たいスープのラーメン。氷の浮かぶ澄んだ醤油スープにコシのある麺が特徴の夏の名物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Hiyashi-Ramen.jpg/640px-Hiyashi-Ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=冷やしラーメン+山形市" },
+  { pref:"山形県", region:"tohoku", name:"米沢牛", genre:"肉料理",
+    area:"米沢市・置賜地方",
+    desc:"日本四大和牛の一つに数えられる黒毛和牛。きめ細かい霜降りと上質な脂の甘みが特徴でステーキやすき焼きが人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Yonezawa_Beef_Steak.jpg/640px-Yonezawa_Beef_Steak.jpg",
+    mapUrl:"https://maps.google.com/?q=米沢牛+米沢市" },
+  { pref:"山形県", region:"tohoku", name:"冷たい肉そば", genre:"麺類",
+    area:"河北町（谷地）",
+    desc:"鶏肉の出汁が効いた冷たいつゆに歯ごたえのある田舎そばと親鶏の肉を合わせた河北町発祥のご当地そば",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Chicken-buckwheat-noodles%2Csagae-city%2Cjapan.JPG/640px-Chicken-buckwheat-noodles%2Csagae-city%2Cjapan.JPG",
+    mapUrl:"https://maps.google.com/?q=冷たい肉そば+河北町" },
+  { pref:"山形県", region:"tohoku", name:"山形だし", genre:"郷土料理・軽食",
+    area:"山形県村山地方",
+    desc:"きゅうり・なす・みょうが・大葉などの夏野菜を細かく刻み醤油で味付けした万能常備菜。ご飯や豆腐にかけて食べる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Dashi%28Japan_Yamagata_Prefecture%27s_traditional_Vegetable_salad%29.jpg/640px-Dashi%28Japan_Yamagata_Prefecture%27s_traditional_Vegetable_salad%29.jpg",
+    mapUrl:"https://maps.google.com/?q=山形だし+山形県" },
+  { pref:"山形県", region:"tohoku", name:"酒田ラーメン", genre:"麺類",
+    area:"酒田市",
+    desc:"魚介出汁をベースにした透き通る醤油スープと自家製麺が特徴。ワンタンメンが名物であっさりながら深い旨味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Sakata_Wantan_Men.jpg/640px-Sakata_Wantan_Men.jpg",
+    mapUrl:"https://maps.google.com/?q=酒田ラーメン+酒田市" },
+  { pref:"山形県", region:"tohoku", name:"玉こんにゃく", genre:"郷土料理・軽食",
+    area:"山形県内各地",
+    desc:"丸いこんにゃくを醤油で甘辛く煮込み串に刺した山形のソウルフード。観光地や祭りの屋台で手軽に味わえる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/a/a7/Konnyaku.jpg",
+    mapUrl:"https://maps.google.com/?q=玉こんにゃく+山形県" },
+  { pref:"山形県", region:"tohoku", name:"どんどん焼き", genre:"粉もの・鉄板",
+    area:"山形市",
+    desc:"小麦粉の生地に海苔や魚肉ソーセージなどを乗せて焼き割り箸に巻きつけた山形の庶民派おやつ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Dondonyaki.JPG/640px-Dondonyaki.JPG",
+    mapUrl:"https://maps.google.com/?q=どんどん焼き+山形市" },
+
+  // ===== 福島県 =====
+  { pref:"福島県", region:"tohoku", name:"喜多方ラーメン", genre:"麺類",
+    area:"喜多方市",
+    desc:"日本三大ラーメンの一つ。太めの平打ち縮れ麺にあっさり醤油スープが絡む。人口あたりのラーメン店数日本一の街",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Kitakata_ramen_by_macyu_in_Yamagata.jpg/640px-Kitakata_ramen_by_macyu_in_Yamagata.jpg",
+    mapUrl:"https://maps.google.com/?q=喜多方ラーメン+喜多方市" },
+  { pref:"福島県", region:"tohoku", name:"会津ソースカツ丼", genre:"肉料理",
+    area:"会津若松市",
+    desc:"大正時代から続く会津名物。ご飯の上にキャベツを敷き甘めの特製ソースに絡めた揚げたてカツを豪快に乗せた一品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%AB%E3%83%84%E4%B8%BC%EF%BC%88%E3%83%AC%E3%82%B9%E3%83%88%E3%83%A9%E3%83%B3%E3%83%B4%E3%82%A9%E3%83%BC%E3%83%8E%EF%BC%89.jpg/640px-%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%AB%E3%83%84%E4%B8%BC%EF%BC%88%E3%83%AC%E3%82%B9%E3%83%88%E3%83%A9%E3%83%B3%E3%83%B4%E3%82%A9%E3%83%BC%E3%83%8E%EF%BC%89.jpg",
+    mapUrl:"https://maps.google.com/?q=ソースカツ丼+会津若松市" },
+  { pref:"福島県", region:"tohoku", name:"円盤餃子", genre:"粉もの・鉄板",
+    area:"福島市",
+    desc:"フライパンに餃子を円盤状に並べてパリッと焼き上げる福島市の名物。野菜たっぷりのあっさりした餡が特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/%E5%86%86%E7%9B%A4%E9%A4%83%E5%AD%90%28%E5%B0%8F%E3%82%B5%E3%82%A4%E3%82%BA%29_%E7%A6%8F%E5%B3%B6%E5%B8%82.jpg/640px-%E5%86%86%E7%9B%A4%E9%A4%83%E5%AD%90%28%E5%B0%8F%E3%82%B5%E3%82%A4%E3%82%BA%29_%E7%A6%8F%E5%B3%B6%E5%B8%82.jpg",
+    mapUrl:"https://maps.google.com/?q=円盤餃子+福島市" },
+  { pref:"福島県", region:"tohoku", name:"白河ラーメン", genre:"麺類",
+    area:"白河市",
+    desc:"手打ちの幅広縮れ麺と澄んだ醤油スープが特徴の福島三大ラーメンの一つ。コシの強い麺がスープによく絡む",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/%E7%99%BD%E6%B2%B3%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg/640px-%E7%99%BD%E6%B2%B3%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.jpg",
+    mapUrl:"https://maps.google.com/?q=白河ラーメン+白河市" },
+  { pref:"福島県", region:"tohoku", name:"なみえ焼そば", genre:"粉もの・鉄板",
+    area:"浪江町",
+    desc:"通常の約3倍の極太麺が特徴の浪江町発祥のB級グルメ。2013年B-1グランプリ金賞。濃厚ソースともやしのシンプルな味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Namie-yakisoba.jpg/640px-Namie-yakisoba.jpg",
+    mapUrl:"https://maps.google.com/?q=なみえ焼そば+浪江町" },
+  { pref:"福島県", region:"tohoku", name:"こづゆ", genre:"郷土料理・軽食",
+    area:"会津地方",
+    desc:"ホタテの貝柱の出汁に豆麩・里芋・きくらげ・にんじんなどを入れた会津のハレの日の汁物。正月や祝い事に欠かせない",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Kozuyu.jpg/640px-Kozuyu.jpg",
+    mapUrl:"https://maps.google.com/?q=こづゆ+会津若松市" },
+  { pref:"福島県", region:"tohoku", name:"クリームボックス", genre:"スイーツ・喫茶",
+    area:"郡山市",
+    desc:"手のひらサイズの厚切り食パンにミルク風味の白いクリームをたっぷり塗った郡山市発祥のご当地パン",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/%E3%83%AD%E3%83%9F%E3%82%AA%E3%81%AE%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%A0%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%EF%BC%88%E9%83%A1%E5%B1%B1%EF%BC%8920230703-P1028042.jpg/640px-%E3%83%AD%E3%83%9F%E3%82%AA%E3%81%AE%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%A0%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%EF%BC%88%E9%83%A1%E5%B1%B1%EF%BC%8920230703-P1028042.jpg",
+    mapUrl:"https://maps.google.com/?q=クリームボックス+郡山市" },
+
+  // ===== 三重県 =====
+  { pref:"三重県", region:"kinki", name:"伊勢うどん", genre:"麺類",
+    area:"伊勢市内",
+    desc:"極太の柔らかい麺に真っ黒なたまり醤油のタレを絡めて食べる伊勢参拝者の定番グルメ。見た目ほど辛くなく甘みのある独特の味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Ise_Udon_by_Kinoko.JPG/640px-Ise_Udon_by_Kinoko.JPG",
+    mapUrl:"https://maps.google.com/?q=伊勢うどん+伊勢市" },
+  { pref:"三重県", region:"kinki", name:"松阪牛", genre:"肉料理",
+    area:"松阪市周辺",
+    desc:"世界に誇る最高級和牛。きめ細かいサシが入った霜降り肉はすき焼きやステーキで。とろけるような食感と甘みが格別",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Sliced_Matsusaka_wagyu_beef.jpg/640px-Sliced_Matsusaka_wagyu_beef.jpg",
+    mapUrl:"https://maps.google.com/?q=松阪牛+松阪市" },
+  { pref:"三重県", region:"kinki", name:"てこね寿司", genre:"ご飯もの",
+    area:"志摩市・伊勢市",
+    desc:"カツオやマグロの赤身を醤油だれに漬け込み酢飯の上に豪快に盛りつけた志摩地方の漁師めし",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Tekone-zushi_01.JPG/640px-Tekone-zushi_01.JPG",
+    mapUrl:"https://maps.google.com/?q=てこね寿司+伊勢市" },
+  { pref:"三重県", region:"kinki", name:"赤福", genre:"スイーツ・喫茶",
+    area:"伊勢市おはらい町",
+    desc:"創業300年超の伊勢名物。こし餡を餅に指でなぞるように塗った独特の形は五十鈴川のせせらぎを表す",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Akafuku-mochi_001.jpg/640px-Akafuku-mochi_001.jpg",
+    mapUrl:"https://maps.google.com/?q=赤福+伊勢市" },
+  { pref:"三重県", region:"kinki", name:"伊勢海老料理", genre:"海鮮",
+    area:"志摩市・鳥羽市",
+    desc:"志摩半島で水揚げされる伊勢海老を造り・焼き・味噌汁で豪快に味わう。プリプリの身と濃厚な味噌が絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Sashimi_%E4%BC%8A%E5%8B%A2%E3%82%A8%E3%83%93.jpg/640px-Sashimi_%E4%BC%8A%E5%8B%A2%E3%82%A8%E3%83%93.jpg",
+    mapUrl:"https://maps.google.com/?q=伊勢海老+鳥羽市" },
+  { pref:"三重県", region:"kinki", name:"津ぎょうざ", genre:"粉もの・鉄板",
+    area:"津市内",
+    desc:"直径15cmの巨大な揚げ餃子。学校給食で生まれた津市民のソウルフード。カリカリの皮と肉汁がたまらない",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Tsu-gyoza_%282011.09.25%29.jpg/640px-Tsu-gyoza_%282011.09.25%29.jpg",
+    mapUrl:"https://maps.google.com/?q=津ぎょうざ+津市" },
+
+  // ===== 滋賀県 =====
+  { pref:"滋賀県", region:"kinki", name:"近江牛", genre:"肉料理",
+    area:"近江八幡市・彦根市周辺",
+    desc:"日本三大和牛の一つ。400年の歴史を持つ近江の銘柄牛はきめ細かな脂と深い旨みが特徴。すき焼きが王道",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/LE_POINT_DE_VUE07s4s4000.jpg/640px-LE_POINT_DE_VUE07s4s4000.jpg",
+    mapUrl:"https://maps.google.com/?q=近江牛+近江八幡市" },
+  { pref:"滋賀県", region:"kinki", name:"鮒寿し", genre:"郷土料理・軽食",
+    area:"琵琶湖周辺",
+    desc:"琵琶湖の固有種ニゴロブナを塩漬けにし飯で発酵させた日本最古の寿司。独特の酸味と発酵の旨みは日本酒と絶妙に合う",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Funazushi_%E9%AE%92%E5%AF%BF%E5%8F%B8_Maibara_City_Shiga_Japan_2022-10-06.jpg/640px-Funazushi_%E9%AE%92%E5%AF%BF%E5%8F%B8_Maibara_City_Shiga_Japan_2022-10-06.jpg",
+    mapUrl:"https://maps.google.com/?q=鮒寿し+滋賀" },
+  { pref:"滋賀県", region:"kinki", name:"焼鯖そうめん", genre:"麺類",
+    area:"長浜市",
+    desc:"甘辛く煮付けた焼き鯖をそうめんの上にのせた長浜の郷土料理。農繁期の娘を気遣い届けた「五月見舞い」が起源",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Sabasomen1.jpg/640px-Sabasomen1.jpg",
+    mapUrl:"https://maps.google.com/?q=焼鯖そうめん+長浜市" },
+  { pref:"滋賀県", region:"kinki", name:"のっぺいうどん", genre:"麺類",
+    area:"長浜市",
+    desc:"大きな椎茸がのったとろみのある餡かけうどん。長浜の冬の名物で体の芯まで温まる一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Ankakeudon.jpg/640px-Ankakeudon.jpg",
+    mapUrl:"https://maps.google.com/?q=のっぺいうどん+長浜市" },
+  { pref:"滋賀県", region:"kinki", name:"サラダパン", genre:"郷土料理・軽食",
+    area:"長浜市木之本",
+    desc:"コッペパンにたくあんのマヨネーズ和えを挟んだ「つるやパン」の名物。サラダなのにたくあんという意外性が人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Saradapan1.jpg/640px-Saradapan1.jpg",
+    mapUrl:"https://maps.google.com/?q=サラダパン+木之本" },
+
+  // ===== 京都府 =====
+  { pref:"京都府", region:"kinki", name:"京都の湯豆腐", genre:"郷土料理・軽食",
+    area:"南禅寺・嵐山周辺",
+    desc:"昆布出汁でゆっくりと温めた絹豆腐をポン酢や薬味で。南禅寺門前の老舗で味わう冬の京都の風物詩",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Yud%C5%8Dfu_001.jpg/640px-Yud%C5%8Dfu_001.jpg",
+    mapUrl:"https://maps.google.com/?q=湯豆腐+南禅寺" },
+  { pref:"京都府", region:"kinki", name:"にしんそば", genre:"麺類",
+    area:"京都市内",
+    desc:"甘辛く炊いた身欠きにしんをのせた京都発祥の温かいそば。にしんの旨みがつゆに溶け込む冬の味覚",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Esashi_Nishin_Soba.JPG/640px-Esashi_Nishin_Soba.JPG",
+    mapUrl:"https://maps.google.com/?q=にしんそば+京都" },
+  { pref:"京都府", region:"kinki", name:"京漬物", genre:"郷土料理・軽食",
+    area:"京都市内",
+    desc:"千枚漬け・しば漬け・すぐきの三大漬物をはじめ四季折々の京野菜を巧みに漬けた繊細な味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Suguki.jpg/640px-Suguki.jpg",
+    mapUrl:"https://maps.google.com/?q=京漬物+京都" },
+  { pref:"京都府", region:"kinki", name:"抹茶スイーツ（宇治）", genre:"スイーツ・喫茶",
+    area:"宇治市",
+    desc:"日本一の茶所・宇治の本格抹茶を使ったパフェ・わらび餅・ソフトクリームなど。中村藤吉や伊藤久右衛門が有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Matcha_ice_cream_001.jpg/640px-Matcha_ice_cream_001.jpg",
+    mapUrl:"https://maps.google.com/?q=抹茶スイーツ+宇治市" },
+  { pref:"京都府", region:"kinki", name:"おばんざい", genre:"郷土料理・軽食",
+    area:"京都市内",
+    desc:"京都の家庭で受け継がれてきた日常のおかず。ひじきの炊いたん・おから・万願寺とうがらしなど素朴で滋味深い味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Obanzai_yasai.JPG/640px-Obanzai_yasai.JPG",
+    mapUrl:"https://maps.google.com/?q=おばんざい+京都" },
+  { pref:"京都府", region:"kinki", name:"京の和菓子", genre:"スイーツ・喫茶",
+    area:"京都市内",
+    desc:"生八ッ橋・阿闍梨餅・豆大福など季節を映す繊細な和菓子の宝庫。老舗が軒を連ねる京都ならではの甘味文化",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Yatsuhashi_20160422.JPG/640px-Yatsuhashi_20160422.JPG",
+    mapUrl:"https://maps.google.com/?q=八つ橋+京都" },
+  { pref:"京都府", region:"kinki", name:"天橋立の海鮮", genre:"海鮮",
+    area:"宮津市天橋立",
+    desc:"日本三景・天橋立のある宮津で味わう岩牡蠣や黒ちくわ、丹後のばらずしなど日本海の幸",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Kaisen-don_001.jpg/640px-Kaisen-don_001.jpg",
+    mapUrl:"https://maps.google.com/?q=海鮮+天橋立" },
+
+  // ===== 大阪府 =====
+  { pref:"大阪府", region:"kinki", name:"たこ焼き", genre:"粉もの・鉄板",
+    area:"大阪市内各所",
+    desc:"外はカリッ中はトロッの大阪のソウルフード。ソース・塩・醤油など店ごとの味の違いも楽しみ。本場の味は食べ歩きで",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Takoyaki_by_yomi955.jpg/640px-Takoyaki_by_yomi955.jpg",
+    mapUrl:"https://maps.google.com/?q=たこ焼き+大阪" },
+  { pref:"大阪府", region:"kinki", name:"お好み焼き", genre:"粉もの・鉄板",
+    area:"大阪市内各所",
+    desc:"生地にキャベツ・豚肉・海鮮を混ぜて鉄板で焼く大阪の粉もん文化の代表格。ソース・マヨ・鰹節の三位一体が旨い",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Okonomiyaki_001.jpg/640px-Okonomiyaki_001.jpg",
+    mapUrl:"https://maps.google.com/?q=お好み焼き+大阪" },
+  { pref:"大阪府", region:"kinki", name:"串カツ", genre:"揚げ物",
+    area:"大阪市浪速区新世界",
+    desc:"薄衣でサクッと揚げた一口サイズの串揚げ。ソース二度漬け禁止は大阪の掟。新世界のネオン街で味わうのが醍醐味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/%E4%B8%B2%E3%82%AB%E3%83%84%EF%BC%88%E7%A5%9E%E8%B0%B7%E3%83%90%E3%83%BC%E3%83%BB%E6%B5%85%E8%8D%89%EF%BC%89_%283027765488%29.jpg/640px-%E4%B8%B2%E3%82%AB%E3%83%84%EF%BC%88%E7%A5%9E%E8%B0%B7%E3%83%90%E3%83%BC%E3%83%BB%E6%B5%85%E8%8D%89%EF%BC%89_%283027765488%29.jpg",
+    mapUrl:"https://maps.google.com/?q=串カツ+新世界" },
+  { pref:"大阪府", region:"kinki", name:"きつねうどん", genre:"麺類",
+    area:"大阪市内",
+    desc:"昆布と鰹の上品な出汁にふっくら甘いお揚げをのせた大阪うどんの定番。柔らかな麺と黄金色のつゆが優しい味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Kitsune_udon.jpg",
+    mapUrl:"https://maps.google.com/?q=きつねうどん+大阪" },
+  { pref:"大阪府", region:"kinki", name:"551蓬莱の豚まん", genre:"郷土料理・軽食",
+    area:"大阪市内（各店舗）",
+    desc:"「551がある時〜♪」のCMでおなじみ。ジューシーな豚肉餡がぎっしり詰まった大阪土産の大定番",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Butaman_by_hirotomo_in_Osaka.jpg/640px-Butaman_by_hirotomo_in_Osaka.jpg",
+    mapUrl:"https://maps.google.com/?q=551蓬莱+大阪" },
+  { pref:"大阪府", region:"kinki", name:"どて焼き", genre:"郷土料理・軽食",
+    area:"大阪市内",
+    desc:"牛すじを白味噌や赤味噌でじっくりトロトロに煮込んだ大阪の居酒屋定番メニュー。ビールのお供に最高",
+    img:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Doteyaki.jpg",
+    mapUrl:"https://maps.google.com/?q=どて焼き+大阪" },
+  { pref:"大阪府", region:"kinki", name:"かすうどん", genre:"麺類",
+    area:"大阪市南河内",
+    desc:"牛ホルモンの油かすを入れた大阪発祥のうどん。カリッと揚げた油かすから旨みがじゅわっと溶け出す",
+    img:"https://upload.wikimedia.org/wikipedia/commons/b/b5/Kasu_udon.jpg",
+    mapUrl:"https://maps.google.com/?q=かすうどん+大阪" },
+  { pref:"大阪府", region:"kinki", name:"箱寿司（大阪寿司）", genre:"ご飯もの",
+    area:"大阪市内",
+    desc:"木型で美しく押した大阪発祥の押し寿司。酢でしめた鯛やエビを彩り豊かに盛りつけた「食い倒れ」の美学",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Bateira_-_%E3%83%90%E3%83%83%E3%83%86%E3%83%A9_-_Flickr_-_Kanko.jpg/640px-Bateira_-_%E3%83%90%E3%83%83%E3%83%86%E3%83%A9_-_Flickr_-_Kanko.jpg",
+    mapUrl:"https://maps.google.com/?q=箱寿司+大阪" },
+  { pref:"大阪府", region:"kinki", name:"いか焼き", genre:"粉もの・鉄板",
+    area:"大阪市内（阪神百貨店地下など）",
+    desc:"小麦粉の生地にイカを入れて鉄板でプレスして焼く大阪のファストフード。阪神百貨店地下の行列が有名",
+    img:"https://upload.wikimedia.org/wikipedia/commons/e/e1/Ikayaki.jpg",
+    mapUrl:"https://maps.google.com/?q=いか焼き+大阪" },
+
+  // ===== 兵庫県 =====
+  { pref:"兵庫県", region:"kinki", name:"神戸ビーフ", genre:"肉料理",
+    area:"神戸市内",
+    desc:"世界中のセレブを魅了する最高級ブランド和牛。繊細なサシと芳醇な甘みはステーキ・しゃぶしゃぶ・すき焼きで",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/4_Kobe_Beef%2C_Kobe_Japan.jpg/640px-4_Kobe_Beef%2C_Kobe_Japan.jpg",
+    mapUrl:"https://maps.google.com/?q=神戸牛ステーキ+神戸" },
+  { pref:"兵庫県", region:"kinki", name:"明石焼き", genre:"粉もの・鉄板",
+    area:"明石市内",
+    desc:"ふわふわの卵生地にタコを入れて焼き、出汁につけて食べる明石発祥の「玉子焼」。たこ焼きのルーツとも言われる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/%E6%98%8E%E7%9F%B3%E7%87%92%2C_%E7%8E%89%E5%AD%90%E7%87%92_%2825165926536%29.jpg/960px-%E6%98%8E%E7%9F%B3%E7%87%92%2C_%E7%8E%89%E5%AD%90%E7%87%92_%2825165926536%29.jpg",
+    mapUrl:"https://maps.google.com/?q=明石焼き+明石市" },
+  { pref:"兵庫県", region:"kinki", name:"姫路おでん", genre:"郷土料理・軽食",
+    area:"姫路市内",
+    desc:"生姜醤油につけて食べるのが姫路流。関東煮ベースのおでんに生姜のアクセントが効いた独特の食べ方",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Oden_001.jpg/640px-Oden_001.jpg",
+    mapUrl:"https://maps.google.com/?q=姫路おでん+姫路市" },
+  { pref:"兵庫県", region:"kinki", name:"出石皿そば", genre:"麺類",
+    area:"豊岡市出石町",
+    desc:"白磁の小皿に盛った5皿一組の手打ちそば。薬味と卵を添えて味を変えながら楽しむ但馬の蕎麦文化",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Izushi-soba01st3200.jpg/640px-Izushi-soba01st3200.jpg",
+    mapUrl:"https://maps.google.com/?q=出石皿そば+出石" },
+  { pref:"兵庫県", region:"kinki", name:"そばめし", genre:"粉もの・鉄板",
+    area:"神戸市長田区",
+    desc:"焼きそばの麺を細かく刻んでご飯と一緒にソースで炒めた神戸・長田発祥のB級グルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Sobameshi_001.jpg/640px-Sobameshi_001.jpg",
+    mapUrl:"https://maps.google.com/?q=そばめし+神戸長田" },
+  { pref:"兵庫県", region:"kinki", name:"ぼっかけ", genre:"郷土料理・軽食",
+    area:"神戸市長田区",
+    desc:"牛すじとこんにゃくを甘辛く煮込んだ長田の名物。うどんやお好み焼きのトッピングとしても大活躍",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Bokkake_udon_by_rhosoi_in_Kobe.jpg/640px-Bokkake_udon_by_rhosoi_in_Kobe.jpg",
+    mapUrl:"https://maps.google.com/?q=ぼっかけ+神戸長田" },
+
+  // ===== 奈良県 =====
+  { pref:"奈良県", region:"kinki", name:"柿の葉寿司", genre:"ご飯もの",
+    area:"吉野地方・五條市",
+    desc:"サバや鮭の切り身を酢飯にのせ柿の葉で包んだ吉野地方の郷土寿司。柿の葉の殺菌作用と香りが絶妙",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Kakinohazusi.jpg/640px-Kakinohazusi.jpg",
+    mapUrl:"https://maps.google.com/?q=柿の葉寿司+吉野" },
+  { pref:"奈良県", region:"kinki", name:"三輪そうめん", genre:"麺類",
+    area:"桜井市三輪",
+    desc:"日本のそうめん発祥の地・三輪の手延べそうめん。極細ながらコシが強く、にゅうめんでも冷やしでも絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Miwa_somen_01.jpg/640px-Miwa_somen_01.jpg",
+    mapUrl:"https://maps.google.com/?q=三輪そうめん+桜井市" },
+  { pref:"奈良県", region:"kinki", name:"奈良漬", genre:"郷土料理・軽食",
+    area:"奈良市内",
+    desc:"白うりや胡瓜を酒粕で漬け込んだ奈良1300年の伝統漬物。べっこう色の深い味わいはお茶請けや酒の肴に",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Narazuke_from_Aichi_by_daveyll_in_Ginza.jpg/640px-Narazuke_from_Aichi_by_daveyll_in_Ginza.jpg",
+    mapUrl:"https://maps.google.com/?q=奈良漬+奈良市" },
+  { pref:"奈良県", region:"kinki", name:"天理ラーメン", genre:"麺類",
+    area:"天理市内",
+    desc:"豚骨鶏ガラに白菜・ニラ・ニンニクたっぷりのピリ辛スタミナラーメン。こってり系の中毒性が高い一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/%E3%82%B9%E3%82%BF%E3%83%9F%E3%83%8A%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%EF%BC%88%E5%A4%A9%E7%90%86%E3%82%B9%E3%82%BF%E3%83%9F%E3%83%8A%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%EF%BC%89.jpg/640px-%E3%82%B9%E3%82%BF%E3%83%9F%E3%83%8A%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%EF%BC%88%E5%A4%A9%E7%90%86%E3%82%B9%E3%82%BF%E3%83%9F%E3%83%8A%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%EF%BC%89.jpg",
+    mapUrl:"https://maps.google.com/?q=天理ラーメン+天理市" },
+  { pref:"奈良県", region:"kinki", name:"大仏プリン", genre:"スイーツ・喫茶",
+    area:"奈良市内",
+    desc:"大仏さまの瓶に入った奈良のご当地プリン。カスタード・大和茶・レアチーズなど多彩なフレーバーが人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Cremecaramel.jpg/640px-Cremecaramel.jpg",
+    mapUrl:"https://maps.google.com/?q=大仏プリン+奈良市" },
+
+  // ===== 和歌山県 =====
+  { pref:"和歌山県", region:"kinki", name:"和歌山ラーメン", genre:"麺類",
+    area:"和歌山市内",
+    desc:"豚骨醤油ベースの濃厚スープに細ストレート麺。早寿司（鯖の押し寿司）と一緒に食べるのが和歌山流",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Wakayamaramen222.jpg/640px-Wakayamaramen222.jpg",
+    mapUrl:"https://maps.google.com/?q=和歌山ラーメン+和歌山市" },
+  { pref:"和歌山県", region:"kinki", name:"めはり寿司", genre:"ご飯もの",
+    area:"新宮市・熊野地方",
+    desc:"高菜の浅漬けでご飯を大きく包んだ熊野地方のおにぎり。目を見張るほど大きく口を開けて食べることが名前の由来",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Meharizushi.JPG/640px-Meharizushi.JPG",
+    mapUrl:"https://maps.google.com/?q=めはり寿司+新宮市" },
+  { pref:"和歌山県", region:"kinki", name:"クエ鍋", genre:"海鮮",
+    area:"日高郡・白浜町",
+    desc:"幻の高級魚クエをぶつ切りにして鍋で味わう冬の贅沢。淡泊ながら旨みが凝縮した身とコラーゲンたっぷりの皮が絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/KUE_NABE.JPG/640px-KUE_NABE.JPG",
+    mapUrl:"https://maps.google.com/?q=クエ鍋+白浜" },
+  { pref:"和歌山県", region:"kinki", name:"紀州南高梅", genre:"郷土料理・軽食",
+    area:"みなべ町・田辺市",
+    desc:"日本一の梅の里・みなべ町が誇る最高級梅干し。果肉が厚くフルーティーな味わいは梅干しの概念を変える",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Umeboshi_20101209_c.jpg/640px-Umeboshi_20101209_c.jpg",
+    mapUrl:"https://maps.google.com/?q=南高梅+みなべ町" },
+  { pref:"和歌山県", region:"kinki", name:"生マグロ丼", genre:"海鮮",
+    area:"那智勝浦町",
+    desc:"生マグロ水揚げ日本一の勝浦漁港で揚がったばかりの本マグロを丼で。冷凍しない生の旨みは格別",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Tekkadon_001.jpg/640px-Tekkadon_001.jpg",
+    mapUrl:"https://maps.google.com/?q=マグロ丼+那智勝浦" },
+  { pref:"和歌山県", region:"kinki", name:"しらす丼", genre:"海鮮",
+    area:"湯浅町・有田市",
+    desc:"湯浅湾で獲れた新鮮な生しらすや釜揚げしらすをたっぷり丼に。醤油発祥の地・湯浅醤油でいただく贅沢",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Whitebait_Rice_Bowl_at_Enoshima.jpg/640px-Whitebait_Rice_Bowl_at_Enoshima.jpg",
+    mapUrl:"https://maps.google.com/?q=しらす丼+湯浅町" },
+
+  // ===== 鳥取県 =====
+  { pref:"鳥取県", region:"chugoku", name:"松葉ガニ", genre:"海鮮",
+    area:"鳥取市・境港市",
+    desc:"山陰を代表する冬の味覚。身がぎっしり詰まったズワイガニを茹で・焼き・刺身・甲羅味噌で贅沢に堪能",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Jasuk-daege_2.jpg/640px-Jasuk-daege_2.jpg",
+    mapUrl:"https://maps.google.com/?q=松葉ガニ+鳥取" },
+  { pref:"鳥取県", region:"chugoku", name:"鳥取牛骨ラーメン", genre:"麺類",
+    area:"鳥取県中西部",
+    desc:"牛骨でスープをとる全国的にも珍しいラーメン。あっさりしつつコクのある琥珀色のスープが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Tottori_Gy%C5%ABkotsu_Ramen.jpg/640px-Tottori_Gy%C5%ABkotsu_Ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=牛骨ラーメン+鳥取" },
+  { pref:"鳥取県", region:"chugoku", name:"とうふちくわ", genre:"郷土料理・軽食",
+    area:"鳥取市内",
+    desc:"木綿豆腐と白身魚のすり身を混ぜ合わせて焼いた鳥取独自のちくわ。ふんわり軽い食感と豆腐の風味が特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/a/aa/Tofutikuwa1.jpg",
+    mapUrl:"https://maps.google.com/?q=とうふちくわ+鳥取市" },
+  { pref:"鳥取県", region:"chugoku", name:"いただき（ののこめし）", genre:"ご飯もの",
+    area:"鳥取県西部・弓ヶ浜",
+    desc:"油揚げの中にお米と野菜を詰めて出汁で炊き上げた弓ヶ浜地方の郷土料理。素朴で優しい味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Inari_zushi_in_201902_001.jpg/640px-Inari_zushi_in_201902_001.jpg",
+    mapUrl:"https://maps.google.com/?q=いただき+鳥取" },
+  { pref:"鳥取県", region:"chugoku", name:"二十世紀梨", genre:"スイーツ・喫茶",
+    area:"倉吉市・湯梨浜町",
+    desc:"鳥取の代名詞と言える青梨の最高峰。みずみずしくシャキシャキの食感と上品な甘さ。梨ソフトクリームも人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/d/d1/Nijusseiki_nashi_-_Japanese_pears_by_akira_yamada.jpg",
+    mapUrl:"https://maps.google.com/?q=二十世紀梨+鳥取" },
+
+  // ===== 島根県 =====
+  { pref:"島根県", region:"chugoku", name:"出雲そば", genre:"麺類",
+    area:"出雲市内",
+    desc:"殻ごと挽いた黒っぽい蕎麦を丸い割子（わりご）器に盛って食べる出雲の伝統そば。三段重ねが定番スタイル",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/IzumoSoba_WarigoSoba_5dan.jpg/640px-IzumoSoba_WarigoSoba_5dan.jpg",
+    mapUrl:"https://maps.google.com/?q=出雲そば+出雲市" },
+  { pref:"島根県", region:"chugoku", name:"しじみ料理", genre:"海鮮",
+    area:"松江市・宍道湖周辺",
+    desc:"宍道湖産大和しじみの味噌汁は島根の朝の定番。しじみの旨みが溶け出した滋味深い一杯は二日酔いにも効く",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Miso_soup_of_shizimi%28corbicula_japonica%29_2014.jpg/640px-Miso_soup_of_shizimi%28corbicula_japonica%29_2014.jpg",
+    mapUrl:"https://maps.google.com/?q=しじみ+宍道湖" },
+  { pref:"島根県", region:"chugoku", name:"出雲ぜんざい", genre:"スイーツ・喫茶",
+    area:"出雲市内",
+    desc:"ぜんざい発祥の地・出雲で食べる本場のぜんざい。神在月の「神在餅」がルーツとされる縁起の良い甘味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Zenzai_and_tea_set_at_Shirasagido%2C_Himeji.jpg/640px-Zenzai_and_tea_set_at_Shirasagido%2C_Himeji.jpg",
+    mapUrl:"https://maps.google.com/?q=出雲ぜんざい+出雲市" },
+  { pref:"島根県", region:"chugoku", name:"のどぐろ（島根）", genre:"海鮮",
+    area:"浜田市・大田市",
+    desc:"「白身のトロ」と呼ばれる高級魚のどぐろ。日本海の荒波で育った島根産は脂のりが格別。塩焼きや煮付けで",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Nodoguro_grilled_with_salt%2C_Kappo_Uosen%2C_Nagaoka_01.jpg/640px-Nodoguro_grilled_with_salt%2C_Kappo_Uosen%2C_Nagaoka_01.jpg",
+    mapUrl:"https://maps.google.com/?q=のどぐろ+浜田市" },
+  { pref:"島根県", region:"chugoku", name:"松江和菓子", genre:"スイーツ・喫茶",
+    area:"松江市内",
+    desc:"茶の湯文化が根付く松江は京都・金沢と並ぶ日本三大菓子処。不昧公ゆかりの若草・山川・菜種の里が銘菓",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Wakakusa%2C_Wagashi%2C_Shimane.jpg/640px-Wakakusa%2C_Wagashi%2C_Shimane.jpg",
+    mapUrl:"https://maps.google.com/?q=和菓子+松江市" },
+
+  // ===== 岡山県 =====
+  { pref:"岡山県", region:"chugoku", name:"デミカツ丼", genre:"ご飯もの",
+    area:"岡山市内",
+    desc:"ご飯の上にキャベツとカツをのせ濃厚なデミグラスソースをかけた岡山のご当地丼。洋食文化が根付く岡山ならでは",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Demikatsudon_02.jpg/640px-Demikatsudon_02.jpg",
+    mapUrl:"https://maps.google.com/?q=デミカツ丼+岡山" },
+  { pref:"岡山県", region:"chugoku", name:"ままかり寿司", genre:"海鮮",
+    area:"岡山市・倉敷市",
+    desc:"「ままを借りに行くほど旨い」が名前の由来。サッパ（ニシン科）を酢漬けにした岡山の郷土寿司",
+    img:"https://upload.wikimedia.org/wikipedia/commons/a/a7/Mamakari_by_Kossy%40FINEDAYS_in_Akabane%2C_Tokyo.jpg",
+    mapUrl:"https://maps.google.com/?q=ままかり+岡山" },
+  { pref:"岡山県", region:"chugoku", name:"きびだんご", genre:"スイーツ・喫茶",
+    area:"岡山市内",
+    desc:"桃太郎伝説で知られる岡山の代表銘菓。もち米に砂糖ときび粉を練り上げた素朴な甘さの一口菓子",
+    img:"https://upload.wikimedia.org/wikipedia/commons/2/2a/Kibidango01.JPG",
+    mapUrl:"https://maps.google.com/?q=きびだんご+岡山" },
+  { pref:"岡山県", region:"chugoku", name:"えびめし", genre:"ご飯もの",
+    area:"岡山市内",
+    desc:"ソースで真っ黒に炒めた焼き飯にエビを入れた岡山のB級グルメ。見た目のインパクトと甘辛い味が癖になる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Ebimeshi.jpg",
+    mapUrl:"https://maps.google.com/?q=えびめし+岡山" },
+  { pref:"岡山県", region:"chugoku", name:"白桃", genre:"スイーツ・喫茶",
+    area:"岡山市・赤磐市",
+    desc:"「果物王国」岡山が誇る最高級白桃。とろけるような果肉と上品な甘さ。白桃パフェやジュースも人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/White-Peaches-Bunch.jpg/640px-White-Peaches-Bunch.jpg",
+    mapUrl:"https://maps.google.com/?q=白桃+岡山" },
+  { pref:"岡山県", region:"chugoku", name:"ひるぜん焼そば", genre:"粉もの・鉄板",
+    area:"真庭市蒜山",
+    desc:"味噌ベースの甘辛タレと親鶏のかしわ肉が特徴の蒜山高原のB-1グランプリ優勝グルメ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Hiruzen_Yakisoba_by_Omiya_Yokocho.jpg/640px-Hiruzen_Yakisoba_by_Omiya_Yokocho.jpg",
+    mapUrl:"https://maps.google.com/?q=ひるぜん焼そば+蒜山" },
+
+  // ===== 広島県 =====
+  { pref:"広島県", region:"chugoku", name:"広島お好み焼き", genre:"粉もの・鉄板",
+    area:"広島市内（お好み村など）",
+    desc:"薄い生地・大量のキャベツ・豚肉・そば麺を重ねて焼く広島流お好み焼き。ヘラで鉄板から直接食べるのが流儀",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Hiroshima-Style_Okonomiyaki_%2840283556800%29.jpg/640px-Hiroshima-Style_Okonomiyaki_%2840283556800%29.jpg",
+    mapUrl:"https://maps.google.com/?q=お好み焼き+広島" },
+  { pref:"広島県", region:"chugoku", name:"牡蠣料理", genre:"海鮮",
+    area:"広島市・宮島・江田島",
+    desc:"生産量日本一の広島牡蠣。生牡蠣・焼き牡蠣・牡蠣フライ・土手鍋と多彩な食べ方で冬の広島を堪能",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Grilled_oysters_Food_in_Miyajima_-_DSC02189.JPG/640px-Grilled_oysters_Food_in_Miyajima_-_DSC02189.JPG",
+    mapUrl:"https://maps.google.com/?q=牡蠣+広島" },
+  { pref:"広島県", region:"chugoku", name:"汁なし担々麺", genre:"麺類",
+    area:"広島市内",
+    desc:"花椒のしびれと辣油の辛さが効いた広島発祥の汁なし担々麺。麺と具を混ぜて食べる中毒性抜群の一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/%E6%B1%81%E3%81%AA%E3%81%97%E6%8B%85%E3%80%85%E9%BA%BA.jpg/640px-%E6%B1%81%E3%81%AA%E3%81%97%E6%8B%85%E3%80%85%E9%BA%BA.jpg",
+    mapUrl:"https://maps.google.com/?q=汁なし担々麺+広島" },
+  { pref:"広島県", region:"chugoku", name:"尾道ラーメン", genre:"麺類",
+    area:"尾道市内",
+    desc:"鶏ガラ醤油ベースのスープに背脂を浮かべた尾道の名物ラーメン。平打ち麺にスープが絡む優しい味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Onomichi_ramen_20241202.jpg/640px-Onomichi_ramen_20241202.jpg",
+    mapUrl:"https://maps.google.com/?q=尾道ラーメン+尾道" },
+  { pref:"広島県", region:"chugoku", name:"もみじ饅頭", genre:"スイーツ・喫茶",
+    area:"廿日市市宮島",
+    desc:"宮島のもみじの葉を模ったカステラ生地の饅頭。こし餡・クリーム・チョコなど多彩な味。揚げもみじも人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Momiji_manju_of_Fujiiya.jpg/640px-Momiji_manju_of_Fujiiya.jpg",
+    mapUrl:"https://maps.google.com/?q=もみじ饅頭+宮島" },
+  { pref:"広島県", region:"chugoku", name:"あなご飯", genre:"ご飯もの",
+    area:"廿日市市宮島口",
+    desc:"瀬戸内海の穴子を蒲焼きにして特製タレのご飯に敷き詰めた宮島口発祥の駅弁グルメ。ふっくら香ばしい穴子が絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Anago_meshi_%2C_%E3%81%82%E3%81%AA%E3%81%94%E9%A3%AF_-_panoramio.jpg/640px-Anago_meshi_%2C_%E3%81%82%E3%81%AA%E3%81%94%E9%A3%AF_-_panoramio.jpg",
+    mapUrl:"https://maps.google.com/?q=あなご飯+宮島口" },
+
+  // ===== 山口県 =====
+  { pref:"山口県", region:"chugoku", name:"ふぐ料理", genre:"海鮮",
+    area:"下関市内",
+    desc:"ふぐの本場・下関では「ふく」と呼ぶ。てっさ（刺身）・てっちり（鍋）・ひれ酒・白子焼きなど冬の贅沢の極み",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Fugu-no-Sashimi%28Totafugu%29.JPG/640px-Fugu-no-Sashimi%28Totafugu%29.JPG",
+    mapUrl:"https://maps.google.com/?q=ふぐ料理+下関" },
+  { pref:"山口県", region:"chugoku", name:"瓦そば", genre:"麺類",
+    area:"下関市豊浦町",
+    desc:"熱した瓦の上で茶そばを焼き、温かいつゆにつけて食べる下関発祥の独創的な麺料理。パリパリとしんなりの食感差が楽しい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Kawara_soba_by_woinary_in_Moji%2C_Fukuoka.jpg/640px-Kawara_soba_by_woinary_in_Moji%2C_Fukuoka.jpg",
+    mapUrl:"https://maps.google.com/?q=瓦そば+下関" },
+  { pref:"山口県", region:"chugoku", name:"岩国寿司（殿様寿司）", genre:"ご飯もの",
+    area:"岩国市",
+    desc:"木枠に酢飯と具材を何層にも重ねて押す豪華な押し寿司。藩政時代の戦陣食が起源とされる岩国の郷土料理",
+    img:"https://upload.wikimedia.org/wikipedia/commons/f/f5/JaIwakuni1IwakuniSushiAj01CR.jpg",
+    mapUrl:"https://maps.google.com/?q=岩国寿司+岩国市" },
+  { pref:"山口県", region:"chugoku", name:"外郎（ういろう）", genre:"スイーツ・喫茶",
+    area:"山口市内",
+    desc:"わらび粉を使う山口のういろうは名古屋のものとは別物。プルプルもちもちの食感と上品な甘さが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Mihorido_uiro.jpg/640px-Mihorido_uiro.jpg",
+    mapUrl:"https://maps.google.com/?q=外郎+山口市" },
+  { pref:"山口県", region:"chugoku", name:"夏みかん菓子", genre:"スイーツ・喫茶",
+    area:"萩市内",
+    desc:"萩の城下町で栽培される夏みかんを使った丸漬け・ゼリー・マーマレードなど。爽やかな酸味と香りが萩の風情を伝える",
+    img:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Biwa-jelly.JPG",
+    mapUrl:"https://maps.google.com/?q=夏みかん+萩市" },
+
+  // ===== 徳島県 =====
+  { pref:"徳島県", region:"shikoku", name:"徳島ラーメン", genre:"麺類",
+    area:"徳島市内",
+    desc:"豚骨醤油の濃厚スープに甘辛く味付けした豚バラ肉と生卵をトッピング。ご飯のおかずとして食べるのが徳島流",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Tokushima_ramen.jpg/640px-Tokushima_ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=徳島ラーメン+徳島市" },
+  { pref:"徳島県", region:"shikoku", name:"たらいうどん", genre:"麺類",
+    area:"阿波市土成町",
+    desc:"大きなたらいに入ったうどんをみんなで囲んで食べる阿波の郷土料理。つけ汁は地鶏の出汁が基本",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/%E3%81%9F%E3%82%89%E3%81%84%E3%81%86%E3%81%A9%E3%82%93_20200722.jpg/640px-%E3%81%9F%E3%82%89%E3%81%84%E3%81%86%E3%81%A9%E3%82%93_20200722.jpg",
+    mapUrl:"https://maps.google.com/?q=たらいうどん+阿波市" },
+  { pref:"徳島県", region:"shikoku", name:"鳴門金時（焼き芋・スイーツ）", genre:"スイーツ・喫茶",
+    area:"鳴門市・徳島市",
+    desc:"鳴門の砂地で育った最高級さつまいも。ホクホクの焼き芋はもちろん、芋けんぴやスイートポテトも人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Naruto_Kintoki.JPG/640px-Naruto_Kintoki.JPG",
+    mapUrl:"https://maps.google.com/?q=鳴門金時+鳴門市" },
+  { pref:"徳島県", region:"shikoku", name:"フィッシュカツ", genre:"揚げ物",
+    area:"徳島県小松島市",
+    desc:"魚のすり身にカレー粉を混ぜてパン粉で揚げた徳島のソウルフード。ピリッとスパイシーでおやつにもおかずにも",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Fish_katsu-1.jpg/640px-Fish_katsu-1.jpg",
+    mapUrl:"https://maps.google.com/?q=フィッシュカツ+小松島市" },
+  { pref:"徳島県", region:"shikoku", name:"阿波尾鶏", genre:"肉料理",
+    area:"徳島県内各所",
+    desc:"阿波踊りにちなんだ名前の徳島県産地鶏。適度な歯ごたえと豊かな旨みが特徴。焼き鳥・たたきで",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Awa-odori_Chicken_Katsu_Curry_01.jpg/640px-Awa-odori_Chicken_Katsu_Curry_01.jpg",
+    mapUrl:"https://maps.google.com/?q=阿波尾鶏+徳島" },
+
+  // ===== 香川県 =====
+  { pref:"香川県", region:"shikoku", name:"讃岐うどん", genre:"麺類",
+    area:"高松市・丸亀市ほか県内全域",
+    desc:"コシが命の讃岐うどんは香川県民のソウルフード。かけ・ぶっかけ・釜揚げ・しっぽくなど食べ方も多彩。セルフ店を巡るうどん遍路が人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Kama-age_sanuki_udon_by_sekido_in_Takamatsu%2C_Kagawa.jpg/640px-Kama-age_sanuki_udon_by_sekido_in_Takamatsu%2C_Kagawa.jpg",
+    mapUrl:"https://maps.google.com/?q=讃岐うどん+高松" },
+  { pref:"香川県", region:"shikoku", name:"骨付鳥", genre:"肉料理",
+    area:"丸亀市内",
+    desc:"鶏もも肉を骨付きのまま丸ごとスパイシーに焼き上げた丸亀発祥のご当地グルメ。豪快にかぶりつくのが流儀",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Honetsukidori_Marugame.JPG/640px-Honetsukidori_Marugame.JPG",
+    mapUrl:"https://maps.google.com/?q=骨付鳥+丸亀" },
+  { pref:"香川県", region:"shikoku", name:"しょうゆ豆", genre:"郷土料理・軽食",
+    area:"香川県内全域",
+    desc:"そら豆を煎って醤油と砂糖のタレに漬け込んだ香川の伝統おかず。カリッとした食感と甘辛い味でご飯が進む",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Syouyumame_1.jpg/640px-Syouyumame_1.jpg",
+    mapUrl:"https://maps.google.com/?q=しょうゆ豆+香川" },
+  { pref:"香川県", region:"shikoku", name:"小豆島オリーブ", genre:"郷土料理・軽食",
+    area:"小豆島",
+    desc:"日本のオリーブ栽培発祥の地・小豆島。オリーブオイル・新漬けオリーブ・オリーブ牛・オリーブハマチなど多彩な食文化",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Oliven_V1.jpg/640px-Oliven_V1.jpg",
+    mapUrl:"https://maps.google.com/?q=オリーブ+小豆島" },
+  { pref:"香川県", region:"shikoku", name:"あん餅雑煮", genre:"郷土料理・軽食",
+    area:"香川県内全域",
+    desc:"白味噌の汁にあんこ入りの丸餅を入れた香川ならではの正月雑煮。甘じょっぱい独特の味わいが他県民を驚かせる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/f/f6/%E9%A6%99%E5%B7%9D%E7%9C%8C%E3%81%AE%E6%AD%A3%E6%9C%88%E6%96%99%E7%90%86%E3%81%A7%E3%81%82%E3%82%8B%E9%A4%A1%E9%A4%85%E9%9B%91%E7%85%AE%E3%81%AE%E4%B8%AD%E3%81%AE%E9%A4%A1%E9%A4%85%EF%BC%88An-mochi_in_zoni_%28rice_cake_with_red_bean_paste%29%2C_a_New_Year%27s_dish_in_Kagawa_Prefecture%EF%BC%89.jpg",
+    mapUrl:"https://maps.google.com/?q=あん餅雑煮+香川" },
+
+  // ===== 愛媛県 =====
+  { pref:"愛媛県", region:"shikoku", name:"鯛めし（宇和島）", genre:"ご飯もの",
+    area:"宇和島市内",
+    desc:"新鮮な鯛の刺身を特製のタレと卵に絡めて熱々のご飯にのせる宇和島式鯛めし。漁師発祥の豪快な一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Uwajima_Taimeshi.jpg/640px-Uwajima_Taimeshi.jpg",
+    mapUrl:"https://maps.google.com/?q=鯛めし+宇和島" },
+  { pref:"愛媛県", region:"shikoku", name:"鯛めし（松山）", genre:"ご飯もの",
+    area:"松山市内",
+    desc:"鯛を丸ごと一尾のせて土鍋で炊き上げる松山式鯛めし。鯛の旨みがご飯に染み渡る贅沢な炊き込みご飯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/7/75/%E9%AF%9B%E3%82%81%E3%81%97%EF%BC%88%E4%BB%8A%E6%B2%BB%E9%A7%85%EF%BC%8920220111-P1300537.jpg",
+    mapUrl:"https://maps.google.com/?q=鯛めし+松山市" },
+  { pref:"愛媛県", region:"shikoku", name:"今治焼き鳥", genre:"肉料理",
+    area:"今治市内",
+    desc:"串に刺さず鉄板で焼くのが今治流。鶏皮をカリッと焼いてプレスする「皮焼き」が名物。焼き鳥店密度は全国トップクラス",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/%E4%BB%8A%E6%B2%BB%E7%84%BC%E9%B3%A5.JPG/640px-%E4%BB%8A%E6%B2%BB%E7%84%BC%E9%B3%A5.JPG",
+    mapUrl:"https://maps.google.com/?q=焼き鳥+今治市" },
+  { pref:"愛媛県", region:"shikoku", name:"じゃこ天", genre:"揚げ物",
+    area:"宇和島市・八幡浜市",
+    desc:"小魚をすり身にして天ぷらにした南予地方の名物。骨ごとすり身にするので独特の歯ごたえとカルシウムたっぷり",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Serving_jakoten_in_Dogo_%28cropped%29.jpg/640px-Serving_jakoten_in_Dogo_%28cropped%29.jpg",
+    mapUrl:"https://maps.google.com/?q=じゃこ天+宇和島" },
+  { pref:"愛媛県", region:"shikoku", name:"みかんスイーツ", genre:"スイーツ・喫茶",
+    area:"松山市ほか愛媛県内",
+    desc:"みかん生産量日本一の愛媛が誇るみかんジュース・ゼリー・大福・ソフトクリーム。蛇口からみかんジュースも名物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/%E3%81%BF%E3%81%8B%E3%82%93%E3%82%B8%E3%83%A5%E3%83%BC%E3%82%B9_%2853191801164%29.jpg/640px-%E3%81%BF%E3%81%8B%E3%82%93%E3%82%B8%E3%83%A5%E3%83%BC%E3%82%B9_%2853191801164%29.jpg",
+    mapUrl:"https://maps.google.com/?q=みかんスイーツ+愛媛" },
+  { pref:"愛媛県", region:"shikoku", name:"八幡浜ちゃんぽん", genre:"麺類",
+    area:"八幡浜市内",
+    desc:"長崎とは異なる鶏ガラ・鰹節ベースのあっさりスープが特徴。野菜たっぷりでヘルシーな八幡浜のソウルフード",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Yawatahama_Maruyama_Chanpon_Tokusei_Chanpon_20170506-001.jpg/640px-Yawatahama_Maruyama_Chanpon_Tokusei_Chanpon_20170506-001.jpg",
+    mapUrl:"https://maps.google.com/?q=ちゃんぽん+八幡浜市" },
+
+  // ===== 高知県 =====
+  { pref:"高知県", region:"shikoku", name:"カツオのたたき", genre:"海鮮",
+    area:"高知市・中土佐町",
+    desc:"藁で豪快に炙ったカツオの表面を叩き、ニンニク・ミョウガ・ネギなどの薬味とポン酢で。本場高知の藁焼きは香ばしさが別格",
+    img:"https://upload.wikimedia.org/wikipedia/commons/c/c6/KatsuoTataki.jpg",
+    mapUrl:"https://maps.google.com/?q=カツオのたたき+高知" },
+  { pref:"高知県", region:"shikoku", name:"皿鉢料理", genre:"郷土料理・軽食",
+    area:"高知市内",
+    desc:"大皿に刺身・寿司・煮物を豪快に盛りつけた高知の宴会料理。お客をもてなす土佐流のおきゃく文化の象徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/0/08/SawachiDish_Sushi_and_Tataki01.jpg",
+    mapUrl:"https://maps.google.com/?q=皿鉢料理+高知" },
+  { pref:"高知県", region:"shikoku", name:"鍋焼きラーメン", genre:"麺類",
+    area:"須崎市内",
+    desc:"土鍋で提供される鶏ガラ醤油ベースの熱々ラーメン。最後まで冷めない須崎のご当地ラーメン",
+    img:"https://upload.wikimedia.org/wikipedia/commons/c/c4/%E9%8D%8B%E7%84%BC%E3%81%8D%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3.JPG",
+    mapUrl:"https://maps.google.com/?q=鍋焼きラーメン+須崎市" },
+  { pref:"高知県", region:"shikoku", name:"四万十川の天然鮎・青さのり", genre:"海鮮",
+    area:"四万十市・四万十町",
+    desc:"最後の清流・四万十川で育った天然鮎の塩焼きや青さのりの天ぷら。清流の恵みを堪能する四万十の味覚",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Charcoal_broiled_Ayu.JPG/640px-Charcoal_broiled_Ayu.JPG",
+    mapUrl:"https://maps.google.com/?q=天然鮎+四万十川" },
+  { pref:"高知県", region:"shikoku", name:"芋けんぴ", genre:"スイーツ・喫茶",
+    area:"高知県内全域",
+    desc:"さつまいもを細切りにして油で揚げ砂糖蜜を絡めた高知発祥の芋菓子。カリポリの食感がやみつきに",
+    img:"https://upload.wikimedia.org/wikipedia/commons/d/d3/Imo-kenpi_001.jpg",
+    mapUrl:"https://maps.google.com/?q=芋けんぴ+高知" },
+  { pref:"高知県", region:"shikoku", name:"ウツボのたたき", genre:"海鮮",
+    area:"高知市・須崎市",
+    desc:"見た目はグロテスクだが味は絶品。皮目をカリッと炙ったウツボはゼラチン質でプリプリの食感。高知の珍味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/7/72/%E3%82%A6%E3%83%84%E3%83%9C%E3%81%AE%E3%81%9F%E3%81%9F%E3%81%8D.jpg",
+    mapUrl:"https://maps.google.com/?q=ウツボのたたき+高知" },
+
+  // ===== 福岡県 =====
+  { pref:"福岡県", region:"kyushu", name:"博多ラーメン", genre:"麺類",
+    area:"福岡市博多区・中央区",
+    desc:"白濁した豚骨スープに極細ストレート麺の博多ラーメン。替え玉システムと屋台文化は博多ならでは",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Hakataramen222.jpg/640px-Hakataramen222.jpg",
+    mapUrl:"https://maps.google.com/?q=博多ラーメン+福岡" },
+  { pref:"福岡県", region:"kyushu", name:"もつ鍋", genre:"郷土料理・軽食",
+    area:"福岡市内",
+    desc:"ぷりぷりの牛モツとニラ・キャベツをニンニク効いた醤油or味噌スープで煮込む博多の名物鍋。〆のちゃんぽん麺も絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Motsunabe.jpg/640px-Motsunabe.jpg",
+    mapUrl:"https://maps.google.com/?q=もつ鍋+福岡" },
+  { pref:"福岡県", region:"kyushu", name:"水炊き", genre:"郷土料理・軽食",
+    area:"福岡市内",
+    desc:"骨付き鶏肉を長時間煮込んだ白濁コラーゲンスープの博多流鍋。ポン酢でさっぱりいただく上品な味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Chicken_hot_pot_and_brown_rice_with_Takana_greens_%E9%B6%8F%E9%8D%8B%E3%81%A8%E9%AB%98%E8%8F%9C%E9%A3%AF.jpg/640px-Chicken_hot_pot_and_brown_rice_with_Takana_greens_%E9%B6%8F%E9%8D%8B%E3%81%A8%E9%AB%98%E8%8F%9C%E9%A3%AF.jpg",
+    mapUrl:"https://maps.google.com/?q=水炊き+福岡" },
+  { pref:"福岡県", region:"kyushu", name:"明太子", genre:"海鮮",
+    area:"福岡市内",
+    desc:"スケトウダラの卵巣を唐辛子調味液に漬け込んだ博多の味。ご飯のお供・お土産の大定番。明太フランスも人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Mentaiko_by_Kanko.jpg",
+    mapUrl:"https://maps.google.com/?q=明太子+博多" },
+  { pref:"福岡県", region:"kyushu", name:"博多うどん", genre:"麺類",
+    area:"福岡市内",
+    desc:"柔らかくてもちもちの麺に透き通った出汁のあっさりうどん。ごぼう天うどんが定番。実はラーメンより歴史が長い",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Hakata_udon.JPG/640px-Hakata_udon.JPG",
+    mapUrl:"https://maps.google.com/?q=博多うどん+福岡" },
+  { pref:"福岡県", region:"kyushu", name:"焼き鳥（久留米）", genre:"肉料理",
+    area:"久留米市・福岡市",
+    desc:"豚バラ串が主役の福岡流焼き鳥。キャベツの酢ダレが付く久留米スタイルは焼き鳥の概念を変える",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Typical_yakitori_001.jpg/640px-Typical_yakitori_001.jpg",
+    mapUrl:"https://maps.google.com/?q=焼き鳥+久留米" },
+  { pref:"福岡県", region:"kyushu", name:"梅ヶ枝餅", genre:"スイーツ・喫茶",
+    area:"太宰府市太宰府天満宮",
+    desc:"小豆餡を薄い餅生地で包んで梅の刻印の鉄板で焼いた太宰府名物。参道の焼きたてはカリッともちもち",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/%E6%A2%85%E3%83%B6%E6%9E%9D%E9%A4%85%E3%81%A8%E6%8A%B9%E8%8C%B6.JPG/640px-%E6%A2%85%E3%83%B6%E6%9E%9D%E9%A4%85%E3%81%A8%E6%8A%B9%E8%8C%B6.JPG",
+    mapUrl:"https://maps.google.com/?q=梅ヶ枝餅+太宰府" },
+
+  // ===== 佐賀県 =====
+  { pref:"佐賀県", region:"kyushu", name:"呼子のイカ", genre:"海鮮",
+    area:"唐津市呼子町",
+    desc:"呼子の朝市で味わう透き通ったイカの活き造り。コリコリの食感と甘みは鮮度抜群の証。ゲソの天ぷらも絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Ika-sashi_01.JPG/640px-Ika-sashi_01.JPG",
+    mapUrl:"https://maps.google.com/?q=イカの活き造り+呼子" },
+  { pref:"佐賀県", region:"kyushu", name:"佐賀牛", genre:"肉料理",
+    area:"佐賀市ほか県内各所",
+    desc:"JAグループ佐賀が誇る最高級ブランド牛。柔らかな赤身にきめ細かなサシが入り、口の中でとろける至高の味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Saga_beef.jpg/640px-Saga_beef.jpg",
+    mapUrl:"https://maps.google.com/?q=佐賀牛+佐賀" },
+  { pref:"佐賀県", region:"kyushu", name:"シシリアンライス", genre:"ご飯もの",
+    area:"佐賀市内",
+    desc:"ご飯の上にレタス・トマトなどのサラダと炒めた肉をのせマヨネーズをかけた佐賀市のご当地ランチ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Sicilian_rice_saga.jpg/640px-Sicilian_rice_saga.jpg",
+    mapUrl:"https://maps.google.com/?q=シシリアンライス+佐賀" },
+  { pref:"佐賀県", region:"kyushu", name:"竹崎カニ", genre:"海鮮",
+    area:"太良町竹崎",
+    desc:"有明海の栄養豊富な干潟で育ったワタリガニ。身が甘く濃厚な味わい。塩茹でが一番おいしいと地元民は言う",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/%E8%8C%B9%E3%81%A7%E3%82%AC%E3%83%8B.jpg/640px-%E8%8C%B9%E3%81%A7%E3%82%AC%E3%83%8B.jpg",
+    mapUrl:"https://maps.google.com/?q=竹崎カニ+太良町" },
+  { pref:"佐賀県", region:"kyushu", name:"丸ぼうろ", genre:"スイーツ・喫茶",
+    area:"佐賀市内",
+    desc:"南蛮渡来の製法を受け継ぐ佐賀の伝統銘菓。小麦粉・砂糖・卵のシンプルな焼き菓子で素朴な甘さ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Marub%C5%8Dro.jpg/640px-Marub%C5%8Dro.jpg",
+    mapUrl:"https://maps.google.com/?q=丸ぼうろ+佐賀" },
+
+  // ===== 長崎県 =====
+  { pref:"長崎県", region:"kyushu", name:"長崎ちゃんぽん", genre:"麺類",
+    area:"長崎市内",
+    desc:"豚骨と鶏ガラの白湯スープに海鮮・野菜をたっぷり入れた長崎発祥の麺料理。中華と和の融合が生んだ究極の一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Shikairo_Nagasaki_Japan05s.jpg/640px-Shikairo_Nagasaki_Japan05s.jpg",
+    mapUrl:"https://maps.google.com/?q=ちゃんぽん+長崎" },
+  { pref:"長崎県", region:"kyushu", name:"皿うどん", genre:"麺類",
+    area:"長崎市内",
+    desc:"パリパリの細麺にとろり餡をかけた長崎の名物。ちゃんぽんと双璧をなす長崎中華の代表格。ウスターソースをかけるのが地元流",
+    img:"https://upload.wikimedia.org/wikipedia/commons/5/5c/Sara_udon_in_Nagasaki.jpg",
+    mapUrl:"https://maps.google.com/?q=皿うどん+長崎" },
+  { pref:"長崎県", region:"kyushu", name:"トルコライス", genre:"ご飯もの",
+    area:"長崎市内",
+    desc:"ピラフ・ナポリタン・トンカツが一皿に盛られた長崎発祥の大人のお子様ランチ。洋食文化の港町ならでは",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Toruko_rice_Cafe_Olympic.jpg/640px-Toruko_rice_Cafe_Olympic.jpg",
+    mapUrl:"https://maps.google.com/?q=トルコライス+長崎" },
+  { pref:"長崎県", region:"kyushu", name:"佐世保バーガー", genre:"郷土料理・軽食",
+    area:"佐世保市内",
+    desc:"米海軍直伝のレシピを日本流にアレンジした佐世保のご当地バーガー。注文を受けてから手作りするこだわりの一品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Sasebo_burger2.jpg/640px-Sasebo_burger2.jpg",
+    mapUrl:"https://maps.google.com/?q=佐世保バーガー+佐世保" },
+  { pref:"長崎県", region:"kyushu", name:"カステラ", genre:"スイーツ・喫茶",
+    area:"長崎市内",
+    desc:"16世紀にポルトガルから伝わった南蛮菓子。しっとりきめ細かな生地と底のザラメが長崎カステラの証",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Castella_002.jpg/640px-Castella_002.jpg",
+    mapUrl:"https://maps.google.com/?q=カステラ+長崎" },
+  { pref:"長崎県", region:"kyushu", name:"五島うどん", genre:"麺類",
+    area:"五島列島",
+    desc:"椿油を塗って手延べする五島列島伝統のうどん。つるつるの細麺を地獄炊き（釜揚げ）であご出汁のつゆで味わう",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Boiled_Goto_Udon.jpg/640px-Boiled_Goto_Udon.jpg",
+    mapUrl:"https://maps.google.com/?q=五島うどん+五島" },
+
+  // ===== 熊本県 =====
+  { pref:"熊本県", region:"kyushu", name:"熊本ラーメン", genre:"麺類",
+    area:"熊本市内",
+    desc:"豚骨にニンニクチップを効かせた熊本流ラーメン。博多よりやや太い中太麺と焦がしニンニクの香りが特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Kumamoro-ramen.jpg/640px-Kumamoro-ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=熊本ラーメン+熊本" },
+  { pref:"熊本県", region:"kyushu", name:"馬刺し", genre:"肉料理",
+    area:"熊本市内",
+    desc:"馬肉消費量日本一の熊本で味わう新鮮な馬刺し。赤身・霜降り・たてがみを甘い醤油とおろし生姜で。桜色の美しい肉は絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Horsemeat%2CAsahikawa-20160724.jpg/640px-Horsemeat%2CAsahikawa-20160724.jpg",
+    mapUrl:"https://maps.google.com/?q=馬刺し+熊本" },
+  { pref:"熊本県", region:"kyushu", name:"太平燕（タイピーエン）", genre:"麺類",
+    area:"熊本市内",
+    desc:"春雨スープに五目の具材と揚げ卵をのせた熊本独自の中華料理。給食でも出る熊本市民のソウルフード",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Taipien_by_woinary_in_Kumamoto.jpg/640px-Taipien_by_woinary_in_Kumamoto.jpg",
+    mapUrl:"https://maps.google.com/?q=太平燕+熊本" },
+  { pref:"熊本県", region:"kyushu", name:"からし蓮根", genre:"揚げ物",
+    area:"熊本市内",
+    desc:"蓮根の穴に辛子味噌を詰めて衣で揚げた熊本の伝統料理。ピリッとした辛さと蓮根のシャキシャキ食感がクセになる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/6/60/Karashi-Renkon.jpg",
+    mapUrl:"https://maps.google.com/?q=からし蓮根+熊本" },
+  { pref:"熊本県", region:"kyushu", name:"天草の海鮮", genre:"海鮮",
+    area:"天草市・上天草市",
+    desc:"天草灘の豊かな海で育った車海老・タコ・鯛など新鮮な海の幸。天草大王（地鶏）も名物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Kaisendon.jpg/640px-Kaisendon.jpg",
+    mapUrl:"https://maps.google.com/?q=海鮮丼+天草" },
+  { pref:"熊本県", region:"kyushu", name:"いきなり団子", genre:"スイーツ・喫茶",
+    area:"熊本市内",
+    desc:"輪切りのさつまいもと餡子を小麦粉の皮で包んで蒸した熊本の素朴なおやつ。『いきなり（簡単に）作れる』が名前の由来",
+    img:"https://upload.wikimedia.org/wikipedia/commons/e/ec/Ikinaridango_2.jpg",
+    mapUrl:"https://maps.google.com/?q=いきなり団子+熊本" },
+
+  // ===== 大分県 =====
+  { pref:"大分県", region:"kyushu", name:"別府冷麺", genre:"麺類",
+    area:"別府市内",
+    desc:"韓国冷麺をルーツに独自進化した別府名物。牛骨ベースの冷たいスープにモチモチ麺とキムチ。温泉帰りに最高",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Beppu_Reimen_%28Naengmyeon_of_Beppu%2C_Oita%29.jpg/640px-Beppu_Reimen_%28Naengmyeon_of_Beppu%2C_Oita%29.jpg",
+    mapUrl:"https://maps.google.com/?q=別府冷麺+別府" },
+  { pref:"大分県", region:"kyushu", name:"とり天", genre:"揚げ物",
+    area:"大分市・別府市",
+    desc:"鶏肉に衣をつけて天ぷらにした大分発祥の名物。カボスとポン酢で食べるのが大分流。からあげとは別物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Toriten_Sengokuya_ac_%281%29.jpg/640px-Toriten_Sengokuya_ac_%281%29.jpg",
+    mapUrl:"https://maps.google.com/?q=とり天+大分" },
+  { pref:"大分県", region:"kyushu", name:"中津からあげ", genre:"揚げ物",
+    area:"中津市内",
+    desc:"からあげの聖地・中津市。専門店がひしめく激戦区で各店が秘伝のタレと揚げ技を競う。衣のカリッ・肉汁のジュワッが最高",
+    img:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Nakatsu_Karaage_%28cropped%29.JPG",
+    mapUrl:"https://maps.google.com/?q=中津からあげ+中津" },
+  { pref:"大分県", region:"kyushu", name:"関あじ・関さば", genre:"海鮮",
+    area:"大分市佐賀関",
+    desc:"豊後水道の激流で育ったブランド魚。一本釣りで傷がなく鮮度抜群。身が締まり脂ものった究極の青魚",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Seki_Aji_Seki_Saba_Festival_set_meal_2004-02-21.jpg/640px-Seki_Aji_Seki_Saba_Festival_set_meal_2004-02-21.jpg",
+    mapUrl:"https://maps.google.com/?q=関あじ関さば+佐賀関" },
+  { pref:"大分県", region:"kyushu", name:"だんご汁", genre:"郷土料理・軽食",
+    area:"大分県内全域",
+    desc:"小麦粉の生地を手で平たく延ばして味噌ベースの汁で野菜と煮込んだ大分の家庭料理。ほうとうに似た素朴な味わい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Dango_jiru.jpg/640px-Dango_jiru.jpg",
+    mapUrl:"https://maps.google.com/?q=だんご汁+大分" },
+  { pref:"大分県", region:"kyushu", name:"地獄蒸し", genre:"郷土料理・軽食",
+    area:"別府市鉄輪温泉",
+    desc:"温泉の蒸気で野菜・海鮮・卵を蒸し上げる別府ならではの調理法。鉄輪温泉の地獄蒸し工房で体験できる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/d/d9/%E9%89%84%E8%BC%AA%E6%B8%A9%E6%B3%89%E5%9C%B0%E7%8D%84%E8%92%B8%E3%81%97%E5%8D%B5PB060092.jpg",
+    mapUrl:"https://maps.google.com/?q=地獄蒸し+別府鉄輪" },
+
+  // ===== 宮崎県 =====
+  { pref:"宮崎県", region:"kyushu", name:"チキン南蛮", genre:"揚げ物",
+    area:"延岡市・宮崎市",
+    desc:"鶏肉をカリッと揚げて甘酢に浸しタルタルソースをたっぷりかけた宮崎発祥の洋食。ご飯が止まらない最強のおかず",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Chicken_nanban_jetalone_in_Tsukishima%2C_Tokyo.jpg/640px-Chicken_nanban_jetalone_in_Tsukishima%2C_Tokyo.jpg",
+    mapUrl:"https://maps.google.com/?q=チキン南蛮+宮崎" },
+  { pref:"宮崎県", region:"kyushu", name:"宮崎地鶏の炭火焼き", genre:"肉料理",
+    area:"宮崎市内",
+    desc:"地鶏を炭火で豪快に焼き上げた宮崎の名物料理。表面は真っ黒に燻され、噛みしめると炭の香りと肉の旨みが広がる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/%E7%82%AD%E7%81%AB%E7%84%BC%E3%81%8D%E9%B3%A5_%E4%B8%B2%E3%81%8B%E3%81%A9_%E6%96%B0%E5%AE%BF%E6%9C%AC%E5%BA%97_IMG_20220502_12.jpg/640px-%E7%82%AD%E7%81%AB%E7%84%BC%E3%81%8D%E9%B3%A5_%E4%B8%B2%E3%81%8B%E3%81%A9_%E6%96%B0%E5%AE%BF%E6%9C%AC%E5%BA%97_IMG_20220502_12.jpg",
+    mapUrl:"https://maps.google.com/?q=地鶏炭火焼+宮崎" },
+  { pref:"宮崎県", region:"kyushu", name:"冷や汁", genre:"ご飯もの",
+    area:"宮崎市ほか県内",
+    desc:"焼いたアジやイワシの身と味噌をすり鉢で練り冷たい出汁で伸ばしご飯にかけた夏の郷土料理。きゅうり・大葉・ミョウガが爽やか",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/12_2%E5%A4%95%E9%A3%9F%EF%BC%88%E5%86%B7%E3%82%84%E6%B1%81%E5%AE%9A%E9%A3%9F%EF%BC%89_%282097833934%29.jpg/640px-12_2%E5%A4%95%E9%A3%9F%EF%BC%88%E5%86%B7%E3%82%84%E6%B1%81%E5%AE%9A%E9%A3%9F%EF%BC%89_%282097833934%29.jpg",
+    mapUrl:"https://maps.google.com/?q=冷や汁+宮崎" },
+  { pref:"宮崎県", region:"kyushu", name:"宮崎マンゴー", genre:"スイーツ・喫茶",
+    area:"宮崎市ほか県内",
+    desc:"「太陽のタマゴ」ブランドで知られる宮崎の完熟マンゴー。糖度15度以上のトロピカルな甘さは国産フルーツの最高峰",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Mango_and_cross_section_edit.jpg/640px-Mango_and_cross_section_edit.jpg",
+    mapUrl:"https://maps.google.com/?q=宮崎マンゴー+宮崎" },
+  { pref:"宮崎県", region:"kyushu", name:"肉巻きおにぎり", genre:"ご飯もの",
+    area:"宮崎市内",
+    desc:"豚肉でおにぎりを巻いて甘辛いタレで焼き上げた宮崎発祥のB級グルメ。食べ歩きやお土産に大人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Nikumaki_Onigiri.JPG/640px-Nikumaki_Onigiri.JPG",
+    mapUrl:"https://maps.google.com/?q=肉巻きおにぎり+宮崎" },
+
+  // ===== 鹿児島県 =====
+  { pref:"鹿児島県", region:"kyushu", name:"黒豚しゃぶしゃぶ", genre:"肉料理",
+    area:"鹿児島市内",
+    desc:"鹿児島が誇るブランド黒豚をさっと湯にくぐらせてポン酢で。きめ細かい肉質と上品な甘みは最上級の豚肉体験",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Shabu-shabu-01.jpg/640px-Shabu-shabu-01.jpg",
+    mapUrl:"https://maps.google.com/?q=黒豚しゃぶしゃぶ+鹿児島" },
+  { pref:"鹿児島県", region:"kyushu", name:"鶏飯（けいはん）", genre:"ご飯もの",
+    area:"奄美大島",
+    desc:"ご飯にほぐした鶏肉・錦糸卵・椎茸・パパイヤ漬けなどをのせ鶏ガラスープをかけて食べる奄美の郷土料理",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Keihan_%28Amami_Oshima%27s_country_dishes%29_Kagoshima%2CJAPAN.jpg/640px-Keihan_%28Amami_Oshima%27s_country_dishes%29_Kagoshima%2CJAPAN.jpg",
+    mapUrl:"https://maps.google.com/?q=鶏飯+奄美大島" },
+  { pref:"鹿児島県", region:"kyushu", name:"さつま揚げ", genre:"揚げ物",
+    area:"鹿児島市内",
+    desc:"白身魚のすり身に地酒を加えて揚げた鹿児島の「つけあげ」。ふんわり甘い素朴な味わいは薩摩の食文化の象徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/e/ec/Satsumaage.jpg",
+    mapUrl:"https://maps.google.com/?q=さつま揚げ+鹿児島" },
+  { pref:"鹿児島県", region:"kyushu", name:"きびなご料理", genre:"海鮮",
+    area:"鹿児島市・甑島",
+    desc:"銀色に輝く小魚・きびなごを刺身・天ぷら・南蛮漬けで。菊の花のように丸く盛り付ける刺身は見た目も美しい",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Kibinago_sashimi_by_jetalone_in_Kagoshima.jpg/640px-Kibinago_sashimi_by_jetalone_in_Kagoshima.jpg",
+    mapUrl:"https://maps.google.com/?q=きびなご+鹿児島" },
+  { pref:"鹿児島県", region:"kyushu", name:"白くま", genre:"スイーツ・喫茶",
+    area:"鹿児島市天文館",
+    desc:"ふわふわのかき氷にミルクをかけフルーツや寒天を彩り豊かにトッピングした鹿児島発祥の夏の名物スイーツ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Kakigori_%22Shirokuma%22_of_Temmonkan_Mujaki_Restaurant.jpg/640px-Kakigori_%22Shirokuma%22_of_Temmonkan_Mujaki_Restaurant.jpg",
+    mapUrl:"https://maps.google.com/?q=白くま+天文館" },
+  { pref:"鹿児島県", region:"kyushu", name:"かるかん", genre:"スイーツ・喫茶",
+    area:"鹿児島市内",
+    desc:"自然薯・米粉・砂糖で作る鹿児島の代表的銘菓。しっとりフワフワの食感と優しい甘さ。あんこ入りのかるかん饅頭も人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Karukan_01.jpg/640px-Karukan_01.jpg",
+    mapUrl:"https://maps.google.com/?q=かるかん+鹿児島" },
+
+  // ===== 沖縄県 =====
+  { pref:"沖縄県", region:"kyushu", name:"沖縄そば", genre:"麺類",
+    area:"那覇市ほか県内全域",
+    desc:"小麦粉の太麺に豚骨と鰹出汁のスープ、三枚肉やソーキを豪快にのせた沖縄のソウルフード。八重山そばや宮古そばなど地域差も",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/%E3%82%BD%E3%83%BC%E3%82%AD%E3%81%9D%E3%81%B0%EF%BC%88%E6%B2%96%E7%B8%84%E3%81%9D%E3%81%B0%E5%B0%82%E9%96%80%E3%82%84%E3%82%93%E3%81%B0%E3%82%8B%E3%83%BB%E6%9C%89%E6%A5%BD%E7%94%BA%E4%BA%A4%E9%80%9A%E4%BC%9A%E9%A4%A8%EF%BC%8920240608-P1043176.jpg/640px-%E3%82%BD%E3%83%BC%E3%82%AD%E3%81%9D%E3%81%B0%EF%BC%88%E6%B2%96%E7%B8%84%E3%81%9D%E3%81%B0%E5%B0%82%E9%96%80%E3%82%84%E3%82%93%E3%81%B0%E3%82%8B%E3%83%BB%E6%9C%89%E6%A5%BD%E7%94%BA%E4%BA%A4%E9%80%9A%E4%BC%9A%E9%A4%A8%EF%BC%8920240608-P1043176.jpg",
+    mapUrl:"https://maps.google.com/?q=沖縄そば+那覇" },
+  { pref:"沖縄県", region:"kyushu", name:"タコライス", genre:"ご飯もの",
+    area:"金武町・那覇市",
+    desc:"メキシカンタコスの具材をご飯にのせた沖縄発祥のアメリカンフード。ひき肉・チーズ・レタス・サルサの四重奏",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Taco_rice_-_Tokyo_area_-_November_9_2016_-_002.jpg/640px-Taco_rice_-_Tokyo_area_-_November_9_2016_-_002.jpg",
+    mapUrl:"https://maps.google.com/?q=タコライス+金武町" },
+  { pref:"沖縄県", region:"kyushu", name:"ゴーヤーチャンプルー", genre:"郷土料理・軽食",
+    area:"沖縄県内全域",
+    desc:"ゴーヤー・豆腐・卵・ポークランチョンミートを炒めた沖縄の家庭料理の代表格。苦味と旨みのバランスが絶妙",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Goya_chanpuru_-_Okinawan_food_-_June_14_2015.jpg/640px-Goya_chanpuru_-_Okinawan_food_-_June_14_2015.jpg",
+    mapUrl:"https://maps.google.com/?q=ゴーヤーチャンプルー+沖縄" },
+  { pref:"沖縄県", region:"kyushu", name:"ラフテー", genre:"肉料理",
+    area:"沖縄県内全域",
+    desc:"豚の三枚肉を泡盛・黒砂糖・醤油でじっくり煮込んだ琉球王朝時代からの伝統料理。とろとろに柔らかい豚肉が絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Rafti%2C_Okinawan_stewed_pork_belly_by_ayustety_in_Tokyo.jpg/640px-Rafti%2C_Okinawan_stewed_pork_belly_by_ayustety_in_Tokyo.jpg",
+    mapUrl:"https://maps.google.com/?q=ラフテー+沖縄" },
+  { pref:"沖縄県", region:"kyushu", name:"海ぶどう", genre:"海鮮",
+    area:"沖縄県内全域",
+    desc:"プチプチの食感が楽しい沖縄の海藻。そのままポン酢で、または海鮮丼のトッピングで。沖縄でしか味わえない食感",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/OceanGrapes.jpg/640px-OceanGrapes.jpg",
+    mapUrl:"https://maps.google.com/?q=海ぶどう+沖縄" },
+  { pref:"沖縄県", region:"kyushu", name:"サーターアンダギー", genre:"スイーツ・喫茶",
+    area:"沖縄県内全域",
+    desc:"小麦粉・砂糖・卵で作る沖縄の伝統揚げ菓子。外はカリッ中はふわっの食感。揚げたては格別のおいしさ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Sata_andagi_001.jpg/640px-Sata_andagi_001.jpg",
+    mapUrl:"https://maps.google.com/?q=サーターアンダギー+沖縄" },
+  { pref:"沖縄県", region:"kyushu", name:"ステーキ", genre:"肉料理",
+    area:"那覇市ほか県内",
+    desc:"米軍統治時代から根付いたステーキ文化。〆のステーキは沖縄の新常識。1000円台でボリューム満点のステーキハウスが多数",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Ribeye-MCB-MaggieO.jpg/640px-Ribeye-MCB-MaggieO.jpg",
+    mapUrl:"https://maps.google.com/?q=ステーキ+那覇" },
+  { pref:"沖縄県", region:"kyushu", name:"ブルーシールアイス", genre:"スイーツ・喫茶",
+    area:"沖縄県内各所",
+    desc:"米軍基地発祥の沖縄限定アイスクリーム。紅芋・塩ちんすこう・マンゴーなど沖縄ならではのフレーバーが勢揃い",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Ice_Cream_Dessert_%28Unsplash%29.jpg/640px-Ice_Cream_Dessert_%28Unsplash%29.jpg",
+    mapUrl:"https://maps.google.com/?q=ブルーシール+沖縄" },
 ];
 
 // ===== State =====
@@ -553,23 +1994,30 @@ let selectedRegion = "";
 let selectedPref = "";
 let activeGenres = new Set();
 
-const selRegion = document.getElementById("sel-region");
-const selPref = document.getElementById("sel-pref");
+const regionFilterEl = document.getElementById("region-filter");
+const prefFilterEl = document.getElementById("pref-filter");
 const genreFilterEl = document.getElementById("genre-filter");
 const cardGrid = document.getElementById("card-grid");
 const resultCount = document.getElementById("result-count");
+const featuredArea = document.getElementById("featured-area");
 
 function init() {
+  const rLabel = document.createElement("span");
+  rLabel.className = "region-filter-label";
+  rLabel.textContent = "地方:";
+  regionFilterEl.appendChild(rLabel);
+
   REGIONS.forEach(r => {
-    const opt = document.createElement("option");
-    opt.value = r.id; opt.textContent = r.name;
-    selRegion.appendChild(opt);
+    const btn = document.createElement("button");
+    btn.className = "region-btn"; btn.textContent = r.name; btn.type = "button";
+    btn.addEventListener("click", () => selectRegion(r.id, btn));
+    regionFilterEl.appendChild(btn);
   });
 
-  const label = document.createElement("span");
-  label.className = "genre-filter-label";
-  label.textContent = "ジャンル:";
-  genreFilterEl.appendChild(label);
+  const gLabel = document.createElement("span");
+  gLabel.className = "genre-filter-label";
+  gLabel.textContent = "ジャンル:";
+  genreFilterEl.appendChild(gLabel);
 
   GENRES.forEach(g => {
     const btn = document.createElement("button");
@@ -578,36 +2026,66 @@ function init() {
     genreFilterEl.appendChild(btn);
   });
 
-  selRegion.addEventListener("change", onRegionChange);
-  selPref.addEventListener("change", onPrefChange);
   render();
 }
 
-function onRegionChange() {
-  selectedRegion = selRegion.value;
+function selectRegion(regionId, clickedBtn) {
+  if (selectedRegion === regionId) {
+    selectedRegion = "";
+    clickedBtn.classList.remove("active");
+  } else {
+    selectedRegion = regionId;
+    regionFilterEl.querySelectorAll(".region-btn").forEach(b => b.classList.remove("active"));
+    clickedBtn.classList.add("active");
+  }
   selectedPref = "";
-  selPref.innerHTML = '<option value="">-- すべて --</option>';
+  prefFilterEl.innerHTML = "";
   if (selectedRegion) {
+    prefFilterEl.classList.add("visible");
     const region = REGIONS.find(r => r.id === selectedRegion);
     if (region) {
+      const lbl = document.createElement("span");
+      lbl.className = "pref-filter-label";
+      lbl.textContent = "都道府県:";
+      prefFilterEl.appendChild(lbl);
+
+      const allBtn = document.createElement("button");
+      allBtn.className = "pref-btn-all"; allBtn.textContent = "すべて"; allBtn.type = "button";
+      allBtn.addEventListener("click", () => selectPref("", allBtn));
+      prefFilterEl.appendChild(allBtn);
+
       const withData = region.prefs.filter(p => SPOTS.some(s => s.pref === p));
       withData.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p; opt.textContent = p;
-        selPref.appendChild(opt);
+        const btn = document.createElement("button");
+        btn.className = "pref-btn"; btn.textContent = p; btn.type = "button";
+        btn.addEventListener("click", () => selectPref(p, btn));
+        prefFilterEl.appendChild(btn);
       });
       const noData = region.prefs.filter(p => !SPOTS.some(s => s.pref === p));
       noData.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p; opt.textContent = p + "（準備中）"; opt.disabled = true;
-        selPref.appendChild(opt);
+        const btn = document.createElement("button");
+        btn.className = "pref-btn disabled"; btn.textContent = p; btn.type = "button";
+        prefFilterEl.appendChild(btn);
       });
     }
+  } else {
+    prefFilterEl.classList.remove("visible");
   }
   render();
 }
 
-function onPrefChange() { selectedPref = selPref.value; render(); }
+function selectPref(pref, clickedBtn) {
+  selectedPref = pref;
+  prefFilterEl.querySelectorAll(".pref-btn").forEach(b => b.classList.remove("active"));
+  const allBtn = prefFilterEl.querySelector(".pref-btn-all");
+  if (pref === "") {
+    allBtn.classList.remove("inactive");
+  } else {
+    allBtn.classList.add("inactive");
+    clickedBtn.classList.add("active");
+  }
+  render();
+}
 
 function toggleGenre(genre, btn) {
   if (activeGenres.has(genre)) { activeGenres.delete(genre); btn.classList.remove("active"); }
@@ -624,16 +2102,76 @@ function getFiltered() {
   });
 }
 
+function cardHTML(s, i) {
+  const delay = Math.min(i * 0.05, 0.6);
+  return `<div class="spot-card" style="animation-delay:${delay}s">
+    <div class="card-img-wrap">
+      <img src="${esc(s.img)}" alt="${esc(s.name)}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="card-img-fallback" style="display:none">${esc(s.name)}</div>
+    </div>
+    <div class="card-body">
+      <span class="card-genre-badge">${esc(s.genre)}</span>
+      <div class="card-name">${esc(s.name)}</div>
+      <div class="card-area">${esc(s.pref)} · ${esc(s.area)}</div>
+      <div class="card-desc">${esc(s.desc)}</div>
+      <a class="card-map-link" href="${esc(s.mapUrl)}" target="_blank" rel="noopener">
+        📍 このグルメを周辺で探す
+      </a>
+    </div>
+  </div>`;
+}
+
+function renderFeatured() {
+  const month = new Date().getMonth() + 1;
+  const seasonNames = SEASONAL_PICKS[month] || SEASONAL_PICKS[1];
+  const seasonLabel = SEASON_LABELS[month] || "おすすめグルメ";
+
+  const seasonalItems = seasonNames.map(n => SPOTS.find(s => s.name === n)).filter(Boolean);
+
+  const seasonalSet = new Set(seasonalItems.map(s => s.name));
+  const pool = SPOTS.filter(s => !seasonalSet.has(s.name));
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  const randomItems = shuffled.slice(0, 8);
+
+  let html = "";
+
+  html += '<div class="featured-section">';
+  html += '<div class="featured-hd"><span class="featured-hd-icon">🍽️</span>';
+  html += '<span class="featured-hd-title">' + esc(seasonLabel) + '</span>';
+  html += '<span class="featured-hd-sub">' + month + '月のおすすめ</span></div>';
+  html += '<div class="card-grid">';
+  seasonalItems.forEach((s,i) => { html += cardHTML(s, i); });
+  html += '</div></div>';
+
+  html += '<div class="featured-section">';
+  html += '<div class="featured-hd"><span class="featured-hd-icon">🎲</span>';
+  html += '<span class="featured-hd-title">ランダムピックアップ</span>';
+  html += '<span class="featured-hd-sub">アクセスごとに変わります</span></div>';
+  html += '<div class="card-grid">';
+  randomItems.forEach((s,i) => { html += cardHTML(s, i); });
+  html += '</div></div>';
+
+  featuredArea.innerHTML = html;
+}
+
 function render() {
   const items = getFiltered();
   cardGrid.innerHTML = "";
 
   if (!selectedRegion) {
     resultCount.textContent = "";
-    cardGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🍽️</div><p>地方を選んでご当地グルメを探しましょう</p></div>';
+    featuredArea.style.display = "";
+    renderFeatured();
     return;
   }
 
+  featuredArea.style.display = "none";
+  featuredArea.innerHTML = "";
   resultCount.textContent = items.length + " 件のグルメが見つかりました";
 
   if (items.length === 0) {
@@ -641,25 +2179,8 @@ function render() {
     return;
   }
 
-  items.forEach(s => {
-    const card = document.createElement("div");
-    card.className = "spot-card";
-    card.innerHTML = `
-      <div class="card-img-wrap">
-        <img src="${esc(s.img)}" alt="${esc(s.name)}" loading="lazy"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="card-img-fallback" style="display:none">${esc(s.name)}</div>
-      </div>
-      <div class="card-body">
-        <span class="card-genre-badge">${esc(s.genre)}</span>
-        <div class="card-name">${esc(s.name)}</div>
-        <div class="card-area">${esc(s.pref)} · ${esc(s.area)}</div>
-        <div class="card-desc">${esc(s.desc)}</div>
-        <a class="card-map-link" href="${esc(s.mapUrl)}" target="_blank" rel="noopener">
-          📍 このグルメを周辺で探す
-        </a>
-      </div>`;
-    cardGrid.appendChild(card);
+  items.forEach((s, i) => {
+    cardGrid.insertAdjacentHTML("beforeend", cardHTML(s, i));
   });
 }
 
