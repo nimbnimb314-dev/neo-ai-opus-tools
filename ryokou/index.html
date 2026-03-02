@@ -2026,7 +2026,41 @@ function init() {
     genreFilterEl.appendChild(btn);
   });
 
-  render();
+  applyHash();
+}
+
+function buildPrefButtons() {
+  prefFilterEl.innerHTML = "";
+  if (!selectedRegion) { prefFilterEl.classList.remove("visible"); return; }
+  prefFilterEl.classList.add("visible");
+  const region = REGIONS.find(r => r.id === selectedRegion);
+  if (!region) return;
+
+  const lbl = document.createElement("span");
+  lbl.className = "pref-filter-label";
+  lbl.textContent = "都道府県:";
+  prefFilterEl.appendChild(lbl);
+
+  const allBtn = document.createElement("button");
+  allBtn.className = "pref-btn-all"; allBtn.textContent = "すべて"; allBtn.type = "button";
+  if (selectedPref) allBtn.classList.add("inactive");
+  allBtn.addEventListener("click", () => selectPref("", allBtn));
+  prefFilterEl.appendChild(allBtn);
+
+  const withData = region.prefs.filter(p => SPOTS.some(s => s.pref === p));
+  withData.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "pref-btn"; btn.textContent = p; btn.type = "button";
+    if (p === selectedPref) btn.classList.add("active");
+    btn.addEventListener("click", () => selectPref(p, btn));
+    prefFilterEl.appendChild(btn);
+  });
+  const noData = region.prefs.filter(p => !SPOTS.some(s => s.pref === p));
+  noData.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "pref-btn disabled"; btn.textContent = p; btn.type = "button";
+    prefFilterEl.appendChild(btn);
+  });
 }
 
 function selectRegion(regionId, clickedBtn) {
@@ -2039,39 +2073,9 @@ function selectRegion(regionId, clickedBtn) {
     clickedBtn.classList.add("active");
   }
   selectedPref = "";
-  prefFilterEl.innerHTML = "";
-  if (selectedRegion) {
-    prefFilterEl.classList.add("visible");
-    const region = REGIONS.find(r => r.id === selectedRegion);
-    if (region) {
-      const lbl = document.createElement("span");
-      lbl.className = "pref-filter-label";
-      lbl.textContent = "都道府県:";
-      prefFilterEl.appendChild(lbl);
-
-      const allBtn = document.createElement("button");
-      allBtn.className = "pref-btn-all"; allBtn.textContent = "すべて"; allBtn.type = "button";
-      allBtn.addEventListener("click", () => selectPref("", allBtn));
-      prefFilterEl.appendChild(allBtn);
-
-      const withData = region.prefs.filter(p => SPOTS.some(s => s.pref === p));
-      withData.forEach(p => {
-        const btn = document.createElement("button");
-        btn.className = "pref-btn"; btn.textContent = p; btn.type = "button";
-        btn.addEventListener("click", () => selectPref(p, btn));
-        prefFilterEl.appendChild(btn);
-      });
-      const noData = region.prefs.filter(p => !SPOTS.some(s => s.pref === p));
-      noData.forEach(p => {
-        const btn = document.createElement("button");
-        btn.className = "pref-btn disabled"; btn.textContent = p; btn.type = "button";
-        prefFilterEl.appendChild(btn);
-      });
-    }
-  } else {
-    prefFilterEl.classList.remove("visible");
-  }
+  buildPrefButtons();
   render();
+  updateHash();
 }
 
 function selectPref(pref, clickedBtn) {
@@ -2085,11 +2089,45 @@ function selectPref(pref, clickedBtn) {
     clickedBtn.classList.add("active");
   }
   render();
+  updateHash();
 }
 
 function toggleGenre(genre, btn) {
   if (activeGenres.has(genre)) { activeGenres.delete(genre); btn.classList.remove("active"); }
   else { activeGenres.add(genre); btn.classList.add("active"); }
+  render();
+  updateHash();
+}
+
+function updateHash() {
+  if (!selectedRegion) {
+    history.replaceState(null, "", location.pathname + location.search);
+    return;
+  }
+  let h = selectedRegion;
+  if (selectedPref || activeGenres.size > 0) h += "/" + encodeURIComponent(selectedPref);
+  if (activeGenres.size > 0) h += "/" + [...activeGenres].map(encodeURIComponent).join(",");
+  history.replaceState(null, "", "#" + h);
+}
+
+function applyHash() {
+  const hash = decodeURIComponent(location.hash.slice(1));
+  if (!hash) {
+    selectedRegion = ""; selectedPref = ""; activeGenres.clear();
+  } else {
+    const parts = hash.split("/");
+    selectedRegion = parts[0] && REGIONS.find(r => r.id === parts[0]) ? parts[0] : "";
+    selectedPref = parts[1] || "";
+    activeGenres = new Set((parts[2] || "").split(",").filter(g => GENRES.includes(g)));
+  }
+  regionFilterEl.querySelectorAll(".region-btn").forEach(b => {
+    const r = REGIONS.find(r => r.name === b.textContent);
+    b.classList.toggle("active", !!(r && r.id === selectedRegion));
+  });
+  buildPrefButtons();
+  genreFilterEl.querySelectorAll(".genre-btn").forEach(b => {
+    b.classList.toggle("active", activeGenres.has(b.textContent));
+  });
   render();
 }
 
@@ -2186,6 +2224,7 @@ function render() {
 
 function esc(str) { const d = document.createElement("div"); d.textContent = str; return d.innerHTML; }
 
+window.addEventListener("hashchange", applyHash);
 init();
 </script>
 </body>
