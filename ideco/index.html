@@ -17,7 +17,9 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: "Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    header { background: linear-gradient(135deg, #1e3a6e, #2a5298); color: white; text-align: center; padding: 1.8rem 1rem; }
+    header { background: linear-gradient(135deg, #1e3a6e, #2a5298); color: white; text-align: center; padding: 1.8rem 1rem; position: relative; }
+    .home-link { position: absolute; top: 0.8rem; left: 0.8rem; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; transition: color 0.2s; }
+    .home-link:hover { color: #fff; }
     header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.03em; }
     header p { font-size: 0.85rem; opacity: 0.9; margin-top: 0.4rem; }
     header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; margin-top: 0.5rem; }
@@ -146,6 +148,7 @@
 </head>
 <body>
   <header>
+    <a href="../" class="home-link">&#9664; トップ</a>
     <h1>退職金+iDeCo 受け取り最適化シミュレーター</h1>
     <p>受取方法・タイミングで手取り額がどう変わるか比較</p>
     <span class="badge">2026年3月作成 ｜ 10年ルール対応</span>

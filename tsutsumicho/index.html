@@ -37,7 +37,10 @@ body {
   color: #fff;
   text-align: center;
   padding: 1.8rem 1rem;
+  position: relative;
 }
+.home-link { position: absolute; top: 0.8rem; left: 0.8rem; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; transition: color 0.2s; }
+.home-link:hover { color: #fff; }
 
 .app-header h1 {
   font-size: 1.5rem;
@@ -500,6 +503,7 @@ body {
 <body>
 
 <header class="app-header">
+  <a href="../" class="home-link">&#9664; トップ</a>
   <h1>つつみ帳</h1>
   <p>冠婚葬祭の金額記録</p>
 </header>

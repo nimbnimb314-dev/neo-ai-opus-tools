@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ご当地グルメナビ</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#ea580c;
+  --primary-hover:#c2410c;
+  --primary-light:#fff7ed;
+  --primary-pale:#fed7aa;
+  --accent:#dc2626;
+  --accent-light:#fef2f2;
+  --bg:#fffbf5;
+  --card:#ffffff;
+  --text:#1e293b;
+  --text-light:#64748b;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,0.08);
+  --radius:10px;
+}
+body{
+  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  min-height:100vh;
+}
+
+/* ----- Header ----- */
+header{
+  background:linear-gradient(135deg,#ea580c,#f97316,#fb923c);
+  color:#fff;
+  text-align:center;
+  padding:2rem 1rem 1.5rem;
+  position:relative;
+}
+.home-link{position:absolute;top:0.8rem;left:0.8rem;color:rgba(255,255,255,0.8);text-decoration:none;font-size:0.8rem;display:flex;align-items:center;gap:0.3rem;transition:color 0.2s}
+.home-link:hover{color:#fff}
+header h1{font-size:1.6rem;font-weight:700;margin-bottom:0.3rem}
+header p{font-size:0.9rem;opacity:0.92}
+
+.container{max-width:1100px;margin:0 auto;padding:1.2rem 1rem}
+
+/* ----- Controls ----- */
+.controls{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:1rem 1.2rem;
+  margin-bottom:1.2rem;
+}
+.control-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:0.8rem;
+}
+.control-row label{font-weight:600;font-size:0.85rem;white-space:nowrap}
+.control-row select{
+  font-family:inherit;font-size:0.9rem;padding:0.5rem 0.7rem;
+  border:1px solid var(--border);border-radius:6px;
+  background:#fff;color:var(--text);cursor:pointer;min-width:160px;
+}
+.control-row select:focus{
+  outline:none;border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(234,88,12,0.15);
+}
+
+/* ----- Genre filter ----- */
+.genre-filter{
+  margin-top:0.8rem;
+  display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;
+}
+.genre-filter-label{font-weight:600;font-size:0.85rem;margin-right:0.3rem}
+.genre-btn{
+  font-family:inherit;font-size:0.78rem;padding:0.35rem 0.7rem;
+  border:1px solid var(--border);border-radius:20px;
+  background:#fff;color:var(--text-light);cursor:pointer;transition:all 0.15s;
+}
+.genre-btn:hover{border-color:var(--primary);color:var(--primary)}
+.genre-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* ----- Result count ----- */
+.result-count{font-size:0.82rem;color:var(--text-light);margin-bottom:0.8rem}
+
+/* ----- Card grid ----- */
+.card-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:580px){.card-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ----- Card ----- */
+.spot-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  overflow:hidden;transition:transform 0.18s,box-shadow 0.18s;
+}
+.spot-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.10)}
+.card-img-wrap{
+  position:relative;width:100%;padding-top:56.25%;overflow:hidden;
+  background:linear-gradient(135deg,var(--primary-light),var(--primary-pale));
+}
+.card-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+.card-img-fallback{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:600;color:var(--primary);
+  text-align:center;padding:0.5rem;
+  background:linear-gradient(135deg,var(--primary-light),var(--primary-pale));
+}
+.card-body{padding:0.8rem 1rem 1rem}
+.card-genre-badge{
+  display:inline-block;font-size:0.7rem;padding:0.15rem 0.5rem;
+  border-radius:12px;background:var(--primary-light);
+  color:var(--primary);font-weight:600;margin-bottom:0.3rem;
+}
+.card-name{font-size:1.05rem;font-weight:700;margin-bottom:0.1rem}
+.card-area{font-size:0.78rem;color:var(--text-light);margin-bottom:0.35rem}
+.card-desc{
+  font-size:0.82rem;color:var(--text-light);line-height:1.5;margin-bottom:0.7rem;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-map-link{
+  display:inline-flex;align-items:center;gap:0.3rem;
+  font-size:0.8rem;font-weight:600;color:var(--primary);
+  text-decoration:none;padding:0.35rem 0.7rem;
+  border:1px solid var(--primary);border-radius:6px;transition:all 0.15s;
+}
+.card-map-link:hover{background:var(--primary);color:#fff}
+
+/* ----- Empty state ----- */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text-light)}
+.empty-state .icon{font-size:2.5rem;margin-bottom:0.5rem}
+.empty-state p{font-size:0.95rem}
+
+footer{text-align:center;padding:1.5rem 1rem;font-size:0.75rem;color:var(--text-light)}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../" class="home-link">&#9664; トップ</a>
+  <h1>ご当地グルメナビ</h1>
+  <p>行き先を選んで、その土地の名物グルメをチェックしよう</p>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <div class="control-row">
+      <label for="sel-region">地方:</label>
+      <select id="sel-region"><option value="">-- 選択してください --</option></select>
+      <label for="sel-pref">都道府県:</label>
+      <select id="sel-pref"><option value="">-- すべて --</option></select>
+    </div>
+    <div class="genre-filter" id="genre-filter"></div>
+  </div>
+  <div class="result-count" id="result-count"></div>
+  <div class="card-grid" id="card-grid"></div>
+</div>
+
+<footer>&copy; 2026 ご当地グルメナビ</footer>
+
+<script>
+const REGIONS = [
+  { id:"hokkaido", name:"北海道",     prefs:["北海道"] },
+  { id:"tohoku",   name:"東北",       prefs:["青森県","岩手県","宮城県","秋田県","山形県","福島県"] },
+  { id:"kanto",    name:"関東",       prefs:["茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県"] },
+  { id:"chubu",    name:"中部",       prefs:["新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県"] },
+  { id:"kinki",    name:"近畿",       prefs:["三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県"] },
+  { id:"chugoku",  name:"中国",       prefs:["鳥取県","島根県","岡山県","広島県","山口県"] },
+  { id:"shikoku",  name:"四国",       prefs:["徳島県","香川県","愛媛県","高知県"] },
+  { id:"kyushu",   name:"九州・沖縄", prefs:["福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"] }
+];
+
+const GENRES = ["麺類","肉料理","海鮮","揚げ物","ご飯もの","粉もの・鉄板","郷土料理・軽食","スイーツ・喫茶"];
+
+// ===== グルメデータ (人気ランキング順) =====
+const SPOTS = [
+  // ===== 愛知県 (10) =====
+  { pref:"愛知県", region:"chubu", name:"ひつまぶし", genre:"ご飯もの",
+    area:"名古屋市内",
+    desc:"香ばしい鰻の蒲焼きを「そのまま・薬味・出汁茶漬け」の3通りで味わう名古屋グルメの最高峰",
+    img:"https://upload.wikimedia.org/wikipedia/commons/b/b5/Hitsumabushi_by_Joi.jpg",
+    mapUrl:"https://maps.google.com/?q=ひつまぶし+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"味噌カツ", genre:"揚げ物",
+    area:"名古屋市内",
+    desc:"サクサクのとんかつに八丁味噌ベースの濃厚甘辛だれをたっぷりかけた名古屋めしの象徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/a/af/Miso_Katsu_by_jetalone_in_Nagoya.jpg",
+    mapUrl:"https://maps.google.com/?q=味噌カツ+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"手羽先唐揚げ", genre:"揚げ物",
+    area:"名古屋市内",
+    desc:"カリカリに揚げた手羽先に甘辛タレと胡椒をまぶした名古屋のソウルフード。ビールとの相性が最強",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Furaibo_Tebasaki.JPG/640px-Furaibo_Tebasaki.JPG",
+    mapUrl:"https://maps.google.com/?q=手羽先+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"味噌煮込みうどん", genre:"麺類",
+    area:"名古屋市内",
+    desc:"八丁味噌の濃厚つゆで硬めの生麺を土鍋でぐつぐつ煮込む郷土料理。蓋を取り皿にして食べるのが流儀",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Miso_nikomi_udon_1_naotakem.jpg/640px-Miso_nikomi_udon_1_naotakem.jpg",
+    mapUrl:"https://maps.google.com/?q=味噌煮込みうどん+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"台湾ラーメン", genre:"麺類",
+    area:"名古屋市内",
+    desc:"台湾には存在しない名古屋発祥のピリ辛ラーメン。挽き肉・ニラ・唐辛子が鶏ガラスープに絡む中毒性抜群の一杯",
+    img:"https://upload.wikimedia.org/wikipedia/commons/8/86/JP-23_Nagoya_Taiwan_Ramen.jpg",
+    mapUrl:"https://maps.google.com/?q=台湾ラーメン+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"きしめん", genre:"麺類",
+    area:"名古屋市内",
+    desc:"幅広で薄い平打ち麺にムロ節の効いたつゆを合わせた名古屋の伝統麺。駅ホームの立ち食いも名物",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Kishimen.JPG/640px-Kishimen.JPG",
+    mapUrl:"https://maps.google.com/?q=きしめん+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"天むす", genre:"ご飯もの",
+    area:"名古屋市内",
+    desc:"小ぶりなおにぎりに海老天を詰めた名古屋発祥の軽食。一口サイズで食べ歩きやお土産にも最適",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Tenmusu_by_yamakazz.jpg/640px-Tenmusu_by_yamakazz.jpg",
+    mapUrl:"https://maps.google.com/?q=天むす+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"小倉トースト", genre:"スイーツ・喫茶",
+    area:"名古屋市内の喫茶店",
+    desc:"厚切りトーストにバターとあんこをたっぷり。名古屋の喫茶文化を象徴するモーニングの定番メニュー",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Ogura_Toast_%28Toast_with_Sweet_Red_Bean_Paste%29_%286639292463%29.jpg/640px-Ogura_Toast_%28Toast_with_Sweet_Red_Bean_Paste%29_%286639292463%29.jpg",
+    mapUrl:"https://maps.google.com/?q=小倉トースト+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"味噌おでん", genre:"郷土料理・軽食",
+    area:"名古屋市内",
+    desc:"八丁味噌の甘辛だれでじっくり煮込んだ名古屋流おでん。大根や卵に味噌が染み込んだ冬の味覚",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Miso_oden_by_jetalone_in_Mount_Takao%2C_Hachioji.jpg/640px-Miso_oden_by_jetalone_in_Mount_Takao%2C_Hachioji.jpg",
+    mapUrl:"https://maps.google.com/?q=味噌おでん+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"エビフライ", genre:"揚げ物",
+    area:"名古屋市内・知多半島",
+    desc:"「えびふりゃ〜」で全国に知られる名古屋名物。皿からはみ出す巨大な海老フライが人気",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Ebi_Fry_of_Kazumura%2C_It%C5%8D%2C_-27_Oct._2012_a.jpg/640px-Ebi_Fry_of_Kazumura%2C_It%C5%8D%2C_-27_Oct._2012_a.jpg",
+    mapUrl:"https://maps.google.com/?q=エビフライ+名古屋" },
+  { pref:"愛知県", region:"chubu", name:"あんかけスパ", genre:"麺類",
+    area:"名古屋市内",
+    desc:"太めのスパゲッティに胡椒の効いたとろみのある中華風ソースをかけた名古屋独自のご当地パスタ",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ankake_Spaghetti.jpg/640px-Ankake_Spaghetti.jpg",
+    mapUrl:"https://maps.google.com/?q=あんかけスパ+名古屋" },
+
+  // ===== 静岡県 =====
+  { pref:"静岡県", region:"chubu", name:"浜松餃子", genre:"粉もの・鉄板",
+    area:"浜松市内",
+    desc:"野菜たっぷりであっさりジューシー。円形に並べて中央にもやしを盛る独特のスタイル。餃子消費量日本一を争う浜松のソウルフード",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Hamamatsugyoza.jpg/640px-Hamamatsugyoza.jpg",
+    mapUrl:"https://maps.google.com/?q=浜松餃子+浜松" },
+  { pref:"静岡県", region:"chubu", name:"さわやかのげんこつハンバーグ", genre:"肉料理",
+    area:"静岡県内各地（県内限定34店舗）",
+    desc:"静岡県民のソウルフード。牛肉100%を炭火で焼きテーブルでカットする劇場型スタイルは、3時間待ちも辞さない伝説の味",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Hamburg_steak1.jpg/640px-Hamburg_steak1.jpg",
+    mapUrl:"https://maps.google.com/?q=げんこつハンバーグ+静岡" },
+  { pref:"静岡県", region:"chubu", name:"静岡おでん", genre:"郷土料理・軽食",
+    area:"静岡市内",
+    desc:"真っ黒なだし汁で煮込んだ黒はんぺんに、だし粉と青のりをかけて食べる独特のスタイル。昭和の屋台文化が今も残る",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Shizoka_oden_9_20151022.jpg/640px-Shizoka_oden_9_20151022.jpg",
+    mapUrl:"https://maps.google.com/?q=静岡おでん+静岡市" },
+  { pref:"静岡県", region:"chubu", name:"富士宮やきそば", genre:"粉もの・鉄板",
+    area:"富士宮市内",
+    desc:"B-1グランプリ2連覇＆殿堂入り。コシの強い蒸し麺に肉かすとイワシの削り粉をまぶした日本一有名なご当地焼きそば",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Fujinomiya-yakisoba.jpg/640px-Fujinomiya-yakisoba.jpg",
+    mapUrl:"https://maps.google.com/?q=富士宮やきそば+富士宮" },
+  { pref:"静岡県", region:"chubu", name:"桜えび料理", genre:"海鮮",
+    area:"由比・静岡市清水区",
+    desc:"駿河湾は世界唯一の桜えび商業漁場。春と秋の短い漁期だけ食べられる生桜えびやかき揚げは絶品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Suruga_wan_no_Sakuraebi_20160513.jpg/640px-Suruga_wan_no_Sakuraebi_20160513.jpg",
+    mapUrl:"https://maps.google.com/?q=桜えび+由比" },
+  { pref:"静岡県", region:"chubu", name:"生しらす丼", genre:"海鮮",
+    area:"田子の浦・用宗・焼津",
+    desc:"朝獲れたてのしらすをご飯にたっぷり盛った贅沢丼。透明に輝くプリプリの生しらすは産地でしか味わえない鮮度",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Shirasu-don_001.jpg/640px-Shirasu-don_001.jpg",
+    mapUrl:"https://maps.google.com/?q=生しらす丼+静岡" },
+  { pref:"静岡県", region:"chubu", name:"浜名湖うなぎ", genre:"ご飯もの",
+    area:"浜松市・湖西市",
+    desc:"養殖発祥の地・浜名湖が誇るブランドうなぎ。関西風の地焼きで外はパリッと中はふわっとした食感が特徴",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Unagi_Kabayaki-2005-08-28.jpg/640px-Unagi_Kabayaki-2005-08-28.jpg",
+    mapUrl:"https://maps.google.com/?q=うなぎ+浜名湖" },
+  { pref:"静岡県", region:"chubu", name:"抹茶スイーツ", genre:"スイーツ・喫茶",
+    area:"藤枝市・島田市・牧之原市",
+    desc:"お茶の生産量日本一を誇る静岡の本場。濃さを選べる抹茶ジェラートなど茶どころならではのスイーツが充実",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Green_tea_ice_cream.JPG/640px-Green_tea_ice_cream.JPG",
+    mapUrl:"https://maps.google.com/?q=抹茶スイーツ+静岡" },
+  { pref:"静岡県", region:"chubu", name:"金目鯛の煮付け", genre:"海鮮",
+    area:"下田・稲取・伊豆",
+    desc:"伊豆の代表的な地魚料理。脂の乗った金目鯛を甘辛い煮汁でふっくら炊き上げた贅沢な逸品",
+    img:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Kinmedai_Nizakana.JPG/640px-Kinmedai_Nizakana.JPG",
+    mapUrl:"https://maps.google.com/?q=金目鯛+煮付け+伊豆" },
+  { pref:"静岡県", region:"chubu", name:"焼津マグロ", genre:"海鮮",
+    area:"焼津市",
+    desc:"マグロ水揚げ量日本一の焼津港直送。新鮮なマグロ丼や刺身を市場価格で堪能できる",
+    img:"https://upload.wikimedia.org/wikipedia/commons/e/e3/Maguro-don.jpg",
+    mapUrl:"https://maps.google.com/?q=マグロ丼+焼津" }
+];
+
+// ===== State =====
+let selectedRegion = "";
+let selectedPref = "";
+let activeGenres = new Set();
+
+const selRegion = document.getElementById("sel-region");
+const selPref = document.getElementById("sel-pref");
+const genreFilterEl = document.getElementById("genre-filter");
+const cardGrid = document.getElementById("card-grid");
+const resultCount = document.getElementById("result-count");
+
+function init() {
+  REGIONS.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r.id; opt.textContent = r.name;
+    selRegion.appendChild(opt);
+  });
+
+  const label = document.createElement("span");
+  label.className = "genre-filter-label";
+  label.textContent = "ジャンル:";
+  genreFilterEl.appendChild(label);
+
+  GENRES.forEach(g => {
+    const btn = document.createElement("button");
+    btn.className = "genre-btn"; btn.textContent = g; btn.type = "button";
+    btn.addEventListener("click", () => toggleGenre(g, btn));
+    genreFilterEl.appendChild(btn);
+  });
+
+  selRegion.addEventListener("change", onRegionChange);
+  selPref.addEventListener("change", onPrefChange);
+  render();
+}
+
+function onRegionChange() {
+  selectedRegion = selRegion.value;
+  selectedPref = "";
+  selPref.innerHTML = '<option value="">-- すべて --</option>';
+  if (selectedRegion) {
+    const region = REGIONS.find(r => r.id === selectedRegion);
+    if (region) {
+      const withData = region.prefs.filter(p => SPOTS.some(s => s.pref === p));
+      withData.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        selPref.appendChild(opt);
+      });
+      const noData = region.prefs.filter(p => !SPOTS.some(s => s.pref === p));
+      noData.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p + "（準備中）"; opt.disabled = true;
+        selPref.appendChild(opt);
+      });
+    }
+  }
+  render();
+}
+
+function onPrefChange() { selectedPref = selPref.value; render(); }
+
+function toggleGenre(genre, btn) {
+  if (activeGenres.has(genre)) { activeGenres.delete(genre); btn.classList.remove("active"); }
+  else { activeGenres.add(genre); btn.classList.add("active"); }
+  render();
+}
+
+function getFiltered() {
+  return SPOTS.filter(s => {
+    if (selectedRegion && s.region !== selectedRegion) return false;
+    if (selectedPref && s.pref !== selectedPref) return false;
+    if (activeGenres.size > 0 && !activeGenres.has(s.genre)) return false;
+    return true;
+  });
+}
+
+function render() {
+  const items = getFiltered();
+  cardGrid.innerHTML = "";
+
+  if (!selectedRegion) {
+    resultCount.textContent = "";
+    cardGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🍽️</div><p>地方を選んでご当地グルメを探しましょう</p></div>';
+    return;
+  }
+
+  resultCount.textContent = items.length + " 件のグルメが見つかりました";
+
+  if (items.length === 0) {
+    cardGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>条件に一致するグルメがありません</p></div>';
+    return;
+  }
+
+  items.forEach(s => {
+    const card = document.createElement("div");
+    card.className = "spot-card";
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${esc(s.img)}" alt="${esc(s.name)}" loading="lazy"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-fallback" style="display:none">${esc(s.name)}</div>
+      </div>
+      <div class="card-body">
+        <span class="card-genre-badge">${esc(s.genre)}</span>
+        <div class="card-name">${esc(s.name)}</div>
+        <div class="card-area">${esc(s.pref)} · ${esc(s.area)}</div>
+        <div class="card-desc">${esc(s.desc)}</div>
+        <a class="card-map-link" href="${esc(s.mapUrl)}" target="_blank" rel="noopener">
+          📍 このグルメを周辺で探す
+        </a>
+      </div>`;
+    cardGrid.appendChild(card);
+  });
+}
+
+function esc(str) { const d = document.createElement("div"); d.textContent = str; return d.innerHTML; }
+
+init();
+</script>
+</body>
+</html>
