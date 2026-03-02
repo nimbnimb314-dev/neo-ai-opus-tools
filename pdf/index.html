@@ -35,8 +35,6 @@
       background: linear-gradient(135deg, #1e3a6e, #2a5298); color: white;
       text-align: center; padding: 1.8rem 1rem; position: relative;
     }
-    .home-link { position: absolute; top: 0.8rem; left: 0.8rem; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; transition: color 0.2s; }
-    .home-link:hover { color: #fff; }
     header .logo { display: none; }
     header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.03em; }
     header .subtitle { font-size: 0.85rem; opacity: 0.9; margin-top: 0.4rem; }
@@ -239,7 +237,6 @@
 </head>
 <body>
   <header>
-    <a href="../" class="home-link">&#9664; トップ</a>
     <div class="logo">PDF</div>
     <h1>PDF ツール</h1>
     <span class="subtitle">すべてブラウザ内で処理</span>
@@ -460,7 +457,10 @@
   <div id="excel-render-container" class="render-container"></div>
   <div id="html-render-container" class="render-container"></div>
 
-  <footer>PDF ツール &mdash; ファイルはサーバーに送信されず、すべてブラウザ内で処理されます。</footer>
+  <footer>
+    <div>PDF ツール &mdash; ファイルはサーバーに送信されず、すべてブラウザ内で処理されます。</div>
+    <a href="../" style="display:inline-block;margin-top:0.6rem;color:var(--primary);font-size:0.85rem;font-weight:600;text-decoration:none;">&#9664; トップページへ戻る</a>
+  </footer>
 
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
