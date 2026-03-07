@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>日本周辺 予想天気図ビューア</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Manual Build Preview</p>
+        <h1>日本周辺 予想天気図ビューア</h1>
+        <p class="hero-copy">
+          ECMWF / GFS / ICON の3モデルを、同一予報時刻で横並び比較できます。
+          画像はローカルで生成し、最新セットだけを読み込みます。
+        </p>
+        <dl class="meta-strip">
+          <div>
+            <dt>生成時刻</dt>
+            <dd id="generated-at">-</dd>
+          </div>
+          <div>
+            <dt>データソース</dt>
+            <dd id="data-source">-</dd>
+          </div>
+          <div>
+            <dt>注記</dt>
+            <dd id="manifest-note">-</dd>
+          </div>
+        </dl>
+      </header>
+
+      <main class="content">
+        <section class="slot-panel">
+          <div class="slot-panel-header">
+            <div>
+              <p class="section-kicker">Forecast Slots</p>
+              <h2>予報時刻を選ぶ</h2>
+            </div>
+            <p class="current-slot" id="current-slot-label">-</p>
+          </div>
+          <div class="time-slider-panel">
+            <div class="time-slider-toolbar">
+              <button class="slider-nav" id="slot-prev" type="button" aria-label="前の予報時刻">‹</button>
+              <div class="time-slider-readout">
+                <p class="time-slider-label">選択中</p>
+                <p class="time-slider-value" id="slider-slot-label">-</p>
+              </div>
+              <button class="slider-nav" id="slot-next" type="button" aria-label="次の予報時刻">›</button>
+            </div>
+            <div class="time-slider-track">
+              <input class="time-slider" id="slot-slider" type="range" min="0" max="0" step="1" value="0" />
+              <div class="time-slider-scale">
+                <span id="slot-start-label">-</span>
+                <span id="slot-end-label">-</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="cards" id="model-cards"></section>
+      </main>
+
+      <footer class="site-footer">
+        Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data: Natural Earth
+      </footer>
+    </div>
+
+    <script src="./data/manifest.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
