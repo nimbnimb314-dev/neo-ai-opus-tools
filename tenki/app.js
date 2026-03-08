@@ -61,7 +61,9 @@
 
     generatedAt.textContent = formatIso(manifest.generatedAt);
     dataSource.textContent = manifest.dataSource || "-";
-    manifestNote.textContent = manifest.note || "-";
+    if (manifestNote) {
+      manifestNote.textContent = manifest.note || "-";
+    }
 
     slotSlider.max = String(maxIndex);
     slotSlider.value = "0";
