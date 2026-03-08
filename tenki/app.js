@@ -67,8 +67,12 @@
 
     slotSlider.max = String(maxIndex);
     slotSlider.value = "0";
-    slotStartLabel.textContent = formatSlotLabel(manifest.slots[0].forecastTime);
-    slotEndLabel.textContent = formatSlotLabel(manifest.slots[maxIndex].forecastTime);
+    if (slotStartLabel) {
+      slotStartLabel.textContent = formatSlotLabel(manifest.slots[0].forecastTime);
+    }
+    if (slotEndLabel) {
+      slotEndLabel.textContent = formatSlotLabel(manifest.slots[maxIndex].forecastTime);
+    }
 
     slotSlider.addEventListener("input", onSlotInput);
     slotPrev.addEventListener("click", onPrevClick);
