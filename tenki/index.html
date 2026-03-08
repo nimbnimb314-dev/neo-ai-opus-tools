@@ -11,58 +11,59 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="bg-glow"></div>
-
-    <header class="header">
-      <a href="../" class="home-link">Top Page</a>
-      <div class="brand-mark">
-        <img src="../nullandone-icon.png" alt="Null and One icon" class="brand-icon" />
-        <div class="logo">Null and One</div>
+    <header class="site-header">
+      <div class="header-actions">
+        <a href="../" class="header-link">Top Page</a>
+        <a href="../webtools/" class="header-link header-link-secondary">Web Tools 一覧</a>
       </div>
-      <p class="page-label">Web App</p>
-      <h1 class="title">日本周辺 予想天気図ビューア</h1>
+      <p class="app-label">Null and One Web App</p>
+      <h1>日本周辺 予想天気図ビューア</h1>
       <p class="subtitle">
-        ECMWF / GFS / ICON を同じ予報時刻で見比べる自動更新ビューア。
-        気圧配置の流れを、ブラウザでそのまま追えます。
+        ECMWF / GFS / ICON の最新予想天気図を、同じ時間軸で切り替えながら比較できます。
       </p>
-      <a href="../webtools/" class="sub-link">Web Tools 一覧へ</a>
     </header>
 
-    <main class="page-shell">
-      <section class="meta-panel">
+    <main class="container">
+      <section class="panel meta-panel">
         <dl class="meta-strip">
-          <div>
-            <dt>最終生成時刻</dt>
+          <div class="meta-item">
+            <dt>最新取得時刻</dt>
             <dd id="generated-at">-</dd>
           </div>
-          <div>
+          <div class="meta-item">
             <dt>データソース</dt>
             <dd id="data-source">-</dd>
           </div>
-          <div>
+          <div class="meta-item">
             <dt>メモ</dt>
             <dd id="manifest-note">-</dd>
           </div>
         </dl>
       </section>
 
-      <section class="slot-panel">
+      <section class="panel slot-panel">
         <div class="slot-panel-header">
           <div>
             <p class="section-kicker">Forecast Slots</p>
-            <h2>予報時刻を選ぶ</h2>
+            <h2>予想時間を選ぶ</h2>
           </div>
           <p class="current-slot" id="current-slot-label">-</p>
         </div>
+
         <div class="time-slider-panel">
           <div class="time-slider-toolbar">
-            <button class="slider-nav" id="slot-prev" type="button" aria-label="前の予報時刻">&#8249;</button>
+            <button class="slider-nav" id="slot-prev" type="button" aria-label="前の予想時間">
+              &#8249;
+            </button>
             <div class="time-slider-readout">
               <p class="time-slider-label">選択中</p>
               <p class="time-slider-value" id="slider-slot-label">-</p>
             </div>
-            <button class="slider-nav" id="slot-next" type="button" aria-label="次の予報時刻">&#8250;</button>
+            <button class="slider-nav" id="slot-next" type="button" aria-label="次の予想時間">
+              &#8250;
+            </button>
           </div>
+
           <div class="time-slider-track">
             <input class="time-slider" id="slot-slider" type="range" min="0" max="0" step="1" value="0" />
             <div class="time-slider-scale">
@@ -77,8 +78,11 @@
     </main>
 
     <footer class="site-footer">
-      Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data: Natural Earth
+      Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data:
+      Natural Earth
     </footer>
+
+    <img src="../nullandone-icon.png" alt="" class="corner-brand" aria-hidden="true" />
 
     <script>
       window.TENKI_MANIFEST_URL = "./data/manifest.js?v=" + Date.now();
