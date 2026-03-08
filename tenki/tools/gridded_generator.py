@@ -665,6 +665,14 @@ def is_within_plot_region(lon: float, lat: float, margin_degrees: float = 0.0) -
     )
 
 
+def is_within_visible_map_region(lon: float, lat: float, edge_padding_ratio: float = 0.0) -> bool:
+    center_x, center_y = project_coords(lon, lat)
+    x_min, x_max, y_min, y_max = visible_projected_bounds()
+    pad_x = (x_max - x_min) * edge_padding_ratio
+    pad_y = (y_max - y_min) * edge_padding_ratio
+    return x_min + pad_x <= center_x <= x_max - pad_x and y_min + pad_y <= center_y <= y_max - pad_y
+
+
 def load_land_features() -> list[list[list[tuple[float, float]]]]:
     data = json.loads(LAND_PATH.read_text(encoding="utf-8"))
     features = []
@@ -693,7 +701,7 @@ def detect_pressure_centers(lons: np.ndarray, lats: np.ndarray, values: np.ndarr
         center = PressureCenter(candidate.kind, candidate.lon, candidate.lat, candidate.value, candidate.prominence)
         if not should_keep_candidate(candidate, field_reference):
             continue
-        if not is_within_plot_region(center.lon, center.lat, 0.5):
+        if not is_within_visible_map_region(center.lon, center.lat, 0.015):
             continue
         if any(center.kind == other.kind and is_nearby_center(center, other) for other in result):
             continue
@@ -939,6 +947,13 @@ def projected_region_bounds() -> tuple[float, float, float, float]:
     return float(all_x.min()), float(all_x.max()), float(all_y.min()), float(all_y.max())
 
 
+def visible_projected_bounds() -> tuple[float, float, float, float]:
+    x_min, x_max, y_min, y_max = projected_region_bounds()
+    pad_x = (x_max - x_min) * PLOT_PAD_X_RATIO
+    pad_y = (y_max - y_min) * PLOT_PAD_Y_RATIO
+    return x_min - pad_x, x_max + pad_x, y_min - pad_y, y_max + pad_y
+
+
 def draw_projected_grid(ax: plt.Axes, x_min: float, x_max: float, y_min: float, y_max: float) -> None:
     grid_color = "#94a3ad"
     lon_samples = np.linspace(REGION["lon_min"], REGION["lon_max"], 256)
@@ -965,8 +980,7 @@ def render_map(path: Path, model_name: str, valid_jst: datetime, run_utc: dateti
     mesh_lons, mesh_lats = np.meshgrid(lons, lats)
     projected_x, projected_y = project_coords(mesh_lons, mesh_lats)
     x_min, x_max, y_min, y_max = projected_region_bounds()
-    pad_x = (x_max - x_min) * PLOT_PAD_X_RATIO
-    pad_y = (y_max - y_min) * PLOT_PAD_Y_RATIO
+    visible_x_min, visible_x_max, visible_y_min, visible_y_max = visible_projected_bounds()
     levels = np.arange(
         math.floor(np.nanmin(contour_values) / 4.0) * 4.0,
         math.ceil(np.nanmax(contour_values) / 4.0) * 4.0 + 4.0,
@@ -974,14 +988,14 @@ def render_map(path: Path, model_name: str, valid_jst: datetime, run_utc: dateti
     )
     strong = [level for level in levels if level % 8 == 0]
     weak = [level for level in levels if level % 8 != 0]
-    centers = [center for center in detect_pressure_centers(lons, lats, values) if is_within_plot_region(center.lon, center.lat, 0.5)]
+    centers = [center for center in detect_pressure_centers(lons, lats, values) if is_within_visible_map_region(center.lon, center.lat, 0.015)]
 
     fig = plt.figure(figsize=(12.8, 9.6), dpi=100, facecolor="#eef2ea")
     fig.subplots_adjust(left=0.075, right=0.97, top=0.90, bottom=0.08)
     ax = fig.add_subplot(111)
     ax.set_facecolor("#d6e4ed")
-    ax.set_xlim(x_min - pad_x, x_max + pad_x)
-    ax.set_ylim(y_min - pad_y, y_max + pad_y)
+    ax.set_xlim(visible_x_min, visible_x_max)
+    ax.set_ylim(visible_y_min, visible_y_max)
     ax.set_aspect("equal", adjustable="box")
     ax.set_xticks([])
     ax.set_yticks([])

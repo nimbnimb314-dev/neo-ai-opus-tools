@@ -114,6 +114,16 @@ class PressureCenterRegressionTests(unittest.TestCase):
         self.assertHasCenter(centers, "low", 154.25, 45.75)
         self.assertLacksCenter(centers, "low", 138.0, 35.75)
 
+    def test_icon_visible_northern_low_kept(self):
+        centers = self.detect(
+            "ICON",
+            "icon",
+            datetime(2026, 3, 7, 12, tzinfo=self.utc),
+            180,
+            "2026-03-09T09:00:00+09:00",
+        )
+        self.assertHasCenter(centers, "low", 146.25, 53.0)
+
     def test_should_keep_candidate_rejects_high_pressure_low(self):
         candidate = self.make_candidate("low", value=1020.0, prominence=3.6, merged=True, area=80)
         self.assertFalse(self.mod.should_keep_candidate(candidate, field_reference=1014.0))
@@ -156,6 +166,10 @@ class PressureCenterRegressionTests(unittest.TestCase):
         self.assertTrue(self.mod.is_within_plot_region(158.0, 52.0))
         self.assertFalse(self.mod.is_within_plot_region(110.0, 30.0))
         self.assertFalse(self.mod.is_within_plot_region(160.5, 30.0))
+
+    def test_visible_map_region_includes_padded_top_edge_center(self):
+        self.assertTrue(self.mod.is_within_visible_map_region(146.25, 53.0))
+        self.assertFalse(self.mod.is_within_visible_map_region(94.0, 61.0))
 
     def test_smooth_contour_values_preserves_shape_and_finite_values(self):
         values = self.mod.np.array(
