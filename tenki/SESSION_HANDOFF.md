@@ -2,133 +2,97 @@
 
 ## 現状
 
-- 予想天気図の生成は `Open-Meteo` 多点サンプリング方式ではなく、`gridded data` ベースへ移行済み。
-- 生成入口は `generate.ps1`、本体は `tools/gridded_generator.py`、表示は `docs/index.html` / `docs/app.js` / `docs/styles.css`。
-- データ元は `ECMWF Open Data` / `NOAA NOMADS GFS` / `DWD ICON Open Data`。
-- 海岸線は `Natural Earth` 由来の `tools/ForecastMapGenerator/map-data/japan-region-land.geojson` を使用。
+- 対象は `tenki/` 配下の気圧予想図ジェネレータ。
+- 実行入口は `generate.ps1`、本体は `tools/gridded_generator.py`。
+- 出力は `docs/data/manifest.json` / `docs/data/manifest.js` / `docs/data/run-summary.json` / `docs/data/images/*`。
+- 表示側は `docs/index.html` と `docs/app.js`。
 
-## 直近の反映内容
+## 最新生成
 
-- 地図表示を単純な経緯度平面から、Lambert Conformal 系の投影風表示に変更。
-  - 関連: `tools/gridded_generator.py`
-  - `project_coords()` と `draw_projected_grid()` を追加
-- `高 / 低` の判定は persistence ベースの極値検出へ変更済み。
-  - 関連: `detect_pressure_centers()` / `find_persistent_centers()` / `analyze_extremum()` / `should_keep_candidate()`
-- `高 / 低` の下に中心気圧値を表示するように変更済み。
-- 地名ラベル (`Japan`, `Sea of Japan` など) は削除済み。
-- 時刻 UI は一覧クリック式ではなくスライダー式に変更済み。
-- 画像 URL に `manifest.generatedAt` を付けてブラウザキャッシュの取り違えを防止済み。
-- 先読みは「全件」ではなく「前後数コマ」のみに変更済み。
+- 最新成功: `2026-03-08 09:07 JST`
+- `run-summary.json`
+  - `generatedAt: 2026-03-08T09:07:51.874277+09:00`
+  - `requestedSlotCount: 38`
+  - `firstGeneratedSlotId: 20260308T1200`
+  - `lastGeneratedSlotId: 20260318T0900`
+- 採用 run
+  - ECMWF: `2026-03-07 12:00 UTC`
+  - GFS: `2026-03-07 18:00 UTC`
+  - ICON: `2026-03-07 12:00 UTC`
+- 生成枚数
+  - ECMWF: `37`
+  - GFS: `38`
+  - ICON: `32`
+- 最新ログ: `logs/generate-20260308-090606.log`
 
-## 現在の表示スケジュール
+## 今回までの修正
 
-- 72時間先までは 3時間ごと。
-- 72時間超は `09:00 JST` と `21:00 JST` のみ。
-- 表示期間は 10日先まで。
-- そのため `build_slots()` は 240時間先まで作る。
+### 1. 画像端で等圧線が切れる問題
 
-## モデルごとの扱い
+- 原因は「表示矩形の角」が、等圧線計算用データ範囲の外に出ていたこと。
+- 対応として、等圧線用のデータ取得範囲を固定で広げた。
+  - 表示範囲: `114E-158E / 19N-52N`
+  - データ取得範囲: `94E-178E / 12N-60N`
+- 地図の見た目は従来の矩形フレームのまま。
+- 台形クリップ案は破棄済み。
+- 関連箇所:
+  - `tools/gridded_generator.py`
+  - `tests/test_pressure_centers.py::test_data_region_covers_visible_plot_corners`
 
-- GFS:
-  - 最新だが step が短すぎる run は避ける。
-  - `PREFERRED_COMMON_STEP = 144` を満たす run を優先。
-- ICON:
-  - 同様に `144h` 以上ある run を優先。
-  - 補間済み `.npz` は地域キー付きでキャッシュ。
-- ECMWF:
-  - `00/12 UTC` の main run を優先して使う。
-  - `06/18 UTC` は extended range に向かないので、10日表示では前の `00/12 UTC` に戻す実装。
-  - `00/12 UTC` は `240h` まで扱う。
-  - `0-144h` は 3時間刻み、`150-240h` は 6時間刻み。
+### 2. ブラウザが古い画像を掴み続ける問題
 
-## スロットとモデル欠損の扱い
+- `manifest.js` だけでなく `app.js` もキャッシュで残っていた。
+- `docs/index.html` で `manifest.js` / `app.js` を `?v=Date.now()` 付きで読むように変更。
+- `docs/app.js` 側もその前提で動的ロードに変更。
 
-- 以前は「全モデル共通で出せるスロット」のみ生成していた。
-- 今は「その時刻に出せるモデルだけ入れる」方式。
-- そのため後半では `ICON` が先に落ち、さらに最後は `GFS` だけのスロットがある。
-- `docs/app.js` は `slot.models` をそのまま描くので、モデル数がスロットごとに変わっても表示できる。
+### 3. 高 / 低 の中心検出
 
-## 現在の生成結果
-
-- 最新 manifest:
-  - `docs/data/manifest.json`
-  - `generatedAt: 2026-03-07T19:11:00.697447+09:00`
-- 現在のスロット数:
-  - `39`
-- 先頭:
-  - `20260307T2100`
-- 末尾:
-  - `20260317T2100`
-- 末尾スロットのモデル:
-  - `gfs` のみ
-
-## キャッシュ
-
-- `cache/gridded/latest-runs.json`
-  - 最新採用 run と `maxStep` を保存
-- `cache/gridded/ecmwf/...`
-  - ECMWF GRIB
-- `cache/gridded/gfs/...`
-  - GFS GRIB
-- `cache/gridded/icon/...`
-  - ICON GRIB
-  - 補間済み `.npz`
-
-同じ run / step は再取得しない。
+- 現在は `detect_pressure_centers()` で以下を実施:
+  - 平滑化場から局所極値候補を抽出
+  - 閉じた領域の persistence を見て候補化
+  - 表示範囲外の候補は採用前に除外
+  - 近接する同種候補を整理
+  - 異種候補の競合を整理
+- 直近の調整:
+  - `高` は絶対気圧が高いほど出しやすくした
+  - `低` には同じボーナスを入れない
+  - 高圧場の中にある浅い `低` は出にくくした
+  - 表示外候補が `per_kind=4` の上限を食わないようにした
+- まだ「低をさらに減らす」余地はある。今は少し保守的に戻した状態。
 
 ## テスト
 
-- `tests/test_pressure_centers.py`
-  - 代表的な高低圧の残す/消す回帰テスト
-- `tests/test_slot_schedule.py`
-  - 72時間以降の `09/21 JST` 化
-  - ECMWF extended step の扱い
-  - `06 UTC` なら前の `00 UTC` main run を選ぶ挙動
-
-実行コマンド:
+- 最新通過コマンド:
 
 ```powershell
 $env:MAMBA_ROOT_PREFIX = (Join-Path $PWD 'tools/mamba-root')
-& (Join-Path $PWD 'tools/micromamba/Library/bin/micromamba.exe') run -p (Join-Path $PWD 'tools/grib-env') python -m unittest tests.test_pressure_centers tests.test_slot_schedule
+& (Join-Path $PWD 'tools/micromamba/Library/bin/micromamba.exe') run -p (Join-Path $PWD 'tools/grib-env') python -m unittest tests.test_pressure_centers tests.test_slot_schedule tests.test_run_resolution
 ```
 
-## 生成コマンド
+- 現在 `16 tests` 通過。
+
+## 実行コマンド
 
 ```powershell
 ./generate.ps1
 ```
 
-1スロットだけ確認する時:
+厳密失敗モード:
 
 ```powershell
-./generate.ps1 --limit-slots 1
+./generate.ps1 --strict-models
 ```
 
-## 次セッションでやること
+## 主に見るファイル
 
-目的は「この天気図生成を自動で動かす」こと。
+- `tools/gridded_generator.py`
+- `tests/test_pressure_centers.py`
+- `tests/test_run_resolution.py`
+- `docs/index.html`
+- `docs/app.js`
+- `docs/data/run-summary.json`
 
-優先順位:
+## 注意
 
-1. 自動実行方式を決める
-   - 第一候補は Windows タスクスケジューラ
-   - `generate.ps1` を定期実行
-2. 実行タイミングを決める
-   - モデル公開遅延を考えると、毎時間または 3時間ごと実行が無難
-   - ECMWF は遅いので、run 時刻ぴったり実行より「定期ポーリング型」が合う
-3. ログ出力を追加する
-   - 成功 / 失敗 / 採用 run / 生成 slot 数
-   - ログファイルを `logs/` などに残す
-4. 異常時の扱いを決める
-   - あるモデルだけ取れなくても全体を止めるか
-   - 直前成功分を残すか
-5. 必要なら公開先反映も自動化する
-   - まだ未着手
-
-## 注意点
-
-- `generate.ps1` は `tools/grib-env` の Python を使う前提。
-- proxy 環境変数は `generate.ps1` 側で消している。
-- `docs/data-next` で staging してから `docs/data` に差し替えるので、生成途中の中途半端な出力は見えない。
-- `README.md` は一部文字化けしている。次に触るなら UTF-8 で直したほうがよい。
-- 旧 C# 生成器 `tools/ForecastMapGenerator/Program.cs` は残っているが、現行では未使用。
+- Git のトップレベルは `C:\Users\n_m_n\webapp`。`tenki` はそのサブディレクトリ。
+- リポジトリ直下には `tenki` 以外の未追跡ファイルや別作業ディレクトリもある。コミットや push は `tenki` 配下だけを対象にするのが安全。

@@ -8,6 +8,7 @@ tools/__pycache__/
 .venv/
 tests/__pycache__/
 cache/
+logs/
 docs/data-next/
 docs/preview-*.jpg
 tools/ecmwf-sample.grib2

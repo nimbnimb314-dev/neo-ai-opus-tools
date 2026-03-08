@@ -41,6 +41,14 @@ REGION = {
     "lat_min": 19.0,
     "lat_max": 52.0,
 }
+# The visible map is a projected rectangle with extra padding, so the contour field
+# must extend much farther west/east than the display region to avoid broken corners.
+DATA_REGION = {
+    "lon_min": 94.0,
+    "lon_max": 178.0,
+    "lat_min": 12.0,
+    "lat_max": 60.0,
+}
 PROJECTION = {
     "lon_0": 135.0,
     "lat_0": 35.0,
@@ -48,8 +56,12 @@ PROJECTION = {
     "lat_2": 60.0,
 }
 REGION_CACHE_KEY = f"{int(REGION['lon_min'])}_{int(REGION['lon_max'])}_{int(REGION['lat_min'])}_{int(REGION['lat_max'])}"
-TARGET_LONS = np.arange(REGION["lon_min"], REGION["lon_max"] + 0.001, 0.25)
-TARGET_LATS = np.arange(REGION["lat_min"], REGION["lat_max"] + 0.001, 0.25)
+DATA_REGION_CACHE_KEY = (
+    f"{int(DATA_REGION['lon_min'])}_{int(DATA_REGION['lon_max'])}_"
+    f"{int(DATA_REGION['lat_min'])}_{int(DATA_REGION['lat_max'])}"
+)
+TARGET_LONS = np.arange(DATA_REGION["lon_min"], DATA_REGION["lon_max"] + 0.001, 0.25)
+TARGET_LATS = np.arange(DATA_REGION["lat_min"], DATA_REGION["lat_max"] + 0.001, 0.25)
 TARGET_MESH_LON, TARGET_MESH_LAT = np.meshgrid(TARGET_LONS, TARGET_LATS)
 
 PLOT_BOX = (96, 92, 1280 - 96 - 48, 960 - 92 - 76)
@@ -61,6 +73,10 @@ SESSION.trust_env = False
 PREFERRED_COMMON_STEP = 144
 FULL_DETAIL_HOURS = 72
 EXTENDED_FORECAST_HOURS = 240
+CONTOUR_SMOOTHING_SIGMA = 3.0
+PLOT_PAD_X_RATIO = 0.035
+PLOT_PAD_Y_RATIO = 0.045
+PRESSURE_KIND_BIAS_WEIGHT = 0.35
 
 
 @dataclass(frozen=True)
@@ -76,6 +92,13 @@ class ModelRun:
     key: str
     run_utc: datetime
     max_step: int
+
+
+@dataclass(frozen=True)
+class ResolvedModelRun:
+    model: ModelRun
+    source: str
+    note: str | None = None
 
 
 @dataclass(frozen=True)
@@ -102,7 +125,9 @@ class PersistentCenterCandidate:
 def main() -> None:
     args = parse_args()
     disable_proxy_env()
-    runs = resolve_runs()
+    started_at = datetime.now(JST)
+    resolved_runs, warnings = resolve_runs(strict_models=args.strict_models)
+    runs = {key: resolved.model for key, resolved in resolved_runs.items()}
 
     slots = build_slots(datetime.now(JST))
     if args.limit_slots is not None:
@@ -113,17 +138,39 @@ def main() -> None:
     image_root = STAGING_DIR / "images"
     image_root.mkdir(parents=True, exist_ok=True)
 
+    rendered_slot_counts = {key: 0 for key in runs}
+    skipped_slot_counts = {key: 0 for key in runs}
+    for resolved in resolved_runs.values():
+        model = resolved.model
+        print(
+            f"Using {model.name} run {model.run_utc:%Y-%m-%d %H:%M} UTC "
+            f"(max_step={model.max_step}, source={resolved.source})"
+        )
+        if resolved.note:
+            print(f"Warning: {resolved.note}")
+
     manifest_slots = []
     for slot in slots:
         slot_models = []
-        for model in runs.values():
+        for resolved in resolved_runs.values():
+            model = resolved.model
             if step_for(slot.valid_jst, model) is None:
                 continue
-            grid = load_grid(model, slot.valid_jst)
-            model_dir = image_root / model.key
-            model_dir.mkdir(parents=True, exist_ok=True)
-            image_path = model_dir / f"{slot.slot_id}.jpg"
-            render_map(image_path, model.name, slot.valid_jst, model.run_utc, grid, land_features)
+            try:
+                grid = load_grid(model, slot.valid_jst)
+                model_dir = image_root / model.key
+                model_dir.mkdir(parents=True, exist_ok=True)
+                image_path = model_dir / f"{slot.slot_id}.jpg"
+                render_map(image_path, model.name, slot.valid_jst, model.run_utc, grid, land_features)
+            except Exception as exc:
+                skipped_slot_counts[model.key] += 1
+                message = f"{model.key} {slot.slot_id}: skipped render ({describe_exception(exc)})"
+                warnings.append(message)
+                print(f"Warning: {message}")
+                if args.strict_models:
+                    raise RuntimeError(message) from exc
+                continue
+            rendered_slot_counts[model.key] += 1
             slot_models.append(
                 {
                     "key": model.key,
@@ -149,9 +196,10 @@ def main() -> None:
     if not manifest_slots:
         raise RuntimeError("No forecast slots available from any configured model.")
 
+    generated_at = datetime.now(JST)
     manifest = {
         "title": "Japan Surrounding Forecast Viewer",
-        "generatedAt": datetime.now(JST).isoformat(),
+        "generatedAt": generated_at.isoformat(),
         "timezone": "Asia/Tokyo",
         "dataSource": "ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data",
         "note": "Rendered from cached gridded pressure data. Map boundary data: Natural Earth.",
@@ -160,16 +208,39 @@ def main() -> None:
 
     write_text(STAGING_DIR / "manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2))
     write_text(STAGING_DIR / "manifest.js", "window.TENKI_MANIFEST = " + json.dumps(manifest, ensure_ascii=False, indent=2) + ";")
+    summary = build_run_summary(
+        started_at,
+        generated_at,
+        slots,
+        manifest_slots,
+        resolved_runs,
+        rendered_slot_counts,
+        skipped_slot_counts,
+        warnings,
+    )
+    write_text(STAGING_DIR / "run-summary.json", json.dumps(summary, ensure_ascii=False, indent=2))
 
     if OUTPUT_DIR.exists():
         shutil.rmtree(OUTPUT_DIR)
     STAGING_DIR.rename(OUTPUT_DIR)
-    print(f"Generated {len(slots)} slots into {OUTPUT_DIR}")
+    model_summary = ", ".join(
+        f"{resolved_runs[key].model.name}={rendered_slot_counts[key]}"
+        for key in model_order(resolved_runs)
+    )
+    print(f"Generated {len(manifest_slots)} slots into {OUTPUT_DIR}")
+    print(f"Rendered slot counts: {model_summary}")
+    if warnings:
+        print(f"Completed with {len(warnings)} warning(s). See {OUTPUT_DIR / 'run-summary.json'}")
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate pressure maps from gridded forecast data.")
-    parser.add_argument("--limit-slots", type=int, default=None, help="Generate only the first N common forecast slots.")
+    parser.add_argument("--limit-slots", type=int, default=None, help="Generate only the first N forecast slots.")
+    parser.add_argument(
+        "--strict-models",
+        action="store_true",
+        help="Abort when any model run lookup or slot render fails instead of continuing with available models.",
+    )
     return parser.parse_args()
 
 
@@ -187,7 +258,7 @@ def disable_proxy_env() -> None:
         os.environ.pop(key, None)
 
 
-def resolve_runs() -> dict[str, ModelRun]:
+def resolve_runs(strict_models: bool = False) -> tuple[dict[str, ResolvedModelRun], list[str]]:
     cached = load_cached_runs()
     resolvers = {
         "ecmwf": resolve_ecmwf_run,
@@ -195,18 +266,31 @@ def resolve_runs() -> dict[str, ModelRun]:
         "icon": resolve_icon_run,
     }
 
-    resolved: dict[str, ModelRun] = {}
+    resolved: dict[str, ResolvedModelRun] = {}
+    warnings: list[str] = []
     for key, resolver in resolvers.items():
         try:
             model_run = resolver()
-        except Exception:
-            model_run = cached.get(key)
-            if model_run is None:
-                raise
-        resolved[key] = model_run
+            resolved[key] = ResolvedModelRun(model_run, "live")
+        except Exception as exc:
+            cached_run = cached.get(key)
+            detail = describe_exception(exc)
+            if cached_run is not None:
+                warnings.append(
+                    f"{key}: live run lookup failed, using cached run "
+                    f"{cached_run.run_utc.isoformat()} ({detail})"
+                )
+                resolved[key] = ResolvedModelRun(cached_run, "cache", warnings[-1])
+                continue
+            if strict_models:
+                raise RuntimeError(f"{key}: run lookup failed and no cached run is available ({detail})") from exc
+            warnings.append(f"{key}: skipped because run lookup failed and no cached run is available ({detail})")
 
-    save_cached_runs(resolved)
-    return resolved
+    if not resolved:
+        raise RuntimeError("No model runs could be resolved from live sources or cache.")
+
+    save_cached_runs({key: outcome.model for key, outcome in resolved.items()})
+    return resolved, warnings
 
 
 def resolve_ecmwf_run() -> ModelRun:
@@ -282,6 +366,60 @@ def round_up_three_hours(dt: datetime) -> datetime:
     if offset == 0:
         return dt
     return dt + timedelta(hours=3 - offset)
+
+
+def model_order(models: dict[str, object]) -> list[str]:
+    preferred = ["ecmwf", "gfs", "icon"]
+    return [key for key in preferred if key in models] + sorted(key for key in models if key not in preferred)
+
+
+def describe_exception(exc: Exception) -> str:
+    message = str(exc).strip()
+    if message:
+        return f"{exc.__class__.__name__}: {message}"
+    return exc.__class__.__name__
+
+
+def build_run_summary(
+    started_at: datetime,
+    generated_at: datetime,
+    requested_slots: list[Slot],
+    manifest_slots: list[dict[str, object]],
+    resolved_runs: dict[str, ResolvedModelRun],
+    rendered_slot_counts: dict[str, int],
+    skipped_slot_counts: dict[str, int],
+    warnings: list[str],
+) -> dict[str, object]:
+    generated_slot_ids = [slot["id"] for slot in manifest_slots]
+    models = []
+    for key in model_order(resolved_runs):
+        resolved = resolved_runs[key]
+        models.append(
+            {
+                "key": key,
+                "name": resolved.model.name,
+                "runUtc": resolved.model.run_utc.isoformat(),
+                "runJst": resolved.model.run_utc.astimezone(JST).isoformat(),
+                "maxStep": resolved.model.max_step,
+                "resolutionSource": resolved.source,
+                "resolutionNote": resolved.note,
+                "renderedSlotCount": rendered_slot_counts.get(key, 0),
+                "skippedSlotCount": skipped_slot_counts.get(key, 0),
+            }
+        )
+    return {
+        "status": "success",
+        "startedAt": started_at.isoformat(),
+        "generatedAt": generated_at.isoformat(),
+        "requestedSlotCount": len(requested_slots),
+        "generatedSlotCount": len(manifest_slots),
+        "emptySlotCount": len(requested_slots) - len(manifest_slots),
+        "firstGeneratedSlotId": generated_slot_ids[0],
+        "lastGeneratedSlotId": generated_slot_ids[-1],
+        "models": models,
+        "warningCount": len(warnings),
+        "warnings": warnings,
+    }
 
 
 def step_for(valid_jst: datetime, model: ModelRun) -> int | None:
@@ -400,7 +538,7 @@ def load_ecmwf_grid(run_utc: datetime, step: int) -> tuple[np.ndarray, np.ndarra
 
 
 def load_gfs_grid(run_utc: datetime, step: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    cache_path = CACHE_DIR / "gfs" / run_utc.strftime("%Y%m%d%H") / f"f{step:03d}.grib2"
+    cache_path = CACHE_DIR / "gfs" / run_utc.strftime("%Y%m%d%H") / DATA_REGION_CACHE_KEY / f"f{step:03d}.grib2"
     if not cache_path.exists():
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         url = (
@@ -408,8 +546,8 @@ def load_gfs_grid(run_utc: datetime, step: int) -> tuple[np.ndarray, np.ndarray,
             f"?dir=%2Fgfs.{run_utc:%Y%m%d}%2F{run_utc:%H}%2Fatmos"
             f"&file=gfs.t{run_utc:%H}z.pgrb2.0p25.f{step:03d}"
             "&var_PRMSL=on"
-            f"&leftlon={REGION['lon_min']}&rightlon={REGION['lon_max']}"
-            f"&toplat={REGION['lat_max']}&bottomlat={REGION['lat_min']}&subregion="
+            f"&leftlon={DATA_REGION['lon_min']}&rightlon={DATA_REGION['lon_max']}"
+            f"&toplat={DATA_REGION['lat_max']}&bottomlat={DATA_REGION['lat_min']}&subregion="
         )
         data = SESSION.get(url, timeout=180)
         data.raise_for_status()
@@ -419,7 +557,7 @@ def load_gfs_grid(run_utc: datetime, step: int) -> tuple[np.ndarray, np.ndarray,
 
 def load_icon_grid(run_utc: datetime, step: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     cache_dir = CACHE_DIR / "icon" / run_utc.strftime("%Y%m%d%H")
-    interp_path = cache_dir / f"f{step:03d}_{REGION_CACHE_KEY}.npz"
+    interp_path = cache_dir / f"f{step:03d}_{DATA_REGION_CACHE_KEY}.npz"
     if interp_path.exists():
         data = np.load(interp_path)
         return data["lons"], data["lats"], data["values"]
@@ -438,10 +576,10 @@ def load_icon_grid(run_utc: datetime, step: int) -> tuple[np.ndarray, np.ndarray
 
     values = read_first_data_var(field_path) / 100.0
     mask = (
-        (lon_points >= REGION["lon_min"] - 4)
-        & (lon_points <= REGION["lon_max"] + 4)
-        & (lat_points >= REGION["lat_min"] - 4)
-        & (lat_points <= REGION["lat_max"] + 4)
+        (lon_points >= DATA_REGION["lon_min"] - 4)
+        & (lon_points <= DATA_REGION["lon_max"] + 4)
+        & (lat_points >= DATA_REGION["lat_min"] - 4)
+        & (lat_points <= DATA_REGION["lat_max"] + 4)
     )
     interp = griddata(
         np.column_stack((lon_points[mask], lat_points[mask])),
@@ -516,9 +654,16 @@ def crop_regular_grid(lons: np.ndarray, lats: np.ndarray, values: np.ndarray) ->
         lats = lats[::-1]
         data = data[::-1, :]
 
-    lon_mask = (lons >= REGION["lon_min"]) & (lons <= REGION["lon_max"])
-    lat_mask = (lats >= REGION["lat_min"]) & (lats <= REGION["lat_max"])
+    lon_mask = (lons >= DATA_REGION["lon_min"]) & (lons <= DATA_REGION["lon_max"])
+    lat_mask = (lats >= DATA_REGION["lat_min"]) & (lats <= DATA_REGION["lat_max"])
     return lons[lon_mask], lats[lat_mask], data[np.ix_(lat_mask, lon_mask)]
+
+
+def is_within_plot_region(lon: float, lat: float, margin_degrees: float = 0.0) -> bool:
+    return (
+        REGION["lon_min"] - margin_degrees <= lon <= REGION["lon_max"] + margin_degrees
+        and REGION["lat_min"] - margin_degrees <= lat <= REGION["lat_max"] + margin_degrees
+    )
 
 
 def load_land_features() -> list[list[list[tuple[float, float]]]]:
@@ -540,13 +685,20 @@ def load_land_features() -> list[list[list[tuple[float, float]]]]:
 def detect_pressure_centers(lons: np.ndarray, lats: np.ndarray, values: np.ndarray) -> list[PressureCenter]:
     values = np.asarray(values, dtype=float)
     smoothed = gaussian_filter(values, sigma=1.1)
+    field_reference = pressure_field_reference(values)
     candidates = find_persistent_centers(lons, lats, values, smoothed)
-    candidates.sort(key=lambda item: item.prominence, reverse=True)
+    candidates.sort(key=lambda item: candidate_rank_score(item, field_reference), reverse=True)
     result: list[PressureCenter] = []
     per_kind = {"high": 0, "low": 0}
     for candidate in candidates:
         center = PressureCenter(candidate.kind, candidate.lon, candidate.lat, candidate.value, candidate.prominence)
+        if not should_keep_candidate(candidate, field_reference):
+            continue
+        if not is_within_plot_region(center.lon, center.lat, 0.5):
+            continue
         if any(center.kind == other.kind and is_nearby_center(center, other) for other in result):
+            continue
+        if any(center.kind != other.kind and is_cross_kind_conflict(center, other, field_reference) for other in result):
             continue
         if per_kind[center.kind] >= 4:
             continue
@@ -566,8 +718,6 @@ def find_persistent_centers(
         for grid_y, grid_x in find_local_extrema(smoothed_values, kind):
             candidate = analyze_extremum(lons, lats, raw_values, smoothed_values, grid_y, grid_x, kind)
             if candidate is None:
-                continue
-            if not should_keep_candidate(candidate):
                 continue
             candidates.append(candidate)
     return candidates
@@ -654,22 +804,54 @@ def analyze_extremum(
     )
 
 
-def should_keep_candidate(candidate: PersistentCenterCandidate) -> bool:
+def pressure_field_reference(values: np.ndarray) -> float:
+    return float(np.nanmedian(np.asarray(values, dtype=float)))
+
+
+def candidate_pressure_bias(candidate: PersistentCenterCandidate | PressureCenter, field_reference: float) -> float:
+    if candidate.kind == "high":
+        return float(candidate.value) - field_reference
+    return field_reference - float(candidate.value)
+
+
+def candidate_rank_score(candidate: PersistentCenterCandidate | PressureCenter, field_reference: float) -> float:
+    if candidate.kind == "high":
+        return candidate.prominence + PRESSURE_KIND_BIAS_WEIGHT * max(float(candidate.value) - field_reference, 0.0)
+    return candidate.prominence - PRESSURE_KIND_BIAS_WEIGHT * max(float(candidate.value) - field_reference, 0.0)
+
+
+def should_keep_candidate(candidate: PersistentCenterCandidate, field_reference: float) -> bool:
     if candidate.kind == "low":
+        above_reference = max(float(candidate.value) - field_reference, 0.0)
+        effective_prominence = candidate.prominence - PRESSURE_KIND_BIAS_WEIGHT * above_reference
+        if candidate.merged_with_stronger and float(candidate.value) > field_reference + 1.5:
+            return False
         return (
-            (candidate.prominence >= 3.5 and candidate.max_area >= 80)
-            or (not candidate.merged_with_stronger and candidate.prominence >= 2.8 and candidate.max_area >= 20)
-            or (candidate.value <= 1002.0 and candidate.max_area >= 10)
+            (effective_prominence >= 3.0 and candidate.max_area >= 80)
+            or (not candidate.merged_with_stronger and effective_prominence >= 2.8 and candidate.max_area >= 24)
+            or (candidate.value <= min(1002.0, field_reference - 4.0) and candidate.max_area >= 10)
         )
 
+    effective_prominence = candidate.prominence + PRESSURE_KIND_BIAS_WEIGHT * max(float(candidate.value) - field_reference, 0.0)
     return (
-        (not candidate.merged_with_stronger and candidate.prominence >= 2.8 and candidate.max_area >= 10)
-        or (candidate.value >= 1033.5 and candidate.prominence >= 3.0 and candidate.max_area >= 30)
+        (not candidate.merged_with_stronger and effective_prominence >= 2.4 and candidate.max_area >= 10)
+        or (
+            not candidate.merged_with_stronger
+            and candidate.value >= max(1024.0, field_reference + 4.0)
+            and effective_prominence >= 2.2
+            and candidate.max_area >= 20
+        )
     )
 
 
 def is_nearby_center(left: PressureCenter, right: PressureCenter) -> bool:
     return ((left.lon - right.lon) / 6.0) ** 2 + ((left.lat - right.lat) / 5.0) ** 2 < 1.0
+
+
+def is_cross_kind_conflict(left: PressureCenter, right: PressureCenter, field_reference: float) -> bool:
+    if not is_nearby_center(left, right):
+        return False
+    return candidate_rank_score(left, field_reference) <= candidate_rank_score(right, field_reference)
 
 
 def center_label_style(center: PressureCenter) -> tuple[str, int, float]:
@@ -691,6 +873,10 @@ def center_label_style(center: PressureCenter) -> tuple[str, int, float]:
 
 def center_value_style(font_size: int, stroke_width: float) -> tuple[int, float]:
     return max(13, int(round(font_size * 0.48))), max(2.4, stroke_width - 1.5)
+
+
+def smooth_contour_values(values: np.ndarray) -> np.ndarray:
+    return gaussian_filter(np.asarray(values, dtype=float), sigma=CONTOUR_SMOOTHING_SIGMA)
 
 
 PROJ_LON0_RAD = math.radians(PROJECTION["lon_0"])
@@ -718,6 +904,22 @@ def project_coords(
     if np.isscalar(longitudes) and np.isscalar(latitudes):
         return float(projected_x), float(projected_y)
     return projected_x, projected_y
+
+
+def inverse_project_coords(
+    projected_x: np.ndarray | list[float] | float,
+    projected_y: np.ndarray | list[float] | float,
+) -> tuple[np.ndarray, np.ndarray] | tuple[float, float]:
+    x_array, y_array = np.broadcast_arrays(np.asarray(projected_x, dtype=float), np.asarray(projected_y, dtype=float))
+    rho = np.hypot(x_array, PROJ_RHO0 - y_array)
+    theta = np.arctan2(x_array, PROJ_RHO0 - y_array)
+    lat_radians = 2.0 * np.arctan(np.power(PROJ_F / rho, 1.0 / PROJ_N)) - np.pi / 2.0
+    lon_radians = PROJ_LON0_RAD + theta / PROJ_N
+    longitudes = np.rad2deg(lon_radians) % 360.0
+    latitudes = np.rad2deg(lat_radians)
+    if np.isscalar(projected_x) and np.isscalar(projected_y):
+        return float(longitudes), float(latitudes)
+    return longitudes, latitudes
 
 
 def projected_region_bounds() -> tuple[float, float, float, float]:
@@ -760,15 +962,20 @@ def draw_projected_grid(ax: plt.Axes, x_min: float, x_max: float, y_min: float, 
 
 def render_map(path: Path, model_name: str, valid_jst: datetime, run_utc: datetime, grid: tuple[np.ndarray, np.ndarray, np.ndarray], land_features) -> None:
     lons, lats, values = grid
+    contour_values = smooth_contour_values(values)
     mesh_lons, mesh_lats = np.meshgrid(lons, lats)
     projected_x, projected_y = project_coords(mesh_lons, mesh_lats)
     x_min, x_max, y_min, y_max = projected_region_bounds()
-    pad_x = (x_max - x_min) * 0.035
-    pad_y = (y_max - y_min) * 0.045
-    levels = np.arange(math.floor(np.nanmin(values) / 4.0) * 4.0, math.ceil(np.nanmax(values) / 4.0) * 4.0 + 4.0, 4.0)
+    pad_x = (x_max - x_min) * PLOT_PAD_X_RATIO
+    pad_y = (y_max - y_min) * PLOT_PAD_Y_RATIO
+    levels = np.arange(
+        math.floor(np.nanmin(contour_values) / 4.0) * 4.0,
+        math.ceil(np.nanmax(contour_values) / 4.0) * 4.0 + 4.0,
+        4.0,
+    )
     strong = [level for level in levels if level % 8 == 0]
     weak = [level for level in levels if level % 8 != 0]
-    centers = detect_pressure_centers(lons, lats, values)
+    centers = [center for center in detect_pressure_centers(lons, lats, values) if is_within_plot_region(center.lon, center.lat, 0.5)]
 
     fig = plt.figure(figsize=(12.8, 9.6), dpi=100, facecolor="#eef2ea")
     fig.subplots_adjust(left=0.075, right=0.97, top=0.90, bottom=0.08)
@@ -793,11 +1000,12 @@ def render_map(path: Path, model_name: str, valid_jst: datetime, run_utc: dateti
                 ax.fill(xs, ys, facecolor="#e9e5d4", edgecolor="#727d85", linewidth=1.1, zorder=1)
 
     if weak:
-        ax.contour(projected_x, projected_y, values, levels=weak, colors="#7c858c", linewidths=1.0, zorder=2)
-    cs = ax.contour(projected_x, projected_y, values, levels=strong, colors="#2b3237", linewidths=1.7, zorder=3)
-    contour_labels = ax.clabel(cs, inline=True, fmt="%d", fontsize=11)
+        ax.contour(projected_x, projected_y, contour_values, levels=weak, colors="#7c858c", linewidths=1.0, zorder=2)
+    cs = ax.contour(projected_x, projected_y, contour_values, levels=strong, colors="#2b3237", linewidths=1.7, zorder=3)
+    contour_labels = ax.clabel(cs, inline=False, fmt="%d", fontsize=11)
     for contour_label in contour_labels:
-        contour_label.set_path_effects([pe.Stroke(linewidth=2.25, foreground="#eef2ea"), pe.Normal()])
+        contour_label.set_bbox({"facecolor": (0.93, 0.95, 0.92, 0.85), "edgecolor": "none", "pad": 0.15})
+        contour_label.set_path_effects([pe.Stroke(linewidth=1.5, foreground="#eef2ea"), pe.Normal()])
 
     for center in centers:
         color = "#1c5aa6" if center.kind == "high" else "#b13b36"
@@ -841,12 +1049,14 @@ def render_map(path: Path, model_name: str, valid_jst: datetime, run_utc: dateti
         color="#4a5961",
     )
     fig.text(
-        0.80,
-        0.90,
+        0.97,
+        0.965,
         "Surface Pressure\nContour interval: 4 hPa\nBold line: every 8 hPa",
         fontsize=10,
         color="#334047",
-        bbox={"facecolor": (1, 1, 1, 0.8), "edgecolor": "#8c999f", "boxstyle": "round,pad=0.5"},
+        ha="right",
+        va="top",
+        bbox={"facecolor": (1, 1, 1, 0.6), "edgecolor": "#8c999f", "boxstyle": "round,pad=0.45"},
     )
     fig.savefig(path, format="jpg", dpi=100, pil_kwargs={"quality": 92})
     plt.close(fig)

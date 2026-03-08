@@ -1,5 +1,4 @@
 (function () {
-  const manifest = window.TENKI_MANIFEST;
   const generatedAt = document.getElementById("generated-at");
   const dataSource = document.getElementById("data-source");
   const manifestNote = document.getElementById("manifest-note");
@@ -13,46 +12,91 @@
   const slotNext = document.getElementById("slot-next");
   const preloadState = new Map();
   const preloadRadius = 2;
-  const assetVersion = encodeURIComponent(manifest?.generatedAt || "");
+  const manifestScriptUrl = window.TENKI_MANIFEST_URL || `./data/manifest.js?v=${Date.now()}`;
 
-  if (!manifest || !Array.isArray(manifest.slots) || manifest.slots.length === 0) {
-    cards.innerHTML =
-      '<div class="empty-state">データがありません。`./generate.ps1` を実行してから開いてください。</div>';
-    return;
+  let activeManifest = null;
+  let activeSlotIndex = 0;
+  let maxIndex = 0;
+  let assetVersion = "";
+
+  loadManifest()
+    .then(function (manifest) {
+      init(manifest);
+    })
+    .catch(function () {
+      cards.innerHTML =
+        '<div class="empty-state">Failed to load the latest manifest. Reload this page.</div>';
+    });
+
+  function loadManifest() {
+    return new Promise(function (resolve, reject) {
+      const script = document.createElement("script");
+      script.src = manifestScriptUrl;
+      script.async = true;
+      script.onload = function () {
+        if (window.TENKI_MANIFEST && Array.isArray(window.TENKI_MANIFEST.slots)) {
+          resolve(window.TENKI_MANIFEST);
+          return;
+        }
+        reject(new Error("Manifest payload missing"));
+      };
+      script.onerror = function () {
+        reject(new Error("Manifest script failed to load"));
+      };
+      document.head.appendChild(script);
+    });
   }
 
-  generatedAt.textContent = formatIso(manifest.generatedAt);
-  dataSource.textContent = manifest.dataSource || "-";
-  manifestNote.textContent = manifest.note || "-";
+  function init(manifest) {
+    activeManifest = manifest;
+    activeSlotIndex = 0;
+    maxIndex = manifest.slots.length - 1;
+    assetVersion = encodeURIComponent(manifest.generatedAt || "");
 
-  let activeSlotIndex = 0;
-  const maxIndex = manifest.slots.length - 1;
+    if (!Array.isArray(manifest.slots) || manifest.slots.length === 0) {
+      cards.innerHTML =
+        '<div class="empty-state">データがありません。`./generate.ps1` を実行してから開いてください。</div>';
+      return;
+    }
 
-  slotSlider.max = String(maxIndex);
-  slotSlider.value = "0";
-  slotStartLabel.textContent = formatSlotLabel(manifest.slots[0].forecastTime);
-  slotEndLabel.textContent = formatSlotLabel(manifest.slots[maxIndex].forecastTime);
+    generatedAt.textContent = formatIso(manifest.generatedAt);
+    dataSource.textContent = manifest.dataSource || "-";
+    manifestNote.textContent = manifest.note || "-";
 
-  slotSlider.addEventListener("input", function () {
+    slotSlider.max = String(maxIndex);
+    slotSlider.value = "0";
+    slotStartLabel.textContent = formatSlotLabel(manifest.slots[0].forecastTime);
+    slotEndLabel.textContent = formatSlotLabel(manifest.slots[maxIndex].forecastTime);
+
+    slotSlider.addEventListener("input", onSlotInput);
+    slotPrev.addEventListener("click", onPrevClick);
+    slotNext.addEventListener("click", onNextClick);
+
+    render();
+    scheduleWindowPreload();
+  }
+
+  function onSlotInput() {
     activeSlotIndex = Number(slotSlider.value);
     render();
-  });
+  }
 
-  slotPrev.addEventListener("click", function () {
+  function onPrevClick() {
     activeSlotIndex = Math.max(0, activeSlotIndex - 1);
     render();
-  });
+  }
 
-  slotNext.addEventListener("click", function () {
+  function onNextClick() {
     activeSlotIndex = Math.min(maxIndex, activeSlotIndex + 1);
     render();
-  });
-
-  render();
-  scheduleWindowPreload();
+  }
 
   function render() {
-    const slot = manifest.slots[activeSlotIndex] || manifest.slots[0];
+    if (!activeManifest) {
+      return;
+    }
+
+    const slot = activeManifest.slots[activeSlotIndex] || activeManifest.slots[0];
     currentSlotLabel.textContent = formatSlotLabel(slot.forecastTime);
     sliderSlotLabel.textContent = formatSlotLabel(slot.forecastTime);
     slotSlider.value = String(activeSlotIndex);
@@ -64,13 +108,13 @@
     slot.models.forEach((model) => {
       const article = document.createElement("article");
       article.className = "model-card";
-      article.innerHTML = [
-        '<div class="model-card-header">',
-        `<p class="section-kicker">${model.key.toUpperCase()}</p>`,
-        `<h3>${model.name}</h3>`,
-        `<p>予報時刻: ${formatIso(model.forecastTime)}</p>`,
-        `<p>モデル更新時刻: ${formatIso(model.modelRunTime)}</p>`,
-        "</div>",
+        article.innerHTML = [
+          '<div class="model-card-header">',
+          `<p class="section-kicker">${model.key.toUpperCase()}</p>`,
+          `<h3>${model.name}</h3>`,
+          `<p>予報時刻: ${formatIso(model.forecastTime)}</p>`,
+          `<p>モデル更新時刻: ${formatIso(model.modelRunTime)}</p>`,
+          "</div>",
         '<div class="image-wrap">',
         '<div class="image-frame">',
         `<img src="${buildImageUrl(model.imagePath)}" alt="${model.name} forecast map" width="1280" height="960" loading="eager" decoding="async" />`,
@@ -95,11 +139,15 @@
   }
 
   function preloadNearbySlots(centerIndex, radius) {
+    if (!activeManifest) {
+      return;
+    }
+
     const start = Math.max(0, centerIndex - radius);
     const end = Math.min(maxIndex, centerIndex + radius);
 
     for (let index = start; index <= end; index += 1) {
-      const slot = manifest.slots[index];
+      const slot = activeManifest.slots[index];
       if (!slot || !Array.isArray(slot.models)) {
         continue;
       }
@@ -166,7 +214,7 @@
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-      timeZone: manifest.timezone || "Asia/Tokyo",
+      timeZone: activeManifest?.timezone || "Asia/Tokyo",
       timeZoneName: "short",
     }).format(date);
   }
@@ -188,7 +236,7 @@
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-      timeZone: manifest.timezone || "Asia/Tokyo",
+      timeZone: activeManifest?.timezone || "Asia/Tokyo",
     }).formatToParts(date);
     const get = function (type) {
       return parts.find((part) => part.type === type)?.value || "";
