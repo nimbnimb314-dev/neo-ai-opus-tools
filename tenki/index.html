@@ -11,18 +11,25 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="hero">
-        <div class="hero-actions">
-          <a class="hero-link" href="../webtools/">Web Tools</a>
-          <a class="hero-link" href="../">Top Page</a>
-        </div>
-        <p class="eyebrow">Auto Updated Forecast Viewer</p>
-        <h1>日本周辺 予想天気図ビューア</h1>
-        <p class="hero-copy">
-          ECMWF / GFS / ICON の3モデルを、同じ予報時刻で並べて比較する気圧予想図アプリです。
-          GitHub Actions で定期更新し、最新の生成結果をこのページでそのまま確認できます。
-        </p>
+    <div class="bg-glow"></div>
+
+    <header class="header">
+      <a href="../" class="home-link">Top Page</a>
+      <div class="brand-mark">
+        <img src="../nullandone-icon.png" alt="Null and One icon" class="brand-icon" />
+        <div class="logo">Null and One</div>
+      </div>
+      <p class="page-label">Web App</p>
+      <h1 class="title">日本周辺 予想天気図ビューア</h1>
+      <p class="subtitle">
+        ECMWF / GFS / ICON を同じ予報時刻で見比べる自動更新ビューア。
+        気圧配置の流れを、ブラウザでそのまま追えます。
+      </p>
+      <a href="../webtools/" class="sub-link">Web Tools 一覧へ</a>
+    </header>
+
+    <main class="page-shell">
+      <section class="meta-panel">
         <dl class="meta-strip">
           <div>
             <dt>最終生成時刻</dt>
@@ -37,43 +44,41 @@
             <dd id="manifest-note">-</dd>
           </div>
         </dl>
-      </header>
+      </section>
 
-      <main class="content">
-        <section class="slot-panel">
-          <div class="slot-panel-header">
-            <div>
-              <p class="section-kicker">Forecast Slots</p>
-              <h2>予報時刻を選ぶ</h2>
-            </div>
-            <p class="current-slot" id="current-slot-label">-</p>
+      <section class="slot-panel">
+        <div class="slot-panel-header">
+          <div>
+            <p class="section-kicker">Forecast Slots</p>
+            <h2>予報時刻を選ぶ</h2>
           </div>
-          <div class="time-slider-panel">
-            <div class="time-slider-toolbar">
-              <button class="slider-nav" id="slot-prev" type="button" aria-label="前の予報時刻">&#8249;</button>
-              <div class="time-slider-readout">
-                <p class="time-slider-label">選択中</p>
-                <p class="time-slider-value" id="slider-slot-label">-</p>
-              </div>
-              <button class="slider-nav" id="slot-next" type="button" aria-label="次の予報時刻">&#8250;</button>
+          <p class="current-slot" id="current-slot-label">-</p>
+        </div>
+        <div class="time-slider-panel">
+          <div class="time-slider-toolbar">
+            <button class="slider-nav" id="slot-prev" type="button" aria-label="前の予報時刻">&#8249;</button>
+            <div class="time-slider-readout">
+              <p class="time-slider-label">選択中</p>
+              <p class="time-slider-value" id="slider-slot-label">-</p>
             </div>
-            <div class="time-slider-track">
-              <input class="time-slider" id="slot-slider" type="range" min="0" max="0" step="1" value="0" />
-              <div class="time-slider-scale">
-                <span id="slot-start-label">-</span>
-                <span id="slot-end-label">-</span>
-              </div>
+            <button class="slider-nav" id="slot-next" type="button" aria-label="次の予報時刻">&#8250;</button>
+          </div>
+          <div class="time-slider-track">
+            <input class="time-slider" id="slot-slider" type="range" min="0" max="0" step="1" value="0" />
+            <div class="time-slider-scale">
+              <span id="slot-start-label">-</span>
+              <span id="slot-end-label">-</span>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section class="cards" id="model-cards"></section>
-      </main>
+      <section class="cards" id="model-cards"></section>
+    </main>
 
-      <footer class="site-footer">
-        Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data: Natural Earth
-      </footer>
-    </div>
+    <footer class="site-footer">
+      Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data: Natural Earth
+    </footer>
 
     <script>
       window.TENKI_MANIFEST_URL = "./data/manifest.js?v=" + Date.now();
