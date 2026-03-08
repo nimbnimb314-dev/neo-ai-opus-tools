@@ -110,16 +110,22 @@
     slot.models.forEach((model) => {
       const article = document.createElement("article");
       article.className = "model-card";
-        article.innerHTML = [
+      const displayKey = (model.key || "").toUpperCase();
+      const displayName = model.name || displayKey || "-";
+      const subLabel =
+        displayKey && displayKey !== displayName.toUpperCase()
+          ? `<p class="section-kicker">${displayKey}</p>`
+          : "";
+      article.innerHTML = [
           '<div class="model-card-header">',
-          `<p class="section-kicker">${model.key.toUpperCase()}</p>`,
-          `<h3>${model.name}</h3>`,
+          subLabel,
+          `<h3>${displayName}</h3>`,
           `<p>予報時刻: ${formatIso(model.forecastTime)}</p>`,
           `<p>モデル更新時刻: ${formatIso(model.modelRunTime)}</p>`,
           "</div>",
         '<div class="image-wrap">',
         '<div class="image-frame">',
-        `<img src="${buildImageUrl(model.imagePath)}" alt="${model.name} forecast map" width="1280" height="960" loading="eager" decoding="async" />`,
+        `<img src="${buildImageUrl(model.imagePath)}" alt="${displayName} forecast map" width="1280" height="960" loading="eager" decoding="async" />`,
         "</div>",
         "</div>",
       ].join("");
