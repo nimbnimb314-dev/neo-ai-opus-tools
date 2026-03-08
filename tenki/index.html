@@ -11,19 +11,19 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-actions">
-        <a href="../" class="header-link">Top Page</a>
-        <a href="../webtools/" class="header-link header-link-secondary">Web Tools 一覧</a>
-      </div>
-      <p class="app-label">Null and One Web App</p>
+    <header class="app-header">
       <h1>日本周辺 予想天気図ビューア</h1>
       <p class="subtitle">
         ECMWF / GFS / ICON の最新予想天気図を、同じ時間軸で切り替えながら比較できます。
       </p>
     </header>
 
-    <main class="container">
+    <main class="page-shell">
+      <nav class="page-links" aria-label="ページ移動">
+        <a href="../" class="page-link">&#9664; トップページへ戻る</a>
+        <a href="../webtools/" class="page-link">Web Tools 一覧へ</a>
+      </nav>
+
       <section class="panel meta-panel">
         <dl class="meta-strip">
           <div class="meta-item">
@@ -78,6 +78,10 @@
     </main>
 
     <footer class="site-footer">
+      <div class="footer-links">
+        <a href="../" class="footer-link">&#9664; トップページへ戻る</a>
+        <a href="../webtools/" class="footer-link">Web Tools 一覧へ</a>
+      </div>
       Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data:
       Natural Earth
     </footer>

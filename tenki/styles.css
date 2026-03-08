@@ -1,16 +1,15 @@
 :root {
-  --primary: #2a5298;
-  --primary-hover: #1e3f7a;
-  --primary-light: #e8eef8;
-  --accent: #3b82c4;
   --bg: #eaf0f7;
   --card: #ffffff;
-  --surface: #f7faff;
+  --primary: #2a5298;
+  --primary-dark: #1e3f7a;
+  --primary-light: #e8eef8;
+  --accent: #3b6fb5;
   --text: #1e293b;
   --text-light: #546b8a;
   --border: #c8d6e5;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --radius: 12px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --radius: 10px;
 }
 
 * {
@@ -19,107 +18,76 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
-  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  min-height: 100dvh;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
   background: var(--bg);
   color: var(--text);
-}
-
-img {
-  display: block;
-  width: 100%;
-  height: auto;
 }
 
 .corner-brand {
   position: fixed;
   right: 14px;
   bottom: 14px;
-  width: clamp(28px, 4.5vw, 46px);
+  width: clamp(24px, 3.6vw, 38px);
   height: auto;
-  opacity: 0.72;
+  opacity: 0.62;
   z-index: 999;
   pointer-events: none;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
 }
 
-.site-header {
-  position: relative;
-  padding: 2.6rem 1rem 2rem;
+.app-header {
+  padding: 1.8rem 1rem;
   background: linear-gradient(135deg, #1e3a6e, #2a5298);
   color: #ffffff;
   text-align: center;
 }
 
-.header-actions {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.header-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 36px;
-  padding: 0.45rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.34);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.header-link:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.58);
-}
-
-.header-link-secondary {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.app-label,
 .section-kicker,
 .time-slider-label {
   margin: 0;
   color: var(--text-light);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
-.app-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.75rem;
+.app-header h1 {
+  font-size: 1.5rem;
   font-weight: 700;
-}
-
-.site-header h1 {
-  margin: 0.5rem 0 0;
-  font-size: clamp(1.5rem, 3.6vw, 2.3rem);
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.1em;
 }
 
 .subtitle {
+  margin: 2px auto 0;
   max-width: 700px;
-  margin: 0.7rem auto 0;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  opacity: 0.8;
+  line-height: 1.6;
 }
 
-.container {
+.page-shell {
   width: min(1320px, calc(100% - 32px));
-  margin: 1.5rem auto 0;
-  padding-bottom: 2.5rem;
+  margin: 0 auto;
+  padding: 16px 0 24px;
+}
+
+.page-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.page-link,
+.footer-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.page-link:hover,
+.footer-link:hover {
+  text-decoration: underline;
 }
 
 .panel,
@@ -151,8 +119,8 @@ img {
   min-width: 0;
   padding: 0.95rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
+  border-radius: 8px;
+  background: var(--card);
 }
 
 .meta-strip dt {
@@ -178,14 +146,15 @@ img {
 
 .section-kicker {
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .slot-panel h2,
 .model-card h3 {
   margin: 0.4rem 0 0;
-  font-size: clamp(1.15rem, 2vw, 1.5rem);
-  font-weight: 800;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -200,8 +169,8 @@ img {
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
+  border-radius: 8px;
+  background: var(--primary-light);
 }
 
 .time-slider-toolbar {
@@ -246,7 +215,8 @@ img {
 .time-slider-label {
   margin-bottom: 0.25rem;
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .time-slider-value {
@@ -303,7 +273,7 @@ img {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 16px;
 }
 
 .model-card {
@@ -313,7 +283,7 @@ img {
 .model-card-header {
   padding: 1rem 1rem 0.85rem;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--card);
 }
 
 .model-card-header p {
@@ -330,12 +300,13 @@ img {
 .image-frame {
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   background: #f4f7fb;
   aspect-ratio: 4 / 3;
 }
 
 .image-frame img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -348,11 +319,19 @@ img {
 }
 
 .site-footer {
-  padding: 0 1rem 2rem;
+  padding: 2rem 1rem;
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   line-height: 1.7;
   color: var(--text-light);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
 @media (max-width: 1080px) {
@@ -362,25 +341,9 @@ img {
 }
 
 @media (max-width: 760px) {
-  .site-header {
-    padding: 4.8rem 1rem 1.6rem;
-  }
-
-  .header-actions {
-    top: 0.75rem;
-    left: 0.75rem;
-    right: 0.75rem;
-  }
-
-  .header-link {
-    min-height: 34px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.76rem;
-  }
-
-  .container {
+  .page-shell {
     width: min(100% - 20px, 960px);
-    margin-top: 1rem;
+    padding-top: 12px;
   }
 
   .meta-strip {
@@ -411,7 +374,16 @@ img {
   .corner-brand {
     right: 10px;
     bottom: 10px;
-    width: 30px;
-    opacity: 0.64;
+    width: 26px;
+    opacity: 0.56;
+  }
+
+  .page-links {
+    margin-bottom: 12px;
+  }
+
+  .page-link,
+  .footer-link {
+    font-size: 0.84rem;
   }
 }
