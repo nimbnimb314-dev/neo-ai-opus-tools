@@ -1,78 +1,98 @@
 # SESSION HANDOFF
 
-> Note
-> このメモは `/tenki/` 直下公開へ移行する前の内容を含みます。現在の公開入口は `tenki/index.html`、生成物は `tenki/data/`、自動更新 workflow は repo ルートの `.github/workflows/tenki-update.yml` です。
-
 ## 現状
 
-- 対象は `tenki/` 配下の気圧予想図ジェネレータ。
-- 実行入口は `generate.ps1`、本体は `tools/gridded_generator.py`。
-- 出力は `docs/data/manifest.json` / `docs/data/manifest.js` / `docs/data/run-summary.json` / `docs/data/images/*`。
-- 表示側は `docs/index.html` と `docs/app.js`。
+- 公開入口は `tenki/index.html`
+- 生成物は `tenki/data/manifest.json` / `tenki/data/manifest.js` / `tenki/data/run-summary.json` / `tenki/data/images/*`
+- 生成スクリプトは `tenki/generate.ps1`
+- 本体ロジックは `tenki/tools/gridded_generator.py`
+- 自動更新 workflow は repo ルートの `.github/workflows/tenki-update.yml`
+- 現在の公開 URL は `https://nimbnimb314-dev.github.io/Null-and-One/tenki/`
 
 ## 最新生成
 
-- 最新成功: `2026-03-08 09:07 JST`
+- 最新成功: `2026-03-08 12:38 JST`
 - `run-summary.json`
-  - `generatedAt: 2026-03-08T09:07:51.874277+09:00`
+  - `generatedAt: 2026-03-08T12:38:35.932853+09:00`
   - `requestedSlotCount: 38`
-  - `firstGeneratedSlotId: 20260308T1200`
+  - `generatedSlotCount: 38`
+  - `firstGeneratedSlotId: 20260308T1500`
   - `lastGeneratedSlotId: 20260318T0900`
 - 採用 run
   - ECMWF: `2026-03-07 12:00 UTC`
   - GFS: `2026-03-07 18:00 UTC`
-  - ICON: `2026-03-07 12:00 UTC`
+  - ICON: `2026-03-08 00:00 UTC`
 - 生成枚数
   - ECMWF: `37`
   - GFS: `38`
-  - ICON: `32`
-- 最新ログ: `logs/generate-20260308-090606.log`
+  - ICON: `33`
+- 最新ログ: `tenki/logs/generate-20260308-123452.log`
 
-## 今回までの修正
+## このセッションでやったこと
 
-### 1. 画像端で等圧線が切れる問題
+### 1. `tenki` の見た目を個別アプリ側に寄せた
 
-- 原因は「表示矩形の角」が、等圧線計算用データ範囲の外に出ていたこと。
-- 対応として、等圧線用のデータ取得範囲を固定で広げた。
-  - 表示範囲: `114E-158E / 19N-52N`
-  - データ取得範囲: `94E-178E / 12N-60N`
-- 地図の見た目は従来の矩形フレームのまま。
-- 台形クリップ案は破棄済み。
-- 関連箇所:
-  - `tools/gridded_generator.py`
-  - `tests/test_pressure_centers.py::test_data_region_covers_visible_plot_corners`
+- `webtools` 一覧ページ風の大きいヒーロー構成は廃止
+- `tsutsumicho` 系の個別アプリに寄せて以下へ変更
+  - 明るい背景
+  - シンプルな青ヘッダー
+  - 下部の戻りリンク
+  - 右下の小さい `Null and One` ロゴ
+- 変更ファイル
+  - `tenki/index.html`
+  - `tenki/styles.css`
 
-### 2. ブラウザが古い画像を掴み続ける問題
+### 2. 画面内に見えている低気圧でも `低` が出ない問題を直した
 
-- `manifest.js` だけでなく `app.js` もキャッシュで残っていた。
-- `docs/index.html` で `manifest.js` / `app.js` を `?v=Date.now()` 付きで読むように変更。
-- `docs/app.js` 側もその前提で動的ロードに変更。
+- 原因:
+  - 以前は `高/低` ラベルの採用範囲が `REGION (114E-158E / 19N-52N)` 基準だった
+  - ただし地図自体は投影後にパディングを足して広く描いているため、画像内に見えていても中心が `REGION` の外だと `低` が落ちていた
+- 修正:
+  - `is_within_plot_region()` ではなく、実際に画像へ表示している投影後の可視範囲で判定する `is_within_visible_map_region()` を追加
+  - `detect_pressure_centers()` と `render_map()` の両方でこの可視範囲判定を使うように変更
+- 回帰確認:
+  - `ICON 2026-03-09 09:00 JST` の北側低気圧が採用されるテストを追加
+- 変更ファイル
+  - `tenki/tools/gridded_generator.py`
+  - `tenki/tests/test_pressure_centers.py`
 
-### 3. 高 / 低 の中心検出
+### 3. 表示のノイズを減らした
 
-- 現在は `detect_pressure_centers()` で以下を実施:
-  - 平滑化場から局所極値候補を抽出
-  - 閉じた領域の persistence を見て候補化
-  - 表示範囲外の候補は採用前に除外
-  - 近接する同種候補を整理
-  - 異種候補の競合を整理
-- 直近の調整:
-  - `高` は絶対気圧が高いほど出しやすくした
-  - `低` には同じボーナスを入れない
-  - 高圧場の中にある浅い `低` は出にくくした
-  - 表示外候補が `per_kind=4` の上限を食わないようにした
-- まだ「低をさらに減らす」余地はある。今は少し保守的に戻した状態。
+- `manifest.note` を見せるだけだった `メモ` 欄を削除
+- モデルカードで `ECMWF` / `GFS` / `ICON` が二重表示される問題を修正
+  - `model.key` と `model.name` が同じときは1回だけ表示
+- スライダー両端の開始・終了日時ラベルを削除
+- 変更ファイル
+  - `tenki/index.html`
+  - `tenki/app.js`
+  - `tenki/styles.css`
+
+### 4. 生成物も更新済み
+
+- `./generate.ps1` を回して `tenki/data/*` を再生成済み
+- 今回の `高/低` 判定修正はコードだけでは反映されないので、画像更新まで含めて push 済み
+
+## 今回の主な commit
+
+- `8427b82` `Align tenki page with app layout`
+- `9673dc3` `Remove tenki manifest note panel`
+- `bc85798` `Deduplicate tenki model labels`
+- `fa00285` `Allow tenki labels across visible map`
+- `5ad3ff1` `Remove tenki slider end labels`
 
 ## テスト
 
-- 最新通過コマンド:
+- 実行して通したもの
 
 ```powershell
 $env:MAMBA_ROOT_PREFIX = (Join-Path $PWD 'tools/mamba-root')
-& (Join-Path $PWD 'tools/micromamba/Library/bin/micromamba.exe') run -p (Join-Path $PWD 'tools/grib-env') python -m unittest tests.test_pressure_centers tests.test_slot_schedule tests.test_run_resolution
+& (Join-Path $PWD 'tools/micromamba/Library/bin/micromamba.exe') run -p (Join-Path $PWD 'tools/grib-env') python -m unittest tests.test_pressure_centers
 ```
 
-- 現在 `16 tests` 通過。
+- 結果: `13 tests` 通過
+
+- 追加で手動確認したこと
+  - `ICON 2026-03-09 09:00 JST` で `PressureCenter(kind='low', lon=147.25, lat=52.0, ...)` が出ることを micromamba 環境で確認済み
 
 ## 実行コマンド
 
@@ -88,14 +108,16 @@ $env:MAMBA_ROOT_PREFIX = (Join-Path $PWD 'tools/mamba-root')
 
 ## 主に見るファイル
 
-- `tools/gridded_generator.py`
-- `tests/test_pressure_centers.py`
-- `tests/test_run_resolution.py`
-- `docs/index.html`
-- `docs/app.js`
-- `docs/data/run-summary.json`
+- `tenki/index.html`
+- `tenki/styles.css`
+- `tenki/app.js`
+- `tenki/tools/gridded_generator.py`
+- `tenki/tests/test_pressure_centers.py`
+- `tenki/data/run-summary.json`
 
 ## 注意
 
-- Git のトップレベルは `C:\Users\n_m_n\webapp`。`tenki` はそのサブディレクトリ。
-- リポジトリ直下には `tenki` 以外の未追跡ファイルや別作業ディレクトリもある。コミットや push は `tenki` 配下だけを対象にするのが安全。
+- Git のトップレベルは `C:\Users\n_m_n\webapp`
+- `tenki` 以外にも未追跡ファイルがかなりあるので、今後も `git add` は対象を絞ること
+- 現在 `git status` に出ている未追跡ファイルの多くは `tenki` と無関係
+- `tenki/` 直下にもメモ画像やテキストらしき未追跡ファイルがあるので、誤ってまとめて commit しないこと
