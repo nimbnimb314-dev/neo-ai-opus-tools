@@ -1,0 +1,49 @@
+name: Update Tenki Forecasts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tenki-update
+  cancel-in-progress: false
+
+jobs:
+  update-tenki:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: tenki/environment.actions.yml
+          environment-name: tenki-actions
+          cache-environment: true
+          cache-downloads: true
+
+      - name: Generate latest forecast assets
+        shell: pwsh
+        working-directory: tenki
+        run: micromamba run -n tenki-actions pwsh -File ./generate.ps1 --strict-models
+
+      - name: Commit updated forecast data
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tenki/data
+          if (git diff --cached --quiet) {
+            Write-Host "No forecast asset changes to commit."
+            exit 0
+          }
+          git commit -m "Update tenki forecast data"
+          git push

@@ -25,9 +25,8 @@ from scipy.interpolate import griddata
 from scipy.ndimage import distance_transform_edt, gaussian_filter, label, maximum_filter, minimum_filter
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCS_DIR = ROOT / "docs"
-OUTPUT_DIR = DOCS_DIR / "data"
-STAGING_DIR = DOCS_DIR / "data-next"
+OUTPUT_DIR = ROOT / "data"
+STAGING_DIR = ROOT / "data-next"
 CACHE_DIR = ROOT / "cache" / "gridded"
 LAND_PATH = ROOT / "tools" / "ForecastMapGenerator" / "map-data" / "japan-region-land.geojson"
 RUN_CACHE_PATH = CACHE_DIR / "latest-runs.json"

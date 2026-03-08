@@ -1,7 +1,7 @@
 # 日本周辺 予想天気図ビューア
 
-日本周辺の海面更正気圧を、`ECMWF / GFS / ICON` の 3 モデルで比較表示するローカル実行版です。  
-各モデルの `gridded data` から等圧線画像を生成し、`docs/index.html` で切り替えて見ます。
+日本周辺の海面更正気圧を、`ECMWF / GFS / ICON` の 3 モデルで比較表示する静的 Web アプリです。  
+各モデルの `gridded data` から等圧線画像を生成し、`index.html` で切り替えて見ます。
 
 ## 現在の構成
 
@@ -37,7 +37,7 @@
 - `tools/grib-env/`
 - インターネット接続
 
-このリポジトリでは `generate.ps1` が `tools/grib-env` の Python を使って生成します。
+ローカルでは `generate.ps1` が `tools/grib-env` の Python を使って生成します。GitHub Actions では workflow が用意した Python 環境に自動でフォールバックします。
 
 ## 実行方法
 
@@ -48,7 +48,7 @@
 生成後にこれを開きます。
 
 ```text
-docs/index.html
+index.html
 ```
 
 短い確認だけしたい場合:
@@ -66,7 +66,7 @@ docs/index.html
 ## 出力
 
 ```text
-docs/
+tenki/
   index.html
   styles.css
   app.js
@@ -91,25 +91,19 @@ logs/
 - run の取得に失敗しても、`cache/gridded/latest-runs.json` に直前の採用 run があればそれを再利用します。
 - あるモデルの特定スロット生成に失敗しても、既定ではそのモデルだけを飛ばして他モデルの生成を続けます。
 - 1 枚も生成できなかった場合だけ全体を失敗にします。
-- 生成は `docs/data-next/` で staging してから `docs/data/` に差し替えるので、途中失敗しても公開中の `docs/data/` は壊しません。
+- 生成は `data-next/` で staging してから `data/` に差し替えるので、途中失敗しても公開中の `data/` は壊しません。
 - 厳密運用が必要なら `--strict-models` を付けると、モデル単位の失敗でも停止します。
 
-## 定期実行へ移行する場合
+## 自動更新
 
-推奨は Windows タスクスケジューラです。`generate.ps1` を 1 時間ごと、または 3 時間ごとに実行する構成が扱いやすいです。ECMWF の公開遅延を考えると、run 時刻ぴったりではなく定期ポーリング型にする方が安定します。
+repo ルートの `.github/workflows/tenki-update.yml` が、GitHub Actions で 6 時間ごとに `generate.ps1 --strict-models` を実行し、更新された `tenki/data/` をコミットします。
 
-実行コマンド例:
+運用時のポイント:
 
-```text
-powershell.exe -ExecutionPolicy Bypass -File C:\Users\n_m_n\webapp\tenki\generate.ps1
-```
-
-設定時のポイント:
-
-- 開始フォルダはリポジトリルート `C:\Users\n_m_n\webapp\tenki`
-- 成功/失敗確認は `logs/` と `docs/data/run-summary.json`
-- 失敗時も直前成功分の `docs/data/` は残る
-- 将来 GitHub Actions に移す場合も、起点は `generate.ps1` のままでよい
+- GitHub Pages はリポジトリの通常公開をそのまま使い、`tenki/` 配下の更新だけを自動化します。
+- 成功/失敗確認は `logs/` と `data/run-summary.json`
+- 失敗時も直前成功分の `data/` は残る
+- 手動更新したい場合も起点は `generate.ps1` のままでよい
 
 ## データ出典
 
@@ -122,6 +116,6 @@ Natural Earth の地図境界データはパブリックドメインです。
 
 - `generate.ps1`
 - `tools/gridded_generator.py`
-- `docs/index.html`
-- `docs/app.js`
-- `docs/styles.css`
+- `index.html`
+- `app.js`
+- `styles.css`

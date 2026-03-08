@@ -1,5 +1,4 @@
 param(
-    [string]$LogDir,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$GeneratorArgs
 )
@@ -11,16 +10,14 @@ $micromamba = Join-Path $PSScriptRoot 'tools/micromamba/Library/bin/micromamba.e
 $envPrefix = Join-Path $PSScriptRoot 'tools/grib-env'
 $script = Join-Path $PSScriptRoot 'tools/gridded_generator.py'
 $mambaRoot = Join-Path $PSScriptRoot 'tools/mamba-root'
-$summaryPath = Join-Path $PSScriptRoot 'docs/data/run-summary.json'
+$summaryPath = Join-Path $PSScriptRoot 'data/run-summary.json'
 $startedAt = Get-Date
-
-if (-not $LogDir) {
-    $LogDir = Join-Path $PSScriptRoot 'logs'
-}
 
 if ($null -eq $GeneratorArgs) {
     $GeneratorArgs = @()
 }
+
+$LogDir = Join-Path $PSScriptRoot 'logs'
 
 New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
 $logPath = Join-Path $LogDir ("generate-{0}.log" -f $startedAt.ToString('yyyyMMdd-HHmmss'))
@@ -35,28 +32,36 @@ function Write-LogLine {
     $line | Tee-Object -FilePath $logPath -Append
 }
 
-if (-not (Test-Path $micromamba)) {
-    throw "micromamba not found: $micromamba"
-}
-
-if (-not (Test-Path $envPrefix)) {
-    throw "grib environment not found: $envPrefix"
-}
-
-$env:MAMBA_ROOT_PREFIX = $mambaRoot
 foreach ($name in @('HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'http_proxy', 'https_proxy', 'all_proxy', 'GIT_HTTP_PROXY', 'GIT_HTTPS_PROXY')) {
     Remove-Item "Env:$name" -ErrorAction SilentlyContinue
 }
 
+$command = @()
+$executionMode = ''
+if ((Test-Path $micromamba) -and (Test-Path $envPrefix)) {
+    $env:MAMBA_ROOT_PREFIX = $mambaRoot
+    $command = @($micromamba, 'run', '-p', $envPrefix, 'python', $script)
+    $executionMode = 'local micromamba environment'
+}
+else {
+    $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+    if ($null -eq $pythonCommand) {
+        throw "Neither the local micromamba environment nor a 'python' command is available."
+    }
+    $command = @($pythonCommand.Source, $script)
+    $executionMode = 'active python environment'
+}
+
 Write-LogLine "Starting generate.ps1"
 Write-LogLine "Log file: $logPath"
+Write-LogLine "Execution mode: $executionMode"
 Write-LogLine "Generator args: $([string]::Join(' ', $GeneratorArgs))"
 
 $exitCode = 0
 $previousErrorActionPreference = $ErrorActionPreference
 try {
     $ErrorActionPreference = 'Continue'
-    & $micromamba run -p $envPrefix python $script @GeneratorArgs 2>&1 |
+    & $command[0] $command[1..($command.Length - 1)] @GeneratorArgs 2>&1 |
         ForEach-Object {
             if ($_ -is [System.Management.Automation.ErrorRecord]) {
                 $_.ToString()

@@ -1,5 +1,8 @@
 # SESSION HANDOFF
 
+> Note
+> このメモは `/tenki/` 直下公開へ移行する前の内容を含みます。現在の公開入口は `tenki/index.html`、生成物は `tenki/data/`、自動更新 workflow は repo ルートの `.github/workflows/tenki-update.yml` です。
+
 ## 現状
 
 - 対象は `tenki/` 配下の気圧予想図ジェネレータ。
