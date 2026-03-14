@@ -1,0 +1,40 @@
+.claude/
+screenshots/
+test_nav.py
+
+# Python runtime artifacts
+**/__pycache__/
+*.pyc
+
+# Local-only PDF test fixtures
+pdf/create_test_files.py
+pdf/test_runner.html
+pdf/test_sample.csv
+pdf/test_sample.docx
+pdf/test_sample.xlsx
+
+# Local-only ryokou scratch files
+ryokou/images/test.jpg
+ryokou/tmp_img_bad.json
+ryokou/tmp_img_check.json
+ryokou/tmp_imgs/
+ryokou/tmp_imgs_urls.txt
+
+# Local-only tenki design/source materials
+tenki/\!UNIQUE!
+tenki/\!UNIQUE_DIR!/
+tenki/HANDOFF.txt
+tenki/やること.txt
+tenki/仕様書.txt
+tenki/仕様書詳細版.txt
+tenki/イラスト.clip
+tenki/イラスト*.png
+
+# Local-only videomemo runtime data and session notes
+videomemo/.videomemo-data/
+videomemo/__pycache__/
+videomemo/HANDOFF.txt
+videomemo/SESSION_HANDOFF.md
+
+# Root-level local artwork exports
+イラスト*.png

@@ -4,173 +4,165 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="nullandone-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="common.css">
 <title>Null and One</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #0f1d3a;
-  --surface: #13264d;
-  --card: #1a315f;
-  --card-hover: #214078;
-  --border: #2e4b82;
-  --text: #ecf2ff;
-  --text-dim: #9eb2d6;
-  --accent: #73b3ff;
-  --accent-2: #90d4ff;
-}
-
 body {
-  min-height: 100dvh;
-  color: var(--text);
-  background:
-    radial-gradient(900px 500px at 15% -20%, rgba(115, 179, 255, 0.22), transparent 65%),
-    radial-gradient(700px 380px at 90% 10%, rgba(144, 212, 255, 0.16), transparent 70%),
-    var(--bg);
-  font-family: "Zen Kaku Gothic New", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  margin: 0;
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 25%, #e0f2fe 50%, #f1f5f9 75%, #c7d2fe 100%);
+  min-height: 100vh;
+  color: var(--site-text);
 }
 
-.container {
-  max-width: 1024px;
+/* --- Top page content grid --- */
+.top-content {
+  max-width: 860px;
   margin: 0 auto;
-  padding: 28px 20px 72px;
+  padding: 2rem 1.25rem 3rem;
 }
 
-.hero {
-  text-align: center;
-  padding: 42px 12px 30px;
-}
-
-.hero-icon {
-  width: clamp(190px, 30vw, 320px);
-  height: auto;
-  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.28));
-}
-
-.brand {
-  margin-top: 14px;
-  font-size: 0.85rem;
-  letter-spacing: 0.28em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-}
-
-.headline {
-  margin-top: 14px;
-  font-size: clamp(1.9rem, 5.2vw, 3.2rem);
-  line-height: 1.2;
-  font-weight: 800;
-  background: linear-gradient(135deg, #6da9ff, #90d4ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.lead {
-  margin-top: 12px;
-  color: var(--text-dim);
-  font-size: 0.98rem;
-}
-
-.content-grid {
+.top-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
-  margin-top: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
 }
 
-.content-card {
-  display: block;
+.top-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.6rem 1.4rem;
+  background: var(--site-card);
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius);
   text-decoration: none;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--card);
-  padding: 22px 20px;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  color: var(--site-text);
+  box-shadow: var(--site-shadow);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
 }
 
-.content-card:hover {
-  transform: translateY(-3px);
-  background: var(--card-hover);
-  border-color: var(--accent);
+.top-card-icon {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--site-accent-soft, #e0f2fe);
+  color: var(--site-primary);
+  transition: background 0.2s, color 0.2s;
 }
 
-.content-label {
-  color: var(--accent-2);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+.top-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--site-accent, #38bdf8);
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.45),
+    0 8px 32px rgba(56, 189, 248, 0.25),
+    0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.top-card:hover .top-card-icon {
+  background: var(--site-accent, #38bdf8);
+  color: #ffffff;
+}
+
+.top-card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--site-primary);
 }
 
-.content-title {
-  margin-top: 8px;
+.top-card-title {
   font-size: 1.15rem;
   font-weight: 700;
 }
 
-.content-desc {
-  margin-top: 8px;
-  color: var(--text-dim);
-  font-size: 0.9rem;
+.top-card-desc {
+  font-size: 0.88rem;
+  color: var(--site-text-light);
   line-height: 1.65;
 }
 
-.content-arrow {
-  display: inline-block;
-  margin-top: 12px;
-  color: var(--accent);
-  font-size: 0.85rem;
-  font-weight: 600;
+.top-card-arrow {
+  margin-top: auto;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--site-accent, #38bdf8);
 }
 
-.content-card.disabled {
+.top-card.disabled {
   pointer-events: none;
-  opacity: 0.72;
+  opacity: 0.55;
 }
 
-footer {
-  text-align: center;
-  margin-top: 42px;
-  color: var(--text-dim);
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
+.top-card.disabled .top-card-arrow {
+  color: var(--site-text-light);
 }
 </style>
 </head>
 <body>
-<div class="container">
-  <section class="hero">
-    <img src="nullandone-icon.png" alt="Null and One icon" class="hero-icon">
-    <div class="brand">Null and One</div>
-    <h1 class="headline">Top Page</h1>
-    <p class="lead">コンテンツ一覧から目的のページを選択してください。</p>
-  </section>
 
-  <main class="content-grid">
-    <a href="webtools/" class="content-card">
-      <div class="content-label">Content 01</div>
-      <div class="content-title">ウェブアプリ</div>
-      <p class="content-desc">各種ツールをまとめた一覧ページです。ここから各アプリへ移動できます。</p>
-      <span class="content-arrow">Open &rarr;</span>
+<nav class="site-nav">
+  <a href="./" class="site-nav-logo">
+    <img src="nullandone-icon.png" alt="">
+    Null and One
+  </a>
+  <ul class="site-nav-links">
+    <li><a href="./" aria-current="page">Home</a></li>
+    <li><a href="webtools/">Tools</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <img src="nullandone-icon.png" alt="Null and One" class="hero-icon">
+  <p class="hero-brand">Null and One</p>
+  <h1 class="hero-title">少し役立つツールを<br>個人開発</h1>
+</section>
+
+<main class="top-content">
+  <div class="top-grid">
+
+    <a href="webtools/" class="top-card">
+      <svg class="top-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+      <div class="top-card-label">Content 01</div>
+      <div class="top-card-title">ウェブアプリ</div>
+      <p class="top-card-desc">各種ツールをまとめた一覧ページです。</p>
+      <span class="top-card-arrow">Open &rarr;</span>
     </a>
 
-    <div class="content-card disabled" aria-disabled="true">
-      <div class="content-label">Content 02</div>
-      <div class="content-title">お知らせ</div>
-      <p class="content-desc">更新情報やリリースノートを掲載する予定です。</p>
-      <span class="content-arrow">Coming Soon</span>
+    <a href="https://x.com/Null_and_One" target="_blank" rel="noopener noreferrer" class="top-card">
+      <svg class="top-card-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <div class="top-card-label">Content 02</div>
+      <div class="top-card-title">X (Twitter)</div>
+      <p class="top-card-desc">更新情報やお知らせはXで発信しています。</p>
+      <span class="top-card-arrow">Open &rarr;</span>
+    </a>
+
+    <div class="top-card disabled" aria-disabled="true">
+      <svg class="top-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="top-card-label">Content 03</div>
+      <div class="top-card-title">プロフィール</div>
+      <p class="top-card-desc">活動内容やプロジェクト紹介を掲載する予定です。</p>
+      <span class="top-card-arrow">Coming Soon</span>
     </div>
 
-    <div class="content-card disabled" aria-disabled="true">
-      <div class="content-label">Content 03</div>
-      <div class="content-title">プロフィール</div>
-      <p class="content-desc">活動内容やプロジェクト紹介を掲載する予定です。</p>
-      <span class="content-arrow">Coming Soon</span>
-    </div>
-  </main>
+  </div>
+</main>
 
-  <footer>&copy; 2026 Null and One</footer>
-</div>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <ul class="site-footer-links">
+      <li><a href="./">Home</a></li>
+      <li><a href="webtools/">Tools</a></li>
+    </ul>
+    &copy; 2026 Null and One
+  </div>
+</footer>
+
 </body>
 </html>

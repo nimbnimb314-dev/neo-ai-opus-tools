@@ -1,0 +1,36 @@
+Task: Push homepage index and app folders to GitHub
+Date: 2026-03-14
+
+Scope prepared for commit
+- Shared site chrome rollout for the homepage and app indexes.
+- Added root `.gitignore` so local-only artifacts do not get mixed into future commits.
+- Added the `videomemo` card to `webtools/index.html` so the newly tracked app is discoverable.
+- Prepared the `videomemo/` app source for version control without runtime data.
+
+Included app/pages
+- `index.html`
+- `webtools/index.html`
+- `car/index.html`
+- `gazou/index.html`
+- `ideco/index.html`
+- `pdf/index.html`
+- `ryokou/index.html`
+- `tenki/index.html`
+- `tenki/styles.css`
+- `tsutsumicho/index.html`
+- `common.css`
+- `icons.svg`
+- `videomemo/` source files
+
+Excluded from commit
+- `.claude/`
+- `screenshots/`
+- PDF sample and test fixture files
+- `ryokou/tmp_*` scratch files
+- `tenki` local artwork, notes, and handoff files
+- `videomemo/.videomemo-data/`, `videomemo/__pycache__/`, and session-only notes
+
+Push target
+- Branch: `main`
+- Remote: `origin`
+- Commit: pending

@@ -9,61 +9,36 @@
 <meta property="og:description" content="全国47都道府県のご当地グルメ330品以上を収録。地方・都道府県・ジャンルで絞り込み、Googleマップで周辺の飲食店を探せます。">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
+<link rel="icon" type="image/png" href="../nullandone-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="../common.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --primary:#2a5298;
-  --primary-hover:#1e3f7a;
-  --primary-light:#e8eef8;
-  --primary-pale:#c8d6e5;
+  --primary:#1e3a5f;
+  --primary-hover:#152d4a;
+  --primary-light:#e4ecf4;
+  --primary-pale:#d5dce6;
   --accent:#3b82c4;
   --accent-light:#e8f2fc;
-  --bg:#eaf0f7;
+  --bg:#f1f5f9;
   --card:#ffffff;
-  --text:#1e293b;
-  --text-light:#546b8a;
-  --border:#c8d6e5;
-  --shadow:0 1px 3px rgba(0,0,0,0.08);
+  --text:#1a3050;
+  --text-light:#4b6a8a;
+  --border:#d5dce6;
+  --shadow:0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);
   --radius:10px;
 }
 body{
-  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  background:var(--bg);
+  font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif;
+  background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 25%, #e0f2fe 50%, #f1f5f9 75%, #c7d2fe 100%);
+  min-height: 100vh;
   color:var(--text);
   line-height:1.6;
-  min-height:100vh;
 }
 
-.corner-brand{
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  width:clamp(28px,4.5vw,46px);
-  height:auto;
-  opacity:.72;
-  z-index:999;
-  pointer-events:none;
-  filter:drop-shadow(0 4px 10px rgba(0,0,0,.25));
-}
-@media (max-width:640px){
-  .corner-brand{
-    right:10px;
-    bottom:10px;
-    width:30px;
-    opacity:.64;
-  }
-}
-
-/* ----- Header ----- */
-header{
-  background:linear-gradient(135deg,#1e3a6e,#2a5298);
-  color:#fff;
-  text-align:center;
-  padding:2rem 1rem 1.5rem;
-  position:relative;
-}
-header h1{font-size:1.6rem;font-weight:700;margin-bottom:0.3rem}
-header p{font-size:0.9rem;opacity:0.92}
 
 .container{max-width:1100px;margin:0 auto;padding:1.2rem 1rem}
 
@@ -193,14 +168,25 @@ header p{font-size:0.9rem;opacity:0.92}
 .featured-hd-title{font-size:1.05rem;font-weight:700;color:var(--primary)}
 .featured-hd-sub{font-size:0.8rem;color:var(--text-light);margin-left:auto}
 
-footer{text-align:center;padding:1.5rem 1rem;font-size:0.75rem;color:var(--text-light)}
+
 </style>
 </head>
 <body>
 
-<header>
+<nav class="site-nav">
+  <a href="../" class="site-nav-logo">
+    <img src="../nullandone-icon.png" alt="">
+    Null and One
+  </a>
+  <ul class="site-nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../webtools/">Tools</a></li>
+  </ul>
+</nav>
+
+<header class="app-header">
   <h1>ご当地グルメナビ</h1>
-  <p>行き先を選んで、その土地の名物グルメをチェックしよう</p>
+  <p class="subtitle">全国47都道府県のご当地グルメ330品以上を収録。地方・県・ジャンルで絞り込み検索</p>
 </header>
 
 <div class="container">
@@ -214,9 +200,14 @@ footer{text-align:center;padding:1.5rem 1rem;font-size:0.75rem;color:var(--text-
   <div class="card-grid" id="card-grid"></div>
 </div>
 
-<footer>
-  <div>&copy; 2026 ご当地グルメナビ</div>
-  <a href="../" style="display:inline-block;margin-top:0.6rem;color:#2a5298;font-size:0.85rem;font-weight:600;text-decoration:none;">&#9664; トップページへ戻る</a>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <ul class="site-footer-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../webtools/">Tools</a></li>
+    </ul>
+    &copy; 2026 Null and One
+  </div>
 </footer>
 
 <script>
@@ -2247,6 +2238,5 @@ function esc(str) { const d = document.createElement("div"); d.textContent = str
 window.addEventListener("hashchange", applyHash);
 init();
 </script>
-<img src="../nullandone-icon.png" alt="" class="corner-brand" aria-hidden="true">
 </body>
 </html>

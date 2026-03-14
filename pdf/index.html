@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF ツール - 結合・分割・圧縮・変換</title>
   <meta name="description" content="PDFの結合・分割・圧縮・変換をブラウザ上で完結。ファイルはサーバーに送信されません。">
+  <link rel="icon" type="image/png" href="../nullandone-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="../common.css">
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js"></script>
@@ -12,52 +17,26 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
-      --primary: #2a5298;
-      --primary-hover: #1e3f7a;
-      --primary-light: #e8eef8;
+      --primary: #1e3a5f;
+      --primary-hover: #152d4a;
+      --primary-light: #e4ecf4;
       --danger: #dc2626;
       --success: #16a34a;
-      --bg: #eaf0f7;
+      --bg: #f1f5f9;
       --card: #ffffff;
-      --text: #1e293b;
-      --text-light: #546b8a;
-      --border: #c8d6e5;
-      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --text: #1a3050;
+      --text-light: #4b6a8a;
+      --border: #d5dce6;
+      --shadow: 0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);
       --radius: 10px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      background: var(--bg); color: var(--text); min-height: 100vh;
+      font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+      background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 25%, #e0f2fe 50%, #f1f5f9 75%, #c7d2fe 100%);
+      min-height: 100vh;
+      color: var(--text);
     }
-
-    .corner-brand {
-      position: fixed;
-      right: 14px;
-      bottom: 14px;
-      width: clamp(28px, 4.5vw, 46px);
-      height: auto;
-      opacity: 0.72;
-      z-index: 999;
-      pointer-events: none;
-      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
-    }
-    @media (max-width: 640px) {
-      .corner-brand {
-        right: 10px;
-        bottom: 10px;
-        width: 30px;
-        opacity: 0.64;
-      }
-    }
-
-    header {
-      background: linear-gradient(135deg, #1e3a6e, #2a5298); color: white;
-      text-align: center; padding: 1.8rem 1rem; position: relative;
-    }
-    header .logo { display: none; }
-    header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.03em; }
-    header .subtitle { font-size: 0.85rem; opacity: 0.9; margin-top: 0.4rem; }
 
     .container { max-width: 720px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 
@@ -248,18 +227,26 @@
     }
     .html-preview-box.visible { display: block; }
 
-    footer { text-align: center; padding: 1.5rem; font-size: 0.75rem; color: var(--text-light); }
-
     @media (max-width: 500px) {
       .tab-btn { font-size: 0.72rem; padding: 0.55rem 0.2rem; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">PDF</div>
+  <nav class="site-nav">
+    <a href="../" class="site-nav-logo">
+      <img src="../nullandone-icon.png" alt="">
+      Null and One
+    </a>
+    <ul class="site-nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../webtools/">Tools</a></li>
+    </ul>
+  </nav>
+
+  <header class="app-header">
     <h1>PDF ツール</h1>
-    <span class="subtitle">すべてブラウザ内で処理</span>
+    <p class="subtitle">結合・分割・圧縮・変換をブラウザ上で完結</p>
   </header>
 
   <div class="container">
@@ -477,9 +464,14 @@
   <div id="excel-render-container" class="render-container"></div>
   <div id="html-render-container" class="render-container"></div>
 
-  <footer>
-    <div>PDF ツール &mdash; ファイルはサーバーに送信されず、すべてブラウザ内で処理されます。</div>
-    <a href="../" style="display:inline-block;margin-top:0.6rem;color:var(--primary);font-size:0.85rem;font-weight:600;text-decoration:none;">&#9664; トップページへ戻る</a>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <ul class="site-footer-links">
+        <li><a href="../">Home</a></li>
+        <li><a href="../webtools/">Tools</a></li>
+      </ul>
+      &copy; 2026 Null and One
+    </div>
   </footer>
 
   <script>
@@ -1289,6 +1281,5 @@
       btn.disabled = false;
     });
   </script>
-  <img src="../nullandone-icon.png" alt="" class="corner-brand" aria-hidden="true">
 </body>
 </html>

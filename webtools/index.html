@@ -4,293 +4,110 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="../nullandone-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="../common.css">
 <title>Null and One - Web Tools</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #162040;
-  --surface: #1c2a50;
-  --card: #1f305a;
-  --card-hover: #263868;
-  --border: #2e4470;
-  --text: #e8edf5;
-  --text-dim: #8fa0c0;
-  --accent: #4a8af0;
-  --accent-glow: rgba(74, 138, 240, 0.25);
-  --gradient-1: #2a5298;
-  --gradient-2: #4a8af0;
-  --gradient-3: #6cb4f0;
-}
-
 body {
-  font-family: "Inter", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  overflow-x: hidden;
+  margin: 0;
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 25%, #e0f2fe 50%, #f1f5f9 75%, #c7d2fe 100%);
+  min-height: 100vh;
+  color: var(--site-text);
 }
 
-/* Background effect */
-.bg-glow {
-  position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 800px;
-  height: 600px;
-  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.5;
-}
-
-/* Header */
-.header {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  padding: 80px 20px 40px;
-}
-
-.home-link {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  color: var(--text-dim);
-  text-decoration: none;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  padding: 7px 12px;
-  transition: all 0.2s ease;
-}
-
-.home-link:hover {
-  color: var(--text);
-  border-color: var(--accent);
-  background: rgba(74, 138, 240, 0.12);
-}
-
-.brand-mark {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.brand-icon {
-  width: clamp(210px, 36vw, 360px);
-  height: auto;
-  display: block;
-  margin-bottom: 18px;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.24));
-}
-
-.logo {
-  font-size: 0.85rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin-bottom: 20px;
-}
-
-.title {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1.2;
-  margin-bottom: 16px;
-}
-
-.subtitle {
-  font-size: 1.05rem;
-  color: var(--text-dim);
-  max-width: 480px;
-  margin: 0 auto;
-  line-height: 1.7;
-}
-
-/* Cards grid */
-.tools-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  max-width: 900px;
-  margin: 40px auto 0;
-  padding: 0 20px 80px;
-}
-
-.tool-card {
-  display: block;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px 28px;
-  text-decoration: none;
-  color: var(--text);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-}
-
-.tool-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--gradient-1), var(--gradient-3), var(--gradient-2));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.tool-card:hover {
-  background: var(--card-hover);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(124, 108, 240, 0.15);
-}
-
-.tool-card:hover::before {
-  opacity: 1;
-}
-
-.card-icon {
-  font-size: 2.2rem;
-  margin-bottom: 16px;
-  display: block;
-}
-
-.card-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.card-desc {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-
-.card-arrow {
-  display: inline-block;
-  margin-top: 16px;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  transition: transform 0.2s;
-}
-
-.tool-card:hover .card-arrow {
-  transform: translateX(6px);
-}
-
-/* Footer */
-.footer {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  padding: 32px 20px 48px;
-  border-top: 1px solid var(--border);
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.footer-brand {
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  color: var(--text-dim);
-}
-
-@media (max-width: 480px) {
-  .home-link { top: 12px; left: 12px; font-size: 0.72rem; padding: 6px 10px; }
-  .header { padding: 60px 16px 30px; }
-  .tools-grid { padding: 0 16px 60px; gap: 16px; }
-  .tool-card { padding: 24px 20px; }
-}
 </style>
 </head>
 <body>
 
-<div class="bg-glow"></div>
+<nav class="site-nav">
+  <a href="../" class="site-nav-logo">
+    <img src="../nullandone-icon.png" alt="">
+    Null and One
+  </a>
+  <ul class="site-nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="./" aria-current="page">Tools</a></li>
+  </ul>
+</nav>
 
-<header class="header">
-  <a href="../" class="home-link">Top Page</a>
-  <div class="brand-mark">
-    <img src="../nullandone-icon.png" alt="Null and One icon" class="brand-icon">
-    <div class="logo">Null and One</div>
-  </div>
-  <h1 class="title">Web Tools</h1>
-  <p class="subtitle">暮らしに役立つツールを、ブラウザだけで。<br>インストール不要・完全無料。</p>
+<header class="app-header">
+  <h1>Web Tools</h1>
+  <p class="subtitle">インストール不要・データ送信なし・完全無料。<br>日常のちょっとした作業をブラウザ上で完結できるツール集です。</p>
 </header>
 
-<main class="tools-grid">
+<section class="tools-section">
+  <div class="tools-grid">
 
-  <a href="../tenki/" class="tool-card">
-    <span class="card-icon">&#127781;</span>
-    <div class="card-title">日本周辺 予想天気図ビューア</div>
-    <div class="card-desc">ECMWF・GFS・ICON の最新予想天気図を自動更新。予報時刻を切り替えながら3モデルを並べて比較できます。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../tenki/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-tenki"/></svg>
+      <div class="tool-card-title">日本周辺 予想天気図ビューア</div>
+      <p class="tool-card-desc">ECMWF・GFS・ICON の最新予想天気図を自動更新。予報時刻を切り替えながら3モデルを並べて比較できます。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-  <a href="../tsutsumicho/" class="tool-card">
-    <span class="card-icon">&#127890;</span>
-    <div class="card-title">つつみ帳</div>
-    <div class="card-desc">冠婚葬祭（ご祝儀・香典など）の金額記録を管理。お返し確認・CSV/Excel/Word出力対応。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../tsutsumicho/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-tsutsumicho"/></svg>
+      <div class="tool-card-title">つつみ帳</div>
+      <p class="tool-card-desc">冠婚葬祭（ご祝儀・香典など）の金額記録を管理。お返し確認・CSV/Excel/Word出力対応。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-  <a href="../ideco/" class="tool-card">
-    <span class="card-icon">&#128200;</span>
-    <div class="card-title">退職金+iDeCo 最適化シミュレーター</div>
-    <div class="card-desc">退職金とiDeCoの受け取り方をシミュレーション。税金を最小化する最適な組み合わせを計算。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../ideco/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-ideco"/></svg>
+      <div class="tool-card-title">退職金+iDeCo 最適化シミュレーター</div>
+      <p class="tool-card-desc">退職金とiDeCoの受け取り方をシミュレーション。税金を最小化する最適な組み合わせを計算。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-  <a href="../car/" class="tool-card">
-    <span class="card-icon">&#128663;</span>
-    <div class="card-title">マイカー vs カーシェア シミュレーター</div>
-    <div class="card-desc">車の維持費とカーシェア料金を比較。あなたの使い方ならどちらがお得か損益分岐点を算出。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../car/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-car"/></svg>
+      <div class="tool-card-title">マイカー vs カーシェア シミュレーター</div>
+      <p class="tool-card-desc">車の維持費とカーシェア料金を比較。あなたの使い方ならどちらがお得か損益分岐点を算出。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-  <a href="../pdf/" class="tool-card">
-    <span class="card-icon">&#128196;</span>
-    <div class="card-title">PDFツール</div>
-    <div class="card-desc">PDFの結合・分割・圧縮・変換をブラウザ上で完結。ファイルはサーバーに送信されません。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../pdf/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-pdf"/></svg>
+      <div class="tool-card-title">PDFツール</div>
+      <p class="tool-card-desc">PDFの結合・分割・圧縮・変換をブラウザ上で完結。ファイルはサーバーに送信されません。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-  <a href="../ryokou/" class="tool-card">
-    <span class="card-icon">&#127836;</span>
-    <div class="card-title">ご当地グルメナビ</div>
-    <div class="card-desc">全国47都道府県のご当地グルメ330品以上を収録。地方・県・ジャンルで検索してGoogleマップで周辺店舗を探せます。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../ryokou/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-ryokou"/></svg>
+      <div class="tool-card-title">ご当地グルメナビ</div>
+      <p class="tool-card-desc">全国47都道府県のご当地グルメ330品以上を収録。地方・県・ジャンルで検索してGoogleマップで周辺店舗を探せます。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-  <a href="../gazou/" class="tool-card">
-    <span class="card-icon">&#128247;</span>
-    <div class="card-title">画像一括圧縮ツール</div>
-    <div class="card-desc">複数画像をまとめて圧縮。品質・サイズを調整してブラウザ上で完結。ファイルはサーバーに送信されません。</div>
-    <span class="card-arrow">Open &rarr;</span>
-  </a>
+    <a href="../gazou/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-gazou"/></svg>
+      <div class="tool-card-title">画像一括圧縮ツール</div>
+      <p class="tool-card-desc">複数画像をまとめて圧縮。品質・サイズを調整してブラウザ上で完結。ファイルはサーバーに送信されません。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-</main>
+    <a href="../videomemo/" class="tool-card">
+      <svg class="tool-card-icon"><use href="../icons.svg#icon-videomemo"/></svg>
+      <div class="tool-card-title">VideoMemo</div>
+      <p class="tool-card-desc">動画の読み込み、文字起こし、マーカー整理、メモ抽出、テキストや CSV への書き出しまでを 1 画面で扱えるローカル向けメモアプリです。</p>
+      <span class="tool-card-arrow">Open &rarr;</span>
+    </a>
 
-<footer class="footer">
-  <div class="footer-brand">&copy; 2026 Null and One</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <ul class="site-footer-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="./">Tools</a></li>
+    </ul>
+    &copy; 2026 Null and One
+  </div>
 </footer>
 
 </body>

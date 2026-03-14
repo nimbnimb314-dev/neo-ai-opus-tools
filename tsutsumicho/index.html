@@ -4,66 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>つつみ帳 - 冠婚葬祭の金額記録</title>
+<link rel="icon" type="image/png" href="../nullandone-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="../common.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #eaf0f7;
+  --bg: #f1f5f9;
   --card: #ffffff;
-  --primary: #2a5298;
-  --primary-dark: #1e3f7a;
-  --accent: #3b6fb5;
-  --text: #1e293b;
-  --text-light: #546b8a;
-  --border: #c8d6e5;
+  --primary: #1e3a5f;
+  --primary-dark: #152d4a;
+  --accent: #38bdf8;
+  --text: #1a3050;
+  --text-light: #4b6a8a;
+  --border: #d5dce6;
   --danger: #b5564e;
   --danger-dark: #943f38;
-  --gave: #2a5298;
+  --gave: #1e3a5f;
   --received: #9e6a6a;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow: 0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);
 }
 
 body {
-  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
-  background: var(--bg);
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 25%, #e0f2fe 50%, #f1f5f9 75%, #c7d2fe 100%);
+  min-height: 100vh;
   color: var(--text);
   font-size: 16px;
   line-height: 1.6;
-  min-height: 100dvh;
-}
-
-.corner-brand {
-  position: fixed;
-  right: 14px;
-  bottom: 14px;
-  width: clamp(28px, 4.5vw, 46px);
-  height: auto;
-  opacity: 0.72;
-  z-index: 999;
-  pointer-events: none;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
-}
-
-@media (max-width: 640px) {
-  .corner-brand {
-    right: 10px;
-    bottom: 10px;
-    width: 30px;
-    opacity: 0.64;
-  }
 }
 
 .app-header {
-  background: linear-gradient(135deg, #1e3a6e, #2a5298);
-  color: #fff;
-  text-align: center;
-  padding: 1.8rem 1rem;
   position: relative;
 }
 
 .app-header h1 {
   font-size: 1.5rem;
-  font-weight: 700;
   letter-spacing: 0.1em;
 }
 
@@ -78,7 +57,7 @@ body {
   display: flex;
   background: var(--primary-dark);
   position: sticky;
-  top: 0;
+  top: var(--site-nav-h, 56px);
   z-index: 100;
 }
 
@@ -507,7 +486,7 @@ body {
   max-width: 640px;
   font-size: 1rem;
   font-weight: 700;
-  color: #1e3a6e;
+  color: #152d4a;
   line-height: 1.7;
   text-align: center;
 }
@@ -520,6 +499,17 @@ body {
 </style>
 </head>
 <body>
+
+<nav class="site-nav">
+  <a href="../" class="site-nav-logo">
+    <img src="../nullandone-icon.png" alt="">
+    Null and One
+  </a>
+  <ul class="site-nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../webtools/">Tools</a></li>
+  </ul>
+</nav>
 
 <header class="app-header">
   <h1>つつみ帳</h1>
@@ -1190,9 +1180,14 @@ body {
 
 })();
 </script>
-<footer style="text-align:center;padding:2rem 1rem;font-size:0.85rem;color:var(--text-sub);">
-  <a href="../" style="color:var(--primary);font-weight:600;text-decoration:none;">&#9664; トップページへ戻る</a>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <ul class="site-footer-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../webtools/">Tools</a></li>
+    </ul>
+    &copy; 2026 Null and One
+  </div>
 </footer>
-<img src="../nullandone-icon.png" alt="" class="corner-brand" aria-hidden="true">
 </body>
 </html>

@@ -1,14 +1,14 @@
 :root {
-  --bg: #eaf0f7;
+  --bg: #f1f5f9;
   --card: #ffffff;
-  --primary: #2a5298;
-  --primary-dark: #1e3f7a;
-  --primary-light: #e8eef8;
-  --accent: #3b6fb5;
-  --text: #1e293b;
-  --text-light: #546b8a;
-  --border: #c8d6e5;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --primary: #1e3a5f;
+  --primary-dark: #152d4a;
+  --primary-light: #e4ecf4;
+  --accent: #38bdf8;
+  --text: #1a3050;
+  --text-light: #4b6a8a;
+  --border: #d5dce6;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
   --radius: 10px;
 }
 
@@ -18,29 +18,10 @@
 
 body {
   margin: 0;
-  min-height: 100dvh;
-  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
-  background: var(--bg);
+  min-height: 100vh;
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 25%, #e0f2fe 50%, #f1f5f9 75%, #c7d2fe 100%);
   color: var(--text);
-}
-
-.corner-brand {
-  position: fixed;
-  right: 14px;
-  bottom: 14px;
-  width: clamp(24px, 3.6vw, 38px);
-  height: auto;
-  opacity: 0.62;
-  z-index: 999;
-  pointer-events: none;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
-}
-
-.app-header {
-  padding: 1.8rem 1rem;
-  background: linear-gradient(135deg, #1e3a6e, #2a5298);
-  color: #ffffff;
-  text-align: center;
 }
 
 .section-kicker,
@@ -50,44 +31,10 @@ body {
   letter-spacing: 0.06em;
 }
 
-.app-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.subtitle {
-  margin: 2px auto 0;
-  max-width: 700px;
-  font-size: 0.8rem;
-  opacity: 0.8;
-  line-height: 1.6;
-}
-
 .page-shell {
   width: min(1320px, calc(100% - 32px));
   margin: 0 auto;
   padding: 16px 0 24px;
-}
-
-.page-links {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.page-link,
-.footer-link {
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.page-link:hover,
-.footer-link:hover {
-  text-decoration: underline;
 }
 
 .panel,
@@ -235,7 +182,7 @@ body {
   appearance: none;
   height: 10px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #b8cae6, #2a5298);
+  background: linear-gradient(90deg, #c4d5e8, #1e3a5f);
   outline: none;
 }
 
@@ -318,22 +265,6 @@ body {
   line-height: 1.6;
 }
 
-.site-footer {
-  padding: 2rem 1rem;
-  text-align: center;
-  font-size: 0.85rem;
-  line-height: 1.7;
-  color: var(--text-light);
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
 @media (max-width: 1080px) {
   .cards {
     grid-template-columns: 1fr;
@@ -370,20 +301,3 @@ body {
   }
 }
 
-@media (max-width: 640px) {
-  .corner-brand {
-    right: 10px;
-    bottom: 10px;
-    width: 26px;
-    opacity: 0.56;
-  }
-
-  .page-links {
-    margin-bottom: 12px;
-  }
-
-  .page-link,
-  .footer-link {
-    font-size: 0.84rem;
-  }
-}

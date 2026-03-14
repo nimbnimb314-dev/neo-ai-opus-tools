@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>VideoMemo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="../common.css">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <nav class="site-nav">
+      <a href="../" class="site-nav-logo">
+        <img src="../nullandone-icon.png" alt="">
+        Null and One
+      </a>
+      <ul class="site-nav-links">
+        <li><a href="../">Home</a></li>
+        <li><a href="../webtools/">Tools</a></li>
+      </ul>
+    </nav>
+
+    <header class="app-header">
+      <h1>VideoMemo</h1>
+      <p class="subtitle">
+        動画編集向けのローカルメモワークスペース。動画、文字起こし、マーカー、メモ書き出しを1画面で扱えます。
+      </p>
+    </header>
+
+    <main class="page-shell">
+      <section class="panel upload-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">Workspace Setup</p>
+            <h2>動画と文字起こしを準備</h2>
+          </div>
+          <div class="panel-actions">
+            <button id="load-demo-btn" class="secondary-button" type="button">デモ読込</button>
+            <button id="reset-session-btn" class="ghost-button" type="button">リセット</button>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <label class="field file-picker">
+            <span class="field-label">動画ファイル</span>
+            <input id="video-input" type="file" accept="video/mp4,video/quicktime,.mov,.mp4,.insv" />
+            <span class="field-note">mp4 / mov / insv を選択。ブラウザで再生可能な形式はそのままプレビューし、同じファイルを文字起こしに使います。</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Whisper モデルパス</span>
+            <input
+              id="model-path-input"
+              type="text"
+              placeholder="C:\\models\\ggml-base.bin"
+            />
+            <span class="field-note">`whisper.cpp` 用のローカルモデルファイルを指定します。既定モデルが見つかる環境では空でも動きます。</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">言語</span>
+            <select id="language-select">
+              <option value="ja" selected>日本語</option>
+              <option value="auto">自動判定</option>
+              <option value="en">英語</option>
+            </select>
+            <span class="field-note">速度優先なら日本語固定のままで使います。多言語混在のときだけ自動判定に切り替えてください。</span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">検出キーワード</span>
+            <input
+              id="keywords-input"
+              type="text"
+              value="メモ,memo,mark,チェック"
+              placeholder="メモ,memo,mark,チェック"
+            />
+            <span class="field-note">カンマ区切りで入力。文字起こしに含まれる単語から自動マーカーを作成します。</span>
+          </label>
+
+          <div class="field field-actions">
+            <span class="field-label">文字起こし実行</span>
+            <div class="transcribe-actions">
+              <button id="transcribe-btn" class="primary-button" type="button">文字起こし開始</button>
+              <p class="job-status" id="job-status">ローカル処理を確認中...</p>
+            </div>
+            <div class="job-progress" id="job-progress" hidden aria-live="polite">
+              <div class="job-progress-track">
+                <div class="job-progress-bar" id="job-progress-bar"></div>
+              </div>
+              <span class="job-progress-value" id="job-progress-value">0%</span>
+            </div>
+            <span class="field-note">ローカル処理で文字起こしします。完了後は文字起こし欄へ自動反映します。</span>
+          </div>
+
+          <label class="field field-wide">
+            <span class="field-label">文字起こしテキスト</span>
+            <textarea
+              id="transcript-input"
+              rows="9"
+              spellcheck="false"
+              placeholder="00:00:12 ここメモ、引きのカットを残す&#10;00:00:34 チェック、この空撮は冒頭候補"
+            ></textarea>
+            <span class="field-note">文字起こし結果はここへ自動で入ります。必要なら 1 行ごとに `hh:mm:ss テキスト` または `mm:ss テキスト` 形式で手修正できます。</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="meta-strip">
+        <article class="meta-card">
+          <span class="meta-label">Video</span>
+          <strong id="video-name">未選択</strong>
+        </article>
+        <article class="meta-card">
+          <span class="meta-label">Transcript</span>
+          <strong id="transcript-count">0 行</strong>
+        </article>
+        <article class="meta-card">
+          <span class="meta-label">Auto Markers</span>
+          <strong id="auto-marker-count">0 件</strong>
+        </article>
+        <article class="meta-card">
+          <span class="meta-label">Manual Memos</span>
+          <strong id="memo-count">0 件</strong>
+        </article>
+      </section>
+
+      <section class="workspace-grid">
+        <div class="main-stack">
+          <section class="panel player-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">Player</p>
+                <h2>動画プレビュー</h2>
+              </div>
+              <p class="panel-status" id="current-time-label">00:00</p>
+            </div>
+
+            <div class="video-shell">
+              <video id="video-player" controls preload="metadata" playsinline></video>
+              <div class="video-empty" id="video-empty">
+                <strong>動画を選択するとここに表示されます</strong>
+                <span>文字起こしだけ先に作ることもできます。</span>
+              </div>
+            </div>
+
+            <div class="timeline-panel">
+              <div class="timeline-toolbar">
+                <div>
+                  <p class="timeline-caption">Transcript Timeline</p>
+                  <p class="timeline-subcaption">黄色は自動検出、青は手動メモです。</p>
+                </div>
+                <button id="add-marker-btn" class="primary-button" type="button">現在位置にメモ追加</button>
+              </div>
+
+              <div class="timeline-track-wrap">
+                <div class="timeline-track" id="timeline-track" role="button" tabindex="0" aria-label="タイムライン">
+                  <div class="timeline-progress" id="timeline-progress"></div>
+                  <div class="timeline-markers" id="timeline-markers"></div>
+                </div>
+                <div class="timeline-scale">
+                  <span>00:00</span>
+                  <span id="timeline-end">00:00</span>
+                </div>
+              </div>
+
+              <div class="transcript-ribbon" id="transcript-ribbon" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <section class="panel export-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">Export</p>
+                <h2>書き出し</h2>
+              </div>
+            </div>
+
+            <div class="export-grid">
+              <button id="copy-full-btn" class="secondary-button" type="button">全文コピー</button>
+              <button id="download-full-btn" class="secondary-button" type="button">TXT 全文</button>
+              <button id="download-memo-btn" class="secondary-button" type="button">TXT メモのみ</button>
+              <button id="download-csv-btn" class="secondary-button" type="button">CSV メモ一覧</button>
+              <button id="download-xml-btn" class="secondary-button" type="button">Premiere XML</button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="side-stack">
+          <section class="panel memo-entry-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">Memo</p>
+                <h2>選択中のメモ</h2>
+              </div>
+            </div>
+
+            <div class="memo-form">
+              <label class="field">
+                <span class="field-label">タイムスタンプ</span>
+                <input id="memo-time-input" type="text" readonly value="00:00" />
+              </label>
+              <label class="field">
+                <span class="field-label">メモ内容</span>
+                <textarea
+                  id="memo-text-input"
+                  rows="4"
+                  placeholder="カット候補、気になる音、色調整メモなど"
+                ></textarea>
+              </label>
+              <div class="memo-form-actions">
+                <button id="save-memo-btn" class="primary-button" type="button">メモ保存</button>
+                <button id="delete-memo-btn" class="ghost-button" type="button">削除</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel transcript-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">Transcript</p>
+                <h2>文字起こし一覧</h2>
+              </div>
+            </div>
+            <div class="list-panel" id="transcript-list"></div>
+          </section>
+
+          <section class="panel memo-list-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">Memo List</p>
+                <h2>メモ一覧</h2>
+              </div>
+            </div>
+            <div class="list-panel" id="memo-list"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <ul class="site-footer-links">
+          <li><a href="../">Home</a></li>
+          <li><a href="../webtools/">Tools</a></li>
+        </ul>
+        &copy; 2026 Null and One
+      </div>
+    </footer>
+    <script src="./app.js"></script>
+  </body>
+</html>

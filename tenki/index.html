@@ -8,9 +8,24 @@
     <meta http-equiv="Expires" content="0" />
     <title>日本周辺 予想天気図ビューア</title>
     <link rel="icon" type="image/png" href="../nullandone-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="../common.css">
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <nav class="site-nav">
+      <a href="../" class="site-nav-logo">
+        <img src="../nullandone-icon.png" alt="">
+        Null and One
+      </a>
+      <ul class="site-nav-links">
+        <li><a href="../">Home</a></li>
+        <li><a href="../webtools/">Tools</a></li>
+      </ul>
+    </nav>
+
     <header class="app-header">
       <h1>日本周辺 予想天気図ビューア</h1>
       <p class="subtitle">
@@ -19,11 +34,6 @@
     </header>
 
     <main class="page-shell">
-      <nav class="page-links" aria-label="ページ移動">
-        <a href="../" class="page-link">&#9664; トップページへ戻る</a>
-        <a href="../webtools/" class="page-link">Web Tools 一覧へ</a>
-      </nav>
-
       <section class="panel meta-panel">
         <dl class="meta-strip">
           <div class="meta-item">
@@ -70,15 +80,15 @@
     </main>
 
     <footer class="site-footer">
-      <div class="footer-links">
-        <a href="../" class="footer-link">&#9664; トップページへ戻る</a>
-        <a href="../webtools/" class="footer-link">Web Tools 一覧へ</a>
+      <div class="site-footer-inner">
+        <ul class="site-footer-links">
+          <li><a href="../">Home</a></li>
+          <li><a href="../webtools/">Tools</a></li>
+        </ul>
+        Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data: Natural Earth<br>
+        &copy; 2026 Null and One
       </div>
-      Forecast data: ECMWF Open Data / NOAA NOMADS GFS / DWD ICON Open Data / Map boundary data:
-      Natural Earth
     </footer>
-
-    <img src="../nullandone-icon.png" alt="" class="corner-brand" aria-hidden="true" />
 
     <script>
       window.TENKI_MANIFEST_URL = "./data/manifest.js?v=" + Date.now();
