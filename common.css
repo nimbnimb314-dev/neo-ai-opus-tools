@@ -300,6 +300,26 @@
   color: #ffffff;
 }
 
+.tool-card.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.tool-card.disabled:hover {
+  transform: none;
+  border-color: var(--site-border);
+  box-shadow: var(--site-shadow);
+}
+
+.tool-card.disabled .tool-card-icon {
+  background: var(--site-primary-light);
+  color: var(--site-text-light);
+}
+
+.tool-card.disabled .tool-card-arrow {
+  color: var(--site-text-light);
+}
+
 .tool-card-icon {
   width: 40px;
   height: 40px;

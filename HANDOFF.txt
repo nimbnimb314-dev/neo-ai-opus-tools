@@ -4,7 +4,7 @@ Date: 2026-03-14
 Scope prepared for commit
 - Shared site chrome rollout for the homepage and app indexes.
 - Added root `.gitignore` so local-only artifacts do not get mixed into future commits.
-- Added the `videomemo` card to `webtools/index.html` so the newly tracked app is discoverable.
+- Switched the `videomemo` card in `webtools/index.html` to a disabled placeholder so users cannot open it yet.
 - Prepared the `videomemo/` app source for version control without runtime data.
 
 Included app/pages
@@ -34,3 +34,6 @@ Push target
 - Branch: `main`
 - Remote: `origin`
 - Commit: pending
+
+Follow-up
+- When `videomemo` is ready to release, change the disabled card in `webtools/index.html` back to a normal link.
